@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-12T14:45:14+00:00",
+  "generated_at": "2026-11-12T14:50:17+00:00",
   "dataset": {
     "documents": 50,
     "entities": 237,
@@ -46,7 +46,7 @@
       ]
     }
   },
-  "model_load_ms": 7920,
+  "model_load_ms": 8173,
   "detection": {
     "full": {
       "strict": {
@@ -188,10 +188,10 @@
       "blocked_requests": [],
       "latency_overhead_ms": {
         "n": 50,
-        "mean": 240.6,
-        "median": 225.0,
-        "p95": 298,
-        "max": 336
+        "mean": 242.4,
+        "median": 232.0,
+        "p95": 308,
+        "max": 338
       }
     },
     "rules_only": {
@@ -401,6 +401,105 @@
       "documents": 45,
       "accuracy": 1.0
     }
+  },
+  "gemini": {
+    "requests": 10,
+    "succeeded": 7,
+    "summary": {
+      "expected": 38,
+      "correct": 38,
+      "wrong_person": 0,
+      "dropped": 0,
+      "unknown": 0,
+      "leaks": 0,
+      "accuracy": 1.0,
+      "mean_llm_ms": 2571.9,
+      "mean_overhead_ms": 263.4
+    },
+    "rows": [
+      {
+        "doc": "loan_01",
+        "model": "gemini-2.5-flash",
+        "fallback": false,
+        "llm_ms": 3061,
+        "overhead_ms": 342,
+        "placeholders_in_reply": 5,
+        "restored": 5,
+        "dropped": 0
+      },
+      {
+        "doc": "loan_05",
+        "model": "gemini-2.5-flash",
+        "fallback": false,
+        "llm_ms": 2589,
+        "overhead_ms": 222,
+        "placeholders_in_reply": 7,
+        "restored": 7,
+        "dropped": 0
+      },
+      {
+        "doc": "loan_09",
+        "model": "gemini-2.5-flash",
+        "fallback": false,
+        "llm_ms": 2765,
+        "overhead_ms": 232,
+        "placeholders_in_reply": 4,
+        "restored": 4,
+        "dropped": 0
+      },
+      {
+        "doc": "loan_13",
+        "model": "gemini-2.5-flash",
+        "fallback": false,
+        "llm_ms": 3104,
+        "overhead_ms": 291,
+        "placeholders_in_reply": 6,
+        "restored": 6,
+        "dropped": 0
+      },
+      {
+        "doc": "kyc_02",
+        "model": "gemini-2.5-flash",
+        "fallback": false,
+        "llm_ms": 1697,
+        "overhead_ms": 233,
+        "placeholders_in_reply": 4,
+        "restored": 4,
+        "dropped": 0
+      },
+      {
+        "doc": "kyc_06",
+        "model": "gemini-2.5-flash",
+        "fallback": false,
+        "llm_ms": 2412,
+        "overhead_ms": 286,
+        "placeholders_in_reply": 7,
+        "restored": 7,
+        "dropped": 0
+      },
+      {
+        "doc": "kyc_10",
+        "error": "LLM_PROVIDER_ERROR"
+      },
+      {
+        "doc": "kyc_14",
+        "model": "gemini-2.5-flash",
+        "fallback": false,
+        "llm_ms": 2375,
+        "overhead_ms": 238,
+        "placeholders_in_reply": 5,
+        "restored": 5,
+        "dropped": 0
+      },
+      {
+        "doc": "support_03",
+        "error": "LLM_PROVIDER_ERROR"
+      },
+      {
+        "doc": "support_07",
+        "error": "LLM_PROVIDER_ERROR"
+      }
+    ]
   },
   "heldout": {
     "dataset": {

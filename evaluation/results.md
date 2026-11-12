@@ -1,6 +1,6 @@
 # Evaluation report - main (used for error analysis)
 
-Generated 2026-11-12T14:45:14+00:00 on 50 synthetic documents (237 labelled entities, 10 Hinglish, 5 with no PII). Mock LLM unless stated. Measured on our own seeded synthetic set; not a claim about real-world data.
+Generated 2026-11-12T14:50:17+00:00 on 50 synthetic documents (237 labelled entities, 10 Hinglish, 5 with no PII). Mock LLM unless stated. Measured on our own seeded synthetic set; not a claim about real-world data.
 
 ## Leakage in outbound payloads (target 0)
 
@@ -20,7 +20,7 @@ Generated 2026-11-12T14:45:14+00:00 on 50 synthetic documents (237 labelled enti
 | ADDRESS | 1.000 | 1.000 | 1.000 | 0.889 | 45 | 0 | 0 |
 | **overall** | 1.000 | 1.000 | 1.000 | 0.979 | 237 | 0 | 0 |
 
-Gateway overhead per request: mean 240.6 ms, median 225.0 ms, p95 298 ms (n=50). Blocked requests: 0.
+Gateway overhead per request: mean 242.4 ms, median 232.0 ms, p95 308 ms (n=50). Blocked requests: 0.
 
 ## Detection - rules only (relaxed: same type, IoU >= 0.5 / strict: exact span)
 
@@ -47,4 +47,8 @@ Gateway overhead per request: mean 0.3 ms, median 0.0 ms, p95 1 ms (n=50). Block
 | drop | 45 | 45 | 100.0% | 0 | 166 | 0/0 |
 | unknown | 211 | 211 | 100.0% | 0 | 0 | 90/90 |
 
-Model warm-up at server start: 7920 ms (excluded from per-request overhead).
+## Live Gemini sample
+
+7/10 requests succeeded. Reinsertion 100.0% (38/38), wrong person 0, leaks 0. Mean LLM time 2571.9 ms vs mean gateway overhead 263.4 ms.
+
+Model warm-up at server start: 8173 ms (excluded from per-request overhead).
