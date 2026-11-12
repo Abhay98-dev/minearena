@@ -5,6 +5,7 @@ for formatted IDs, because synthetic/demo IDs (e.g. 1234-5678-9012) fail real
 checksums but must still be masked. Zero leakage > precision.
 """
 import re
+import os
 from typing import List
 
 from ..schemas import Span
@@ -70,6 +71,85 @@ _PASSPORT = re.compile(r"(?<![0-9A-Za-z])([A-PR-WYa-pr-wy]\d{7})(?![0-9A-Za-z])"
 _PAN_SPACED = re.compile(r"(?<![0-9A-Za-z])([A-Za-z]{5}[ \-]?\d{4}[ \-]?[A-Za-z])(?![0-9A-Za-z])")
 _VOTER_SPACED = re.compile(r"(?<![0-9A-Za-z])([A-Za-z]{3}[ \-]\d{7}|[A-Za-z]{3}[ \-]\d{3}[ \-]?\d{4})(?![0-9A-Za-z])")
 _PASSPORT_SPACED = re.compile(r"(?<![0-9A-Za-z])([A-PR-WYa-pr-wy][ \-]\d{7}|[A-PR-WYa-pr-wy][ \-]?\d{3}[ \-]\d{4})(?![0-9A-Za-z])")
+
+# Indian mobile numbers: strict ten-digit subscriber part, with optional India/leading-zero
+# prefix and common separators. Conflicting transaction/OTP labels suppress a bare-number hit.
+_PHONE = re.compile(r"(?<!\d)(?:(?:\+?91|0)[ \-]?)?([6-9]\d{4}[ \-]?\d{5})(?!\d)")
+_PHONE_CONTEXT = re.compile(
+    r"(?i)(?:mobile|phone|contact|call|telephone|emergency\s+contact|mera\s+(?:number|mobile)|"
+    r"मेरा\s+मोबाइल|मोबाइल\s+नंबर)"
+)
+_PHONE_NON_CONTEXT = re.compile(r"(?i)(?:transaction|txn|reference|ref(?:erence)?\s*(?:no|number|id)|"
+                                r"order\s*(?:no|number|id)|otp|one.time.password|account|invoice|ticket)")
+
+# India Post PINs have six digits and cannot begin with zero. Context gates the candidate so
+# OTPs and unrelated transaction counters are not treated as postal codes.
+_PINCODE = re.compile(r"(?<!\d)([1-9]\d{5})(?!\d)")
+_PIN_CONTEXT = re.compile(r"(?i)\b(?:pin(?:\s*code)?|postal\s*code|post\s*code|postcode|address)\b")
+_PIN_NON_CONTEXT = re.compile(r"(?i)\b(?:otp|transaction|txn|reference|order|account|invoice)\b")
+
+# UPI/VPA suffixes are configurable with comma-separated UPI_HANDLES. Known handles are
+# accepted without context; an unfamiliar handle is accepted only near an explicit UPI cue.
+_DEFAULT_UPI_HANDLES = {
+    "okaxis", "ybl", "paytm", "oksbi", "okhdfcbank", "okicici", "okbizaxis", "apl",
+    "axl", "ibl", "sbi", "icici", "hdfcbank", "upi", "barodampay", "yesbank",
+}
+_UPI = re.compile(r"(?<![A-Za-z0-9._%+-])([A-Za-z0-9][A-Za-z0-9._%+-]{1,254}@[A-Za-z][A-Za-z0-9-]{1,63})(?![A-Za-z0-9-])")
+_UPI_PARTS = re.compile(r"^([A-Za-z0-9][A-Za-z0-9._%+-]{1,254})@([A-Za-z][A-Za-z0-9-]{1,63})$")
+_UPI_CONTEXT = re.compile(r"(?i)\b(?:upi|vpa|upi\s*id|payment\s*id|send\s+money|receive\s+payment|pay\s+to)\b")
+
+
+def find_phone(text: str) -> List[Span]:
+    out = []
+    for match in _PHONE.finditer(text):
+        before = text[max(0, match.start() - 55):match.start()]
+        after = text[match.end():min(len(text), match.end() + 40)]
+        if _PHONE_NON_CONTEXT.search(before) or _PHONE_NON_CONTEXT.search(after):
+            continue
+        confidence = 0.98 if _PHONE_CONTEXT.search(before + after) else 0.84
+        out.append(Span(match.start(), match.end(), "PHONE", confidence, "regex"))
+    return out
+
+
+def _nearby_location(text: str, start: int, end: int) -> bool:
+    from .india_gazetteer import has_city_or_state_context
+    return has_city_or_state_context(text, start, end)
+
+
+def find_pincode(text: str) -> List[Span]:
+    out = []
+    for match in _PINCODE.finditer(text):
+        before = text[max(0, match.start() - 100):match.start()]
+        after = text[match.end():min(len(text), match.end() + 45)]
+        if _PIN_NON_CONTEXT.search(before) or _PIN_NON_CONTEXT.search(after):
+            continue
+        if _PIN_CONTEXT.search(before) or _PIN_CONTEXT.search(after) or _nearby_location(text, match.start(), match.end()):
+            out.append(Span(match.start(1), match.end(1), "PINCODE", 0.94, "regex"))
+    return out
+
+
+def _upi_handles():
+    configured = {h.strip().casefold().lstrip("@") for h in os.getenv("UPI_HANDLES", "").split(",") if h.strip()}
+    return _DEFAULT_UPI_HANDLES | configured
+
+
+def find_upi_id(text: str) -> List[Span]:
+    handles = _upi_handles()
+    out = []
+    for match in _UPI.finditer(text):
+        parts = _UPI_PARTS.fullmatch(match.group(1))
+        if not parts:
+            continue
+        # A domain suffix such as .com/.in means this is an email address, even if its
+        # first domain label happens to match a configured UPI app handle.
+        if re.match(r"\.[A-Za-z]{2,}(?:\.|\b)", text[match.end(1):]):
+            continue
+        handle = parts.group(2).casefold()
+        before = text[max(0, match.start() - 65):match.start()]
+        after = text[match.end():min(len(text), match.end() + 35)]
+        if handle in handles or _UPI_CONTEXT.search(before) or _UPI_CONTEXT.search(after):
+            out.append(Span(match.start(1), match.end(1), "UPI_ID", 0.96, "regex"))
+    return out
 
 _AADHAAR_CTX = re.compile(
     r"(aadhaar|aadhar|adhar|adhaar|aadhhar|uidai|\buid\b|\bu\.\s?id\b|\ba\.\s?id\b|unique\s*id|e-?\s?kyc|आधार)", re.I)
@@ -151,6 +231,7 @@ def find_passport(text: str) -> List[Span]:
 ALL_FINDERS = {
     "GSTIN": find_gstin, "AADHAAR": find_aadhaar, "PAN": find_pan,
     "VOTER_ID": find_voter_id, "PASSPORT": find_passport,
+    "PHONE": find_phone, "PINCODE": find_pincode, "UPI_ID": find_upi_id,
 }
 
 

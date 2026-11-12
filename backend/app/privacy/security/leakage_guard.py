@@ -10,9 +10,10 @@ import re
 from typing import List
 
 from ..detection import india_recognizers as ir
+from ..detection.india_gazetteer import find_contextual_places
 from ..mapping import mapping_store
 
-_ID_TYPES = {"AADHAAR", "PAN", "GSTIN", "VOTER_ID", "PASSPORT"}
+_ID_TYPES = {"AADHAAR", "PAN", "GSTIN", "VOTER_ID", "PASSPORT", "PHONE", "PINCODE"}
 
 
 def validate(sanitized_text: str, mapping_handle: str) -> dict:
@@ -44,6 +45,9 @@ def validate(sanitized_text: str, mapping_handle: str) -> dict:
     for s in ir.find_all_structured(sanitized_text):
         if s.type == "PASSPORT" and s.confidence < 0.9:
             continue  # ambiguous 1-letter+7-digit codes w/o context: don't block on these
+        findings.append({"kind": "residual_pattern", "type": s.type, "start": s.start, "end": s.end})
+
+    for s in find_contextual_places(sanitized_text):
         findings.append({"kind": "residual_pattern", "type": s.type, "start": s.start, "end": s.end})
 
     return {"safe": not findings, "leakage_count": len(findings), "findings": findings}

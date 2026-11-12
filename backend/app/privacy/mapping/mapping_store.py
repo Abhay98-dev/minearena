@@ -17,10 +17,19 @@ ID_SEPARATORS = re.compile(r"[\s\-./]+")  # what people type inside IDs; ignored
 
 
 def normalize(entity_type: str, value: str) -> str:
-    if entity_type == "AADHAAR":
+    if entity_type == "PHONE":
+        digits = re.sub(r"\D", "", value)
+        if len(digits) == 12 and digits.startswith("91"):
+            return digits[2:]
+        if len(digits) == 11 and digits.startswith("0"):
+            return digits[1:]
+        return digits
+    if entity_type in ("AADHAAR", "PINCODE"):
         return re.sub(r"\D", "", value)
     if entity_type in ("PAN", "GSTIN", "VOTER_ID", "PASSPORT"):
         return ID_SEPARATORS.sub("", value).upper()  # "ABCDE-1234-F" / "ABCDE 1234 F" == "ABCDE1234F"
+    if entity_type == "UPI_ID":
+        return re.sub(r"\s+", "", value).casefold()
     return " ".join(value.split()).casefold()  # PERSON / ADDRESS
 
 

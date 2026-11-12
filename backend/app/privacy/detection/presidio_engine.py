@@ -18,11 +18,13 @@ from typing import List, Optional
 
 from ..schemas import Span
 from . import india_recognizers as ir
+from .india_gazetteer import find_cities, find_states
 
 # Presidio entity name -> our canonical name
 PRESIDIO_MAP = {
     "IN_AADHAAR": "AADHAAR", "IN_PAN": "PAN", "IN_PASSPORT": "PASSPORT", "IN_VOTER": "VOTER_ID", "IN_GSTIN": "GSTIN",
-    "GSTIN": "GSTIN", "PERSON": "PERSON",
+    "GSTIN": "GSTIN", "PERSON": "PERSON", "PHONE_NUMBER": "PHONE", "PHONE": "PHONE",
+    "PINCODE": "PINCODE", "UPI_ID": "UPI_ID", "CITY": "CITY", "STATE": "STATE",
 }
 
 _analyzer = None
@@ -65,6 +67,8 @@ def _build():
     # Our validated recognizers (always, incl. GSTIN)
     for ent, fn in ir.ALL_FINDERS.items():
         registry.add_recognizer(FnRecognizer(ent, fn))
+    registry.add_recognizer(FnRecognizer("CITY", find_cities))
+    registry.add_recognizer(FnRecognizer("STATE", find_states))
     return AnalyzerEngine(nlp_engine=nlp, registry=registry, supported_languages=["en"])
 
 

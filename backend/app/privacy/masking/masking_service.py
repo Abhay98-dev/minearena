@@ -19,7 +19,8 @@ from ..detection.ner_engine import HONORIFICS, ROLE_WORDS, get_gliner
 from ..mapping import mapping_store
 from ..schemas import Span
 
-_STRUCTURED = ("AADHAAR", "PAN", "GSTIN", "VOTER_ID", "PASSPORT")
+_STRUCTURED = ("AADHAAR", "PAN", "GSTIN", "VOTER_ID", "PASSPORT",
+               "PHONE", "PINCODE", "UPI_ID")
 _NAME_TOKEN = re.compile(r"[A-Za-z][A-Za-z'\-]+")
 ALIAS = "alias"  # Span.source for a single-owner name token; masked with its owner's placeholder
 

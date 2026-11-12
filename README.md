@@ -30,12 +30,16 @@ To submit a modern Word `.docx`, use `POST /api/v1/gateway/process-file` with th
 | Layer | Finds | How |
 |---|---|---|
 | India ID recognizers | Aadhaar, PAN, GSTIN, Voter ID, Passport | Exact formats; Verhoeff/GSTIN checksums raise confidence |
+| Added India-specific patterns | Mobile numbers, PIN codes, UPI IDs | Validated Indian formats, contextual checks, configurable extra UPI handles |
+| Indian place gazetteer | City names, state/UT names | Broad bundled list; case-insensitive word boundaries and personal-location context |
 | Microsoft Presidio | the same IDs (union) | Built-in `In*Recognizer`s plus ours, inside an `AnalyzerEngine` |
 | GLiNER (`urchade/gliner_multi_pii-v1`) | names, addresses | Local NER model; labels `person`/`address`/`location` |
 | Context rules | names, addresses | "Mera naam X hai", "Applicant: X", "lives in X": backup only |
 | Propagation | other mentions | Repeats and first-name mentions reuse the owner's placeholder; a token shared by two people gets its own |
 | Second pass | anything missed | GLiNER re-reads the masked draft line by line |
 | Leakage guard | the exact outbound payload | Blocks (HTTP 409) if any mapped value or ID pattern remains |
+
+The new labels are `<PHONE_1>`, `<PINCODE_1>`, `<CITY_1>`, `<STATE_1>`, and `<UPI_ID_1>`. Full addresses continue to use the existing `ADDRESS` label; overlapping city/state/PIN spans are not split out of an address. The latest published evaluation numbers above predate these five additions; they have not yet been measured on the synthetic evaluation set.
 
 ## Dataset and evaluation (PS-02 3.7 / 3.8)
 

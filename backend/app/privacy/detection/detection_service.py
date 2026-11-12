@@ -4,10 +4,11 @@ from typing import List
 
 from ..schemas import Span, TYPE_PRIORITY
 from . import india_recognizers as ir
+from .india_gazetteer import find_contextual_places
 from .ner_engine import detect_names_addresses
 from .presidio_engine import detect_with_presidio, presidio_enabled
 
-_STRUCTURED = {"GSTIN", "AADHAAR", "PAN", "VOTER_ID", "PASSPORT"}
+_STRUCTURED = {"GSTIN", "AADHAAR", "PAN", "VOTER_ID", "PASSPORT", "PHONE", "UPI_ID"}
 
 
 def _overlaps(a: Span, b: Span) -> bool:
@@ -79,6 +80,7 @@ def extend_address_pins(spans: List[Span], text: str) -> List[Span]:
 def detect(text: str) -> List[Span]:
     spans = ir.find_all_structured(text)
     spans.extend(detect_names_addresses(text))
+    spans.extend(find_contextual_places(text))
     if presidio_enabled():
         spans.extend(detect_with_presidio(text))
     return extend_address_pins(resolve_overlaps(spans, text), text)

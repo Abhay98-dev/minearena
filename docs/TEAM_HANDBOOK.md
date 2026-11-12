@@ -576,7 +576,10 @@ The judges care most about evidence. Here is ours, from strongest to weakest.
 - **Name precision is 0.79 on held-out data.** We over-mask some ordinary words. That is safe for privacy, but it can make the LLM's answer slightly less useful.
 - **Names and addresses the model misses entirely cannot be caught by the guard.** The guard only knows values we detected, plus ID-shaped patterns.
 - **Some filter word lists** (role words, Hinglish fillers, organisation words) were extended after looking at the main set's errors. That is why we quote held-out numbers.
-- **Email and phone numbers are not masked.** They are not among the 7 required types, and adding them needs team agreement.
+- **Added India-specific types:** `PHONE`, `PINCODE`, `CITY`, `STATE`, and `UPI_ID` now use the same mapping, masking, reinsertion and leakage-guard path. Full address spans retain the existing `ADDRESS` placeholder when city/state/PIN matches overlap them. The previous reported evaluation results predate these added types and must not be presented as their measured accuracy.
+- **Mobile-number ambiguity:** a bare ten-digit number with a valid Indian mobile prefix is inherently ambiguous. Transaction/OTP/reference contexts are excluded, but dataset evaluation should guide future precision tuning.
+- **Gazetteer coverage:** the bundled city catalogue is broad and includes capitals, major cities and many district headquarters, but it is not an exhaustive official population database; GLiNER remains a long-tail location detector when enabled.
+- **UPI IDs:** known handles are matched from a built-in registry; add extra handles with comma-separated `UPI_HANDLES`. Regex shape/context does not verify that an account exists or who owns it.
 - **The mapping is in memory, single process.** Running several server processes behind a load balancer would need a shared store.
 - **Live Gemini sample:** 3 of 10 calls failed (likely rate limiting, not confirmed). Leave a few seconds between demo calls.
 - **Ollama (local model fallback) is untested.** Optional extras (purpose policies, format-preserving tokens) are not built.
@@ -587,7 +590,7 @@ The judges care most about evidence. Here is ours, from strongest to weakest.
 ## 10. Rules for changing the code
 
 - **Frozen. Don't rename or change these without the whole team agreeing:**
-  - The 7 entity names `PERSON, AADHAAR, PAN, GSTIN, VOTER_ID, PASSPORT, ADDRESS` and the `<TYPE_N>` tag format.
+  - The entity names `PERSON, AADHAAR, PAN, GSTIN, VOTER_ID, PASSPORT, ADDRESS, PHONE, PINCODE, CITY, STATE, UPI_ID` and the `<TYPE_N>` tag format.
   - The four privacy functions (`sanitize_document`, `validate_outbound_payload`, `reinsert_placeholders`, `destroy_mapping`) and their return fields.
   - API paths, the request shape, the response fields and the error format and codes.
   - The step order in `gateway_service.py`.
@@ -766,10 +769,10 @@ mere dost ka name rahul hai aur uska adhar no 1111.2222.8888 hai
   - Choosing thresholds by looking at held-out results is tuning on the test set, which would make our honest numbers dishonest.
   - The leaks were fixed with context rules instead, which work even without the model.
   - Re-tune thresholds only with a *new* test set.
-- **"Add a city gazetteer."** Not needed for the reported leaks. The residence rules cover them without a hand-maintained list of cities.
-- **Round 2 / sponsor features** (email, phone, UPI, card masking with a policy selector; purpose policies; Redis mapping store; API keys; audit export; tested Ollama fallback).
+- City/state/PIN, mobile-number and UPI recognizers have since been added as requested. Their detection scores remain unmeasured until the evaluation dataset is extended and run.
+- **Remaining Round 2 / sponsor features** include card masking with a policy selector, purpose policies, Redis mapping store, API keys, audit export, and tested Ollama fallback.
   - These are new features, not fixes. They are listed in the review as "pick 2–3 if time permits".
-  - The team should choose which, if any, to build. Email and phone are still **not** masked (see section 9).
+  - The team should choose which, if any, to build. Email detection is not currently part of this change.
 
 ### 14.4 How to check these fixes yourself
 

@@ -37,7 +37,7 @@ The status paragraph above is out of date.
 - **Other routes:** `GET /api/v1/health`, `/api/v1/audit`, `/api/v1/audit/{request_id}`, `/api/v1/metrics`.
 - **Success response:** includes `request_id`, `status`, `original_text`, `sanitized_text`, `outbound_payload`, `entities` (offsets into original text), `llm_response`, `final_response`, `provider`, `model`, `fallback_used`, `leakage_detected`, `leakage_count`, `processing_time_ms`, `llm_time_ms`, `gateway_overhead_ms`, `missing_placeholders`, and `unknown_placeholders`. Never include the local mapping or its handle.
 - **Error response:** `{"error":{"code":"...","message":"...","request_id":"...|null","details":{}}}`. Stable codes/statuses: `INVALID_REQUEST` 400, `INPUT_TOO_LARGE` 413, `PII_PROCESSING_FAILED` 422, `LLM_PROVIDER_ERROR` 502, `LLM_PROVIDER_TIMEOUT` 504, `REINSERTION_FAILED` 500, `PRIVACY_ENGINE_UNAVAILABLE` 503, `OUTBOUND_PII_LEAKAGE_BLOCKED` 409, `INTERNAL_ERROR` 500. Messages/details must never contain PII or secrets.
-- **Canonical entity labels:** `PERSON`, `AADHAAR`, `PAN`, `GSTIN`, `VOTER_ID`, `PASSPORT`, `ADDRESS`; placeholders are `<TYPE_N>`.
+- **Canonical entity labels:** `PERSON`, `AADHAAR`, `PAN`, `GSTIN`, `VOTER_ID`, `PASSPORT`, `ADDRESS`, `PHONE`, `PINCODE`, `CITY`, `STATE`, `UPI_ID`; placeholders are `<TYPE_N>`.
 
 ## Project in plain language
 
