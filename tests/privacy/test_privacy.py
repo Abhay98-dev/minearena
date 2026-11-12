@@ -74,7 +74,40 @@ def test_ambiguous_token_not_merged_across_people():
     r = sanitize_document(t, "req6")
     s = r["sanitized_text"]
     assert "<PERSON_1>" in s and "<PERSON_2>" in s
-    assert s.count("Rahul") == 1  # ambiguous lone token left alone (documented limitation)
+    # The lone "Rahul" could be either person: it gets its OWN placeholder - never left in clear
+    # text (leak) and never merged into one of the two people (wrong-person restoration).
+    assert "Rahul" not in s and "<PERSON_3>" in s
+    out = reinsert_placeholders("<PERSON_3> called.", r["mapping_handle"])
+    assert out["restored_text"] == "Rahul called."
+    destroy_mapping(r["mapping_handle"])
+
+
+def test_shared_surname_never_leaks():
+    # live-Gemini regression: "Nair" (shared by two people) used to go out in clear text
+    t = "Applicant: Priya Nair\nSpouse: Arjun Nair\nNair family visited the branch."
+    r = sanitize_document(t, "req6b")
+    s = r["sanitized_text"]
+    assert "Nair" not in s and "Priya" not in s and "Arjun" not in s
+    assert r["leakage_check"] is True
+    destroy_mapping(r["mapping_handle"])
+
+
+def test_single_owner_first_name_reuses_placeholder():
+    # live-Gemini regression: one person must not get two placeholders
+    r = sanitize_document("My name is Kavita Rao. Kavita called the branch twice.", "req6c")
+    s = r["sanitized_text"]
+    assert s == "My name is <PERSON_1>. <PERSON_1> called the branch twice."
+    out = reinsert_placeholders("<PERSON_1> called.", r["mapping_handle"])
+    assert out["restored_text"] == "Kavita Rao called."
+    destroy_mapping(r["mapping_handle"])
+
+
+def test_role_word_not_glued_to_name():
+    r = sanitize_document("Applicant Priya Nair and her husband Arjun Nair visited the branch.", "req6d")
+    first = r["entities"][0]
+    t = "Applicant Priya Nair and her husband Arjun Nair visited the branch."
+    assert t[first["start"]:first["end"]] == "Priya Nair"
+    assert r["sanitized_text"].startswith("Applicant <PERSON_1>")
     destroy_mapping(r["mapping_handle"])
 
 

@@ -2,7 +2,7 @@
 
 Our India recognizers are wrapped as Presidio EntityRecognizers and run inside a real
 AnalyzerEngine, so Presidio is the orchestrator. Presidio's own built-in India
-recognizers (IN_AADHAAR, IN_PAN, IN_PASSPORT, IN_VOTER) are ALSO loaded when
+recognizers (IN_AADHAAR, IN_PAN, IN_PASSPORT, IN_VOTER, IN_GSTIN) are ALSO loaded when
 available and their hits are merged (union) with ours. Presidio has no GSTIN
 recognizer, so GSTIN is always ours.
 
@@ -10,6 +10,7 @@ Enable with env PRIVACY_USE_PRESIDIO=1. Needs:
     pip install presidio-analyzer spacy && python -m spacy download en_core_web_sm
 NOT exercised in the offline build sandbox: run tests/privacy/test_presidio_optional.py once installed.
 """
+import logging
 import os
 from typing import List, Optional
 
@@ -18,12 +19,14 @@ from . import india_recognizers as ir
 
 # Presidio entity name -> our canonical name
 PRESIDIO_MAP = {
-    "IN_AADHAAR": "AADHAAR", "IN_PAN": "PAN", "IN_PASSPORT": "PASSPORT", "IN_VOTER": "VOTER_ID",
+    "IN_AADHAAR": "AADHAAR", "IN_PAN": "PAN", "IN_PASSPORT": "PASSPORT", "IN_VOTER": "VOTER_ID", "IN_GSTIN": "GSTIN",
     "GSTIN": "GSTIN", "PERSON": "PERSON",
 }
 
 _analyzer = None
 _failed = False
+_error = None
+log = logging.getLogger("minearena.privacy")
 
 
 def _build():
@@ -49,7 +52,8 @@ def _build():
 
     registry = RecognizerRegistry()
     # Built-in India recognizers (names verified against Presidio docs; skip any missing in your version)
-    for cls_name in ("InAadhaarRecognizer", "InPanRecognizer", "InPassportRecognizer", "InVoterRecognizer"):
+    for cls_name in ("InAadhaarRecognizer", "InPanRecognizer", "InPassportRecognizer", "InVoterRecognizer",
+                     "InGstinRecognizer"):
         try:
             import presidio_analyzer.predefined_recognizers as pr
             registry.add_recognizer(getattr(pr, cls_name)())
@@ -62,16 +66,28 @@ def _build():
 
 
 def get_analyzer():
-    global _analyzer, _failed
+    global _analyzer, _failed, _error
     if _failed:
         return None
     if _analyzer is None:
         try:
             _analyzer = _build()
-        except Exception:
+        except Exception as e:
             _failed = True
+            _error = f"{type(e).__name__}: {str(e)[:200]}"
+            log.error("Presidio failed to load; using built-in India recognizers only. %s", _error)
             return None
     return _analyzer
+
+
+def presidio_status() -> dict:
+    if not presidio_enabled():
+        return {"status": "disabled"}
+    if _failed:
+        return {"status": "failed", "error": _error}
+    if _analyzer is None:
+        return {"status": "not_loaded"}
+    return {"status": "loaded", "recognizers": sorted(r.name for r in _analyzer.registry.recognizers)}
 
 
 def presidio_enabled() -> bool:

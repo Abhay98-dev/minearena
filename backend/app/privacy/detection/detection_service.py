@@ -64,3 +64,21 @@ def detect(text: str) -> List[Span]:
     if presidio_enabled():
         spans.extend(detect_with_presidio(text))
     return resolve_overlaps(spans, text)
+
+
+def engine_status() -> dict:
+    """Which detection layers are actually active. Lets the UI/judges see a silent fallback."""
+    from .ner_engine import gliner_status
+    from .presidio_engine import presidio_status
+    return {"structured_ids": {"status": "loaded"}, "heuristics": {"status": "loaded"},
+            "gliner": gliner_status(), "presidio": presidio_status()}
+
+
+def preload() -> dict:
+    """Load the optional models now (server start) instead of on the first request."""
+    from .ner_engine import get_gliner
+    from .presidio_engine import get_analyzer, presidio_enabled
+    get_gliner()
+    if presidio_enabled():
+        get_analyzer()
+    return engine_status()

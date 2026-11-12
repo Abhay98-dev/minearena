@@ -47,6 +47,13 @@ class MappingEntry:
                 self.surfaces.append((ph, entity_type, value))
             return ph
 
+    def add_surface(self, placeholder: str, entity_type: str, value: str) -> None:
+        """Record another surface form masked by an existing placeholder (e.g. "Priya" for <PERSON_1>
+        = "Priya Nair") so the leakage guard also checks it. Reinsertion still restores the original."""
+        with self._lock:
+            if (placeholder, entity_type, value) not in self.surfaces:
+                self.surfaces.append((placeholder, entity_type, value))
+
 
 _STORE: Dict[str, MappingEntry] = {}
 _GLOBAL_LOCK = threading.Lock()

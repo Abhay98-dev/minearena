@@ -122,3 +122,22 @@ def test_blocked_payload_error_contract_and_safe_audit(client, monkeypatch):
     assert record["status"] == "blocked"
     assert record["sanitized_payload"] is None
     assert all(raw not in str(record) for raw in RAW)
+
+
+def test_engines_reports_each_layer(client):
+    body = client.get("/api/v1/engines").json()
+    assert set(body) == {"structured_ids", "heuristics", "gliner", "presidio"}
+    assert body["gliner"]["status"] == "disabled" and body["presidio"]["status"] == "disabled"
+
+
+def test_evaluation_report_endpoint(client, monkeypatch, tmp_path):
+    from app.api.routes import engines
+
+    monkeypatch.setattr(engines, "RESULTS", tmp_path / "missing.json")
+    missing = client.get("/api/v1/evaluation")
+    assert missing.status_code == 400 and missing.json()["error"]["code"] == "INVALID_REQUEST"
+
+    report = tmp_path / "results.json"
+    report.write_text('{"leakage": {"count": 0}}', encoding="utf-8")
+    monkeypatch.setattr(engines, "RESULTS", report)
+    assert client.get("/api/v1/evaluation").json() == {"leakage": {"count": 0}}
