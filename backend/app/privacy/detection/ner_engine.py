@@ -13,12 +13,12 @@ from typing import List, Optional
 
 from ..schemas import Span
 
-_TOK = r"(?:[A-Z]\.|[A-Z][A-Za-z'\-]+)"  # "Rahul" or an initial "K."
+_TOK = r"(?:[A-Za-z]\.|[A-Za-z][A-Za-z'\-]+)"  # "Rahul", "rahul", or an initial "K."
 _NAME = _TOK + r"(?:[ \t]+" + _TOK + r"){0,4}"
 
 # "My name is X", "Mera naam X hai", "Mr./Shri X"
 _P_TRIGGER = re.compile(r"(?i:my\s+name\s+is|mera\s+naam|mera\s+nam|naam\s+hai|name\s+is)\s+(" + _NAME + r")")
-_P_HONORIFIC = re.compile(r"\b(?:Mr|Mrs|Ms|Miss|Shri|Smt|Sri|Dr|Kumari)\.?\s+(" + _NAME + r")")
+_P_HONORIFIC = re.compile(r"(?i:\b(?:Mr|Mrs|Ms|Miss|Shri|Smt|Sri|Dr|Kumari)\.?)\s+(" + _NAME + r")")
 _P_LABEL = re.compile(
     r"\b(?i:co-applicant|applicant|customer|claimant|policy\s*holder|policyholder|nominee|"
     r"account\s*holder|full\s*name|name|father'?s\s*name|mother'?s\s*name|spouse|guarantor|"
@@ -35,10 +35,18 @@ _A_LIVES = re.compile(
     r"(?i:lives?\s+(?:in|at)|reside[sd]?\s+(?:in|at)|residing\s+(?:in|at)|resident\s+of|staying\s+(?:in|at)|based\s+(?:in|at))\s+"
     r"((?:[0-9][\w/\-]*[ ,]+)?[A-Z][A-Za-z0-9\-]*(?:\.[A-Za-z0-9]+)*(?:[ ,]+[A-Z0-9][A-Za-z0-9\-]*(?:\.[A-Za-z0-9]+)*){0,5})"
 )
-_A_HINGLISH = re.compile(r"\b([A-Z][a-z]+(?:[ \t]+[A-Z][a-z]+){0,2})[ \t]+(?i:mein|me|main)[ \t]+(?i:rehta|rehti|rehte|rahta|rahti|rehna)")
+_A_HINGLISH = re.compile(r"\b([A-Za-z][A-Za-z]+(?:[ \t]+[A-Za-z][A-Za-z]+){0,2})[ \t]+(?i:mein|me|main)[ \t]+(?i:rehta|rehti|rehte|rahta|rahti|rehna)")
 
 _STOP_LEADING = {"Main", "Mai", "Hum", "Mera", "Meri", "I", "He", "She", "They", "My", "The"}
+_STOP_LEADING_FOLDED = {word.casefold() for word in _STOP_LEADING}
 _NON_NAME = {"Aadhaar", "Aadhar", "Pan", "Passport", "Loan", "Insurance", "Policy", "Claim", "Ticket"}
+_NON_NAME_FOLDED = {word.casefold() for word in _NON_NAME}
+_NAME_END_STOP = {
+    "a", "and", "applied", "are", "called", "did", "for", "from", "hai", "hain",
+    "has", "have", "he", "her", "his", "hoon", "in", "is", "lives", "mera", "my",
+    "near", "of", "on", "or", "rehta", "rehti", "resides", "residing", "said",
+    "she", "stays", "submitted", "the", "to", "was", "were", "works", "with",
+}
 
 
 def _strip(text: str, s: int, e: int):
@@ -52,11 +60,21 @@ def _strip(text: str, s: int, e: int):
 
 def _drop_leading_stop(text: str, s: int, e: int):
     tok = re.match(r"[A-Za-z]+", text[s:e])
-    while tok and tok.group(0) in _STOP_LEADING:
+    while tok and tok.group(0).casefold() in _STOP_LEADING_FOLDED:
         s += tok.end()
         while s < e and text[s] in " \t":
             s += 1
         tok = re.match(r"[A-Za-z]+", text[s:e])
+    return s, e
+
+
+def _trim_name_tail(text: str, s: int, e: int):
+    """Stop a context-captured name before common words that start the next clause."""
+    for tok in re.finditer(r"[A-Za-z][A-Za-z'\-]*", text[s:e]):
+        word = tok.group(0).casefold()
+        if len(word) > 1 and word in _NAME_END_STOP:
+            e = s + tok.start()
+            break
     return s, e
 
 
@@ -65,12 +83,14 @@ def heuristic_ner(text: str) -> List[Span]:
 
     def add(m, typ, conf, grp=1, fix_stop=False):
         s, e = m.start(grp), m.end(grp)
+        if typ == "PERSON":
+            s, e = _trim_name_tail(text, s, e)
         if fix_stop:
             s, e = _drop_leading_stop(text, s, e)
         s, e = _strip(text, s, e)
         if e - s < 2:
             return
-        if typ == "PERSON" and text[s:e].split()[0] in _NON_NAME:
+        if typ == "PERSON" and text[s:e].split()[0].casefold() in _NON_NAME_FOLDED:
             return
         out.append(Span(s, e, typ, conf, "heuristic"))
 

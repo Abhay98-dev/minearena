@@ -50,6 +50,19 @@ def test_health_and_process_contract(client):
     assert all(raw in body["final_response"] for raw in RAW)
 
 
+def test_lowercase_name_is_masked_before_provider_payload(client):
+    text = "my name is rahul sharma. His account is active."
+    response = client.post(
+        "/api/v1/gateway/process",
+        json={"text": text, "task": "summarize", "provider": "mock"},
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert "<PERSON_1>" in body["sanitized_text"]
+    assert "rahul sharma" not in body["outbound_payload"].casefold()
+    assert "rahul sharma" in body["final_response"].casefold()
+
+
 def test_audit_and_metrics_contract(client):
     result = client.post(
         "/api/v1/gateway/process",

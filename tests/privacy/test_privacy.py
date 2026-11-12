@@ -2,6 +2,8 @@ import os
 import sys
 import threading
 
+import pytest
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "backend"))
 
 from app.privacy import (sanitize_document, validate_outbound_payload,  # noqa: E402
@@ -66,6 +68,33 @@ def test_repeated_entity_same_placeholder_and_numbering():
 def test_first_name_only_propagation():
     r = sanitize_document("My name is Rahul Sharma. Rahul said hello.", "req5")
     assert "Rahul" not in r["sanitized_text"]
+    destroy_mapping(r["mapping_handle"])
+
+
+@pytest.mark.parametrize("text,name", [
+    ("my name is rahul sharma.", "rahul sharma"),
+    ("Applicant: rahul kumar submitted the form.", "rahul kumar"),
+    ("Mera naam rahul kumar hai.", "rahul kumar"),
+    ("Mr. rahul sharma applied for a loan.", "rahul sharma"),
+    ("my name is rahul sharma and he works here.", "rahul sharma"),
+])
+def test_lowercase_name_detection_does_not_capture_following_clause(text, name):
+    r = sanitize_document(text, f"lower_{name.replace(' ', '_')}")
+    people = [e for e in r["entities"] if e["type"] == "PERSON"]
+    assert len(people) == 1
+    e = people[0]
+    assert text[e["start"]:e["end"]].casefold() == name
+    assert name not in r["sanitized_text"].casefold()
+    destroy_mapping(r["mapping_handle"])
+
+
+def test_lowercase_first_name_propagates_and_hinglish_city_masks():
+    text = "mera naam rahul sharma hai. rahul said hello. main pune mein rehta hoon."
+    r = sanitize_document(text, "lower_hinglish")
+    lowered = r["sanitized_text"].casefold()
+    assert "rahul" not in lowered and "pune" not in lowered
+    assert lowered.count("<person_") == 2
+    assert "<address_1>" in lowered
     destroy_mapping(r["mapping_handle"])
 
 

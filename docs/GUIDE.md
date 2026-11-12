@@ -8,7 +8,7 @@ Use this file as the short context packet for teammates and future models. The f
 2. **Implementation clarifications, Round 1 scenarios, and evaluation definitions:** `MineArena_PS02_Master_Guide_1.md`.
 3. **Starter code:** contents of `minearena_code.zip`, copied into this workspace.
 
-The archive's contents are starter code, not proof of a working deployment. **[TESTED]** The current workspace suite passes: 43 tests using Python 3.14.4, FastAPI 0.115.14, pytest 9.2.0. **[TESTED]** FastAPI lifespan/startup, health, the Member 3 HTTP contract, CORS preflight, safe validation errors, blocked-request response/audit, mock processing for the basic, Hinglish, repeated-name, and dropped-placeholder examples, audit, and metrics passed with heuristic detection. Gemini, GLiNER model loading, Presidio with its spaCy model, Ollama, and the real external provider path remain **[UNTESTED]**. The guide's earlier 37/38-test counts referred to earlier snapshots. Do not report performance numbers before the dataset evaluation runs.
+The archive's contents are starter code, not proof of a working deployment. **[TESTED]** The current workspace suite passes: 50 tests using Python 3.14.4, FastAPI 0.115.14, pytest 9.2.0. **[TESTED]** FastAPI lifespan/startup, health, the Member 3 HTTP contract, CORS preflight, safe validation errors, blocked-request response/audit, mock processing, and lowercase-name/Hinglish regressions passed with heuristic detection. Gemini, GLiNER model loading, Presidio with its spaCy model, Ollama, and the real external provider path remain **[UNTESTED]**. Earlier test counts described earlier snapshots. Do not report performance numbers before the dataset evaluation runs.
 
 Current shared repository branch for Abhay's work: `feature/backend-gateway`, created from `origin/main`. Member 3 should branch from or pull this branch once it is pushed.
 
@@ -70,7 +70,7 @@ For a blocked request, the audit records status and safe finding metadata but st
 
 ## Detection choice: graph or transformer?
 
-Use local GLiNER NER (a model-based span detector) for names and addresses, plus rule/context patterns and India-specific ID recognizers; Presidio orchestrates/customizes detection when enabled. **Do not use GraphRAG**: it is for graph-based retrieval, does not provide the masking spans this pipeline needs, and may make its own LLM calls. ModernBERT fine-tuning is a later option only if measured name/address recall is weak. No training or graph method is required for Round 1.
+Use local GLiNER NER (a model-based span detector) for names and addresses, plus rule/context patterns and India-specific ID recognizers; Presidio orchestrates/customizes detection when enabled. The heuristic name rules accept lowercase text in recognized contexts such as “my name is …”, honorifics, applicant labels, and Hinglish. This improves the reported case but does not guarantee detection of every free-text name. **Do not use GraphRAG**: it is for graph-based retrieval, does not provide the masking spans this pipeline needs, and may make its own LLM calls. ModernBERT fine-tuning is a later option only if measured name/address recall is weak. No training or graph method is required for Round 1.
 
 ## Abhay (Member 1): next steps
 

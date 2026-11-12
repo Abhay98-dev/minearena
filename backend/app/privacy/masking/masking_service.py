@@ -27,7 +27,9 @@ def _propagate(text: str, spans: List[Span]) -> List[Span]:
     for surface, typ in list(needles.items()):
         if typ == "PERSON":
             for tok in surface.split():
-                if len(tok) >= 3 and tok[0].isupper():
+                # Lowercase names are valid too; ambiguity across two people
+                # is still checked by tok_owner before propagating a lone token.
+                if len(tok) >= 3 and (tok[0].isupper() or surface.islower()):
                     tok_owner[tok].add(surface.casefold())
     for tok, owners in tok_owner.items():
         if len(owners) == 1 and tok not in needles:
