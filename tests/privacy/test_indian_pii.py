@@ -236,3 +236,77 @@ def test_repeated_mobile_pin_and_upi_values_reuse_placeholders():
     assert len(set(types_by_value["PINCODE"])) == 1
     assert len(set(types_by_value["UPI_ID"])) == 1
     destroy_mapping(result["mapping_handle"])
+
+
+def test_judge_same_name_friend_disambiguation():
+    text = "aman gave 1000Rs to his friend aman"
+    result = sanitize_document(text, "judge-same-name")
+    assert result["sanitized_text"] == "<PERSON_1> gave 1000Rs to his friend <PERSON_2>"
+    entities = result["entities"]
+    assert len(entities) == 2
+    assert entities[0]["placeholder"] == "<PERSON_1>"
+    assert entities[1]["placeholder"] == "<PERSON_2>"
+    # Outbound guard passes with 0 leaks
+    guard = validate_outbound_payload(result["sanitized_text"], result["mapping_handle"])
+    assert guard["safe"] is True
+    # Reinsertion restores back to original
+    restored = gateway_service.reinsert_placeholders(result["sanitized_text"], result["mapping_handle"])
+    assert restored["restored_text"] == text
+    destroy_mapping(result["mapping_handle"])
+
+
+def test_expanded_20_indian_pii_factors():
+    text = (
+        "Email: rahul.sharma@enterprise.in, DL: DL-0420110012345, "
+        "Bank A/C: 987654321012, IFSC: SBIN0001234, Card: 4532-1111-2222-3333, "
+        "DOB: 15/08/1995, Ration Card: MH123456789, UAN: 101234567890, "
+        "APAAR ID: 1234-5678-9012, ABHA ID: 12-3456-7890-1234, PRAN: 110123456789, "
+        "Device IP: 192.168.1.100, Mobile: +91 98765-43210, PIN: 110001, UPI: rahul@okaxis"
+    )
+    result = sanitize_document(text, "all-expanded-pii")
+    found_types = {e["type"] for e in result["entities"]}
+    expected = {
+        "EMAIL", "DL", "BANK_ACCOUNT", "IFSC", "CREDIT_DEBIT_CARD", "DOB",
+        "RATION_CARD", "UAN", "APAAR", "ABHA", "PRAN", "DEVICE_ID",
+        "PHONE", "PINCODE", "UPI_ID"
+    }
+    assert expected <= found_types
+    guard = validate_outbound_payload(result["sanitized_text"], result["mapping_handle"])
+    assert guard["safe"] is True
+    destroy_mapping(result["mapping_handle"])
+
+
+def test_inspect_endpoint_fast():
+    from fastapi.testclient import TestClient
+    from app.main import app
+
+    client = TestClient(app)
+    res = client.post("/api/v1/gateway/inspect", json={"text": "aman gave 1000Rs to his friend aman"})
+    assert res.status_code == 200
+    data = res.json()
+    assert data["sanitized_text"] == "<PERSON_1> gave 1000Rs to his friend <PERSON_2>"
+    assert data["leakage_guard"]["safe"] is True
+    assert data["processing_time_ms"] >= 0
+
+
+def test_openai_proxy_chat_completions():
+    from fastapi.testclient import TestClient
+    from app.main import app
+
+    client = TestClient(app)
+    res = client.post(
+        "/v1/chat/completions",
+        json={
+            "model": "minearena-privacy-guard",
+            "messages": [
+                {"role": "user", "content": "My name is Rahul Sharma and my PAN is ABCDE1234F"}
+            ],
+            "provider": "mock"
+        }
+    )
+    assert res.status_code == 200
+    data = res.json()
+    assert "choices" in data
+    assert len(data["choices"]) > 0
+    assert "privacy_gateway" in data
+    assert data["privacy_gateway"]["outbound_leaks"] == 0

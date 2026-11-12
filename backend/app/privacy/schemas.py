@@ -3,14 +3,21 @@ import re
 from dataclasses import dataclass
 
 # Canonical entity names. Never use any other spelling in output.
-ENTITY_TYPES = ("PERSON", "AADHAAR", "PAN", "GSTIN", "VOTER_ID", "PASSPORT", "ADDRESS",
-                "PHONE", "PINCODE", "CITY", "STATE", "UPI_ID")
+ENTITY_TYPES = (
+    "PERSON", "AADHAAR", "PAN", "GSTIN", "VOTER_ID", "PASSPORT", "ADDRESS",
+    "PHONE", "PINCODE", "CITY", "STATE", "UPI_ID", "EMAIL", "DL",
+    "BANK_ACCOUNT", "IFSC", "CREDIT_DEBIT_CARD", "DOB", "RATION_CARD",
+    "UAN", "APAAR", "ABHA", "PRAN", "DEVICE_ID",
+)
 
 # Tie-break priority when two spans overlap with equal length (lower = wins).
 TYPE_PRIORITY = {
-    "GSTIN": 0, "AADHAAR": 1, "PAN": 2, "VOTER_ID": 3, "PASSPORT": 4,
-    "PERSON": 5, "ADDRESS": 6,
-    "PHONE": 7, "UPI_ID": 8, "PINCODE": 9, "CITY": 10, "STATE": 11,
+    "BANK_ACCOUNT": 0, "PRAN": 1, "APAAR": 2, "ABHA": 3, "UAN": 4,
+    "GSTIN": 5, "PAN": 6, "VOTER_ID": 7, "PASSPORT": 8, "DL": 9,
+    "CREDIT_DEBIT_CARD": 10, "IFSC": 11, "UPI_ID": 12, "EMAIL": 13,
+    "AADHAAR": 14, "DOB": 15, "RATION_CARD": 16, "PHONE": 17,
+    "PERSON": 18, "ADDRESS": 19,
+    "PINCODE": 20, "CITY": 21, "STATE": 22, "DEVICE_ID": 23,
 }
 
 # Tolerant placeholder matcher: <PERSON_1>, < person_1 >, <VOTER_ID_2>

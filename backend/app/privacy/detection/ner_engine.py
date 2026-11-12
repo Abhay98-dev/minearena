@@ -51,6 +51,13 @@ _P_RELATION = re.compile(
     r"\b(?i:husband|wife|spouse|son|daughter|father|mother|brother|sister|friend|colleague|partner)[ \t]+"
     + r"(" + _NAME + r")"
 )
+_P_RELATION_LC = re.compile(
+    r"(?i)\b(?:his|her|my|their|our|a)?\s*(?:husband|wife|spouse|son|daughter|father|mother|brother|sister|friend|colleague|coworker|partner|another|other|relative)[ \t]+"
+    r"([A-Za-z][A-Za-z'\-]+)"
+)
+_P_ACTION_LC = re.compile(
+    r"(?i)\b([A-Za-z][A-Za-z'\-]+)[ \t]+(?:gave|given|gives|giving|sent|send|sends|transferred|transfer|transfers|paid|pay|pays|lent|borrowed|sold|bought|assigned|called|met|spoke\s+to|told)\b"
+)
 _P_CAREOF = re.compile(
     r"\b(?:C/O|S/O|D/O|W/O|c/o|s/o|d/o|w/o)\.?\s+(" + _NAME + r")"
 )
@@ -207,6 +214,14 @@ def heuristic_ner(text: str) -> List[Span]:
         add(m, "PERSON", 0.6, fix_stop=True)
     for m in _P_RELATION.finditer(text):
         add(m, "PERSON", 0.78)
+    for m in _P_RELATION_LC.finditer(text):
+        word = m.group(1).lower()
+        if word not in LC_STOP and word not in ROLE_WORDS:
+            add(m, "PERSON", 0.85)
+    for m in _P_ACTION_LC.finditer(text):
+        word = m.group(1).lower()
+        if word not in LC_STOP and word not in ROLE_WORDS:
+            add(m, "PERSON", 0.82)
     for m in _P_CAREOF.finditer(text):
         add(m, "PERSON", 0.85)
     for m in _P_COUPLE.finditer(text):

@@ -13,7 +13,11 @@ from ..detection import india_recognizers as ir
 from ..detection.india_gazetteer import find_contextual_places
 from ..mapping import mapping_store
 
-_ID_TYPES = {"AADHAAR", "PAN", "GSTIN", "VOTER_ID", "PASSPORT", "PHONE", "PINCODE"}
+_ID_TYPES = {
+    "AADHAAR", "PAN", "GSTIN", "VOTER_ID", "PASSPORT", "PHONE", "PINCODE",
+    "UPI_ID", "EMAIL", "DL", "BANK_ACCOUNT", "IFSC", "CREDIT_DEBIT_CARD",
+    "DOB", "RATION_CARD", "UAN", "APAAR", "ABHA", "PRAN", "DEVICE_ID",
+}
 
 
 def validate(sanitized_text: str, mapping_handle: str) -> dict:
@@ -32,8 +36,8 @@ def validate(sanitized_text: str, mapping_handle: str) -> dict:
             continue
         seen.add((ph, value))
         norm = mapping_store.normalize(typ, value)
-        if typ == "AADHAAR":
-            hit = len(norm) >= 12 and norm in digits_only
+        if typ in ("AADHAAR", "CREDIT_DEBIT_CARD", "BANK_ACCOUNT", "UAN", "APAAR", "ABHA", "PRAN"):
+            hit = len(norm) >= 9 and norm in digits_only
         elif typ in _ID_TYPES:
             hit = norm.casefold() in compact
         else:

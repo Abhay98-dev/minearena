@@ -42,6 +42,10 @@ export function processDocument(payload) {
   return request('/gateway/process', { method: 'POST', body: JSON.stringify(payload) })
 }
 
+export function inspectDocument(payload) {
+  return request('/gateway/inspect', { method: 'POST', body: JSON.stringify(payload) })
+}
+
 export function processWordDocument(file, { task, provider }) {
   const query = new URLSearchParams({ filename: file.name, task, provider })
   return request(`/gateway/process-file?${query}`, {

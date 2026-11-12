@@ -58,6 +58,22 @@ def gstin_valid(g: str) -> bool:
     return len(g) == 15 and all(c in _G36 for c in g) and gstin_check_char(g[:14]) == g[14]
 
 
+# ---------- Luhn algorithm (Credit/Debit Card checksum) ----------
+def luhn_valid(card_num: str) -> bool:
+    digits = [int(c) for c in card_num if c.isdigit()]
+    if len(digits) not in (13, 14, 15, 16, 19):
+        return False
+    checksum = 0
+    reverse_digits = digits[::-1]
+    for i, d in enumerate(reverse_digits):
+        if i % 2 == 1:
+            d = d * 2
+            if d > 9:
+                d -= 9
+        checksum += d
+    return checksum % 10 == 0
+
+
 # ---------- regexes ----------
 # Separators people actually type inside IDs: space, dash, dot, slash ("1111.2222.8888", "1234/5678/9012")
 _SEP = r"[ \-./]"
@@ -184,6 +200,9 @@ def find_aadhaar(text: str) -> List[Span]:
         digits = re.sub(r"\D", "", raw)
         grouped = bool(re.search(_SEP, raw))
         ctx = _ctx(text, m.start(1), _AADHAAR_CTX)
+        before = text[max(0, m.start(1) - 45):m.start(1)]
+        if not ctx and (_BANK_CTX.search(before) or _PRAN_CTX.search(before) or _APAAR_CTX.search(before)):
+            continue
         valid = verhoeff_valid(digits) and digits[0] in "23456789"
         # accept: checksum-valid, OR grouped 4-4-4 format, OR aadhaar keyword nearby
         if not (valid or grouped or ctx):
@@ -228,10 +247,209 @@ def find_passport(text: str) -> List[Span]:
     return out + _spaced(text, _PASSPORT_SPACED, _PASSPORT_CTX, "PASSPORT", out)
 
 
+# ---------- Email ----------
+_EMAIL = re.compile(r"(?<![A-Za-z0-9_.+-])([A-Za-z0-9_.+-]+@[A-Za-z0-9-]+\.[A-Za-z0-9-.]+)(?![A-Za-z0-9_.+-])")
+
+
+def find_email(text: str) -> List[Span]:
+    out = []
+    for m in _EMAIL.finditer(text):
+        out.append(Span(m.start(1), m.end(1), "EMAIL", 0.99, "regex"))
+    return out
+
+
+# ---------- Driving Licence (DL) ----------
+# Standard DL: 2-letter state code + 2-digit RTO + optional space/dash + 4-digit year + 7 digits
+_DL = re.compile(r"(?<![0-9A-Za-z])([A-Za-z]{2}[ \-]?[0-9]{2}[ \-]?(?:19|20)\d{2}[ \-]?[0-9]{7})(?![0-9A-Za-z])")
+_DL_CTX = re.compile(r"(?i)\b(?:d[\./\-]?l(?:\s*no)?|driving\s*licen[sc]e|driver'?s\s*licen[sc]e|licence\s*no|license\s*no|लाइसेंस)\b")
+_DL_GENERIC = re.compile(r"(?<![0-9A-Za-z])([A-Za-z]{2}[0-9]{13})(?![0-9A-Za-z])")
+
+
+def find_dl(text: str) -> List[Span]:
+    out = []
+    for m in _DL.finditer(text):
+        conf = 0.99 if _ctx(text, m.start(1), _DL_CTX) else 0.92
+        out.append(Span(m.start(1), m.end(1), "DL", conf, "regex"))
+    for m in _DL_GENERIC.finditer(text):
+        if any(s.start <= m.start(1) and m.end(1) <= s.end for s in out):
+            continue
+        if _ctx(text, m.start(1), _DL_CTX):
+            out.append(Span(m.start(1), m.end(1), "DL", 0.95, "regex"))
+    return out
+
+
+# ---------- IFSC Code ----------
+_IFSC = re.compile(r"(?<![0-9A-Za-z])([A-Za-z]{4}0[A-Za-z0-9]{6})(?![0-9A-Za-z])")
+_IFSC_CTX = re.compile(r"(?i)\b(?:ifsc|ifsc\s*code|rtgs|neft|branch\s*code|bank\s*code|आईएफएससी)\b")
+
+
+def find_ifsc(text: str) -> List[Span]:
+    out = []
+    for m in _IFSC.finditer(text):
+        conf = 0.99 if _ctx(text, m.start(1), _IFSC_CTX) else 0.88
+        out.append(Span(m.start(1), m.end(1), "IFSC", conf, "regex"))
+    return out
+
+
+# ---------- Bank Account Number ----------
+_BANK_ACC = re.compile(r"(?<!\d)(\d{9,18})(?!\d)")
+_BANK_CTX = re.compile(r"(?i)\b(?:account\s*(?:no|num|number|#)?|a/c(?:\s*no)?|saving(?:s)?\s*a/c|current\s*a/c|bank\s*a/c|beneficiary\s*a/c|खाता\s*(?:संख्या|नंबर)?)\b")
+_BANK_NON_CTX = re.compile(r"(?i)\b(?:aadhaar|pan|phone|mobile|order|tracking|ticket|invoice|pin(?:\s*code)?)\b")
+
+
+def find_bank_account(text: str) -> List[Span]:
+    out = []
+    for m in _BANK_ACC.finditer(text):
+        before = text[max(0, m.start(1) - 60):m.start(1)]
+        after = text[m.end(1):min(len(text), m.end(1) + 40)]
+        if _BANK_NON_CTX.search(before) or _BANK_NON_CTX.search(after):
+            continue
+        if _BANK_CTX.search(before) or _BANK_CTX.search(after):
+            out.append(Span(m.start(1), m.end(1), "BANK_ACCOUNT", 0.95, "regex"))
+    return out
+
+
+# ---------- Credit / Debit Card Number ----------
+_CARD = re.compile(r"(?<!\d)((?:4\d{3}|5[1-5]\d{2}|6[0-9]\d{2}|3[47]\d{2})[ \-]?(?:\d{4}[ \-]?\d{4}[ \-]?\d{4}|\d{4}[ \-]?\d{4}[ \-]?\d{3})|\d{4}[ \-]\d{4}[ \-]\d{4}[ \-]\d{4})(?!\d)")
+_CARD_CTX = re.compile(r"(?i)\b(?:card|credit|debit|rupay|visa|mastercard|amex|card\s*no|cvv|expiry|कार्ड)\b")
+
+
+def find_card(text: str) -> List[Span]:
+    out = []
+    for m in _CARD.finditer(text):
+        raw = m.group(1)
+        valid = luhn_valid(raw)
+        ctx = _ctx(text, m.start(1), _CARD_CTX)
+        if valid or ctx:
+            conf = 0.99 if valid else 0.90
+            out.append(Span(m.start(1), m.end(1), "CREDIT_DEBIT_CARD", conf, "regex"))
+    return out
+
+
+# ---------- Date of Birth (DOB) ----------
+_DOB = re.compile(r"\b((?:0[1-9]|[12][0-9]|3[01])[/\-.](?:0[1-9]|1[0-2])[/\-.](?:19\d\d|20[0-2]\d)|(?:19\d\d|20[0-2]\d)[/\-.](?:0[1-9]|1[0-2])[/\-.](?:0[1-9]|[12][0-9]|3[01]))\b")
+_DOB_CTX = re.compile(r"(?i)\b(?:d[\./\-]?o[\./\-]?b|date\s*of\s*birth|born\s*(?:on)?|birth\s*date|जन्म\s*तिथि)\b")
+
+
+def find_dob(text: str) -> List[Span]:
+    out = []
+    for m in _DOB.finditer(text):
+        before = text[max(0, m.start(1) - 50):m.start(1)]
+        after = text[m.end(1):min(len(text), m.end(1) + 30)]
+        if _DOB_CTX.search(before) or _DOB_CTX.search(after):
+            out.append(Span(m.start(1), m.end(1), "DOB", 0.98, "regex"))
+    return out
+
+
+# ---------- Ration Card Number ----------
+_RATION = re.compile(r"(?<![0-9A-Za-z])([A-Za-z0-9/\-]{8,16})(?![0-9A-Za-z])")
+_RATION_CTX = re.compile(r"(?i)\b(?:ration\s*(?:card|no|number)|nfsa|bpl\s*card|apl\s*card|राशन\s*कार्ड)\b")
+
+
+def find_ration_card(text: str) -> List[Span]:
+    out = []
+    for m in _RATION.finditer(text):
+        if _ctx(text, m.start(1), _RATION_CTX):
+            out.append(Span(m.start(1), m.end(1), "RATION_CARD", 0.95, "regex"))
+    return out
+
+
+# ---------- UAN (Universal Account Number - EPFO) ----------
+_UAN = re.compile(r"(?<!\d)(10\d{10})(?!\d)")
+_UAN_BARE_12 = re.compile(r"(?<!\d)(\d{12})(?!\d)")
+_UAN_CTX = re.compile(r"(?i)\b(?:uan|epf|epfo|universal\s*account\s*number|pf\s*number)\b")
+
+
+def find_uan(text: str) -> List[Span]:
+    out = []
+    for m in _UAN.finditer(text):
+        before = text[max(0, m.start(1) - 30):m.start(1)]
+        if not _ctx(text, m.start(1), _UAN_CTX) and (_PRAN_CTX.search(before) or _BANK_CTX.search(before)):
+            continue
+        conf = 0.99 if _ctx(text, m.start(1), _UAN_CTX) else 0.88
+        out.append(Span(m.start(1), m.end(1), "UAN", conf, "regex"))
+    for m in _UAN_BARE_12.finditer(text):
+        if any(s.start <= m.start(1) and m.end(1) <= s.end for s in out):
+            continue
+        if _ctx(text, m.start(1), _UAN_CTX):
+            out.append(Span(m.start(1), m.end(1), "UAN", 0.96, "regex"))
+    return out
+
+
+# ---------- APAAR ID (One Nation One Student) ----------
+_APAAR = re.compile(r"(?<!\d)(\d{4}[ \-]?\d{4}[ \-]?\d{4}|\d{12})(?!\d)")
+_APAAR_CTX = re.compile(r"(?i)\b(?:apaar|apaar\s*id|one\s*nation\s*one\s*student|abc\s*id|academic\s*bank\s*of\s*credits)\b")
+
+
+def find_apaar(text: str) -> List[Span]:
+    out = []
+    for m in _APAAR.finditer(text):
+        if _ctx(text, m.start(1), _APAAR_CTX):
+            out.append(Span(m.start(1), m.end(1), "APAAR", 0.98, "regex"))
+    return out
+
+
+# ---------- ABHA (Ayushman Bharat Health Account) ----------
+_ABHA = re.compile(r"(?<!\d)(\d{2}[ \-]?\d{4}[ \-]?\d{4}[ \-]?\d{4}|\d{14})(?!\d)")
+_ABHA_CTX = re.compile(r"(?i)\b(?:abha|abha\s*id|abha\s*number|ayushman\s*bharat|health\s*id)\b")
+
+
+def find_abha(text: str) -> List[Span]:
+    out = []
+    for m in _ABHA.finditer(text):
+        digits = re.sub(r"\D", "", m.group(1))
+        if len(digits) == 14 and (_ctx(text, m.start(1), _ABHA_CTX) or "-" in m.group(1)):
+            out.append(Span(m.start(1), m.end(1), "ABHA", 0.98, "regex"))
+    return out
+
+
+# ---------- PRAN (Permanent Retirement Account Number - NPS) ----------
+_PRAN = re.compile(r"(?<!\d)(110\d{9})(?!\d)")
+_PRAN_BARE_12 = re.compile(r"(?<!\d)(\d{12})(?!\d)")
+_PRAN_CTX = re.compile(r"(?i)\b(?:pran|pran\s*no|nps|permanent\s*retirement\s*account)\b")
+
+
+def find_pran(text: str) -> List[Span]:
+    out = []
+    for m in _PRAN.finditer(text):
+        conf = 0.99 if _ctx(text, m.start(1), _PRAN_CTX) else 0.88
+        out.append(Span(m.start(1), m.end(1), "PRAN", conf, "regex"))
+    for m in _PRAN_BARE_12.finditer(text):
+        if any(s.start <= m.start(1) and m.end(1) <= s.end for s in out):
+            continue
+        if _ctx(text, m.start(1), _PRAN_CTX):
+            out.append(Span(m.start(1), m.end(1), "PRAN", 0.96, "regex"))
+    return out
+
+
+# ---------- Device Identifiers (IP Address, MAC, IMEI) ----------
+_IPV4 = re.compile(r"\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b")
+_MAC = re.compile(r"\b(?:[0-9A-Fa-f]{2}[:-]){5}(?:[0-9A-Fa-f]{2})\b")
+_IMEI = re.compile(r"(?<!\d)(\d{15})(?!\d)")
+_DEV_CTX = re.compile(r"(?i)\b(?:imei|device\s*id|device\s*identifier|ip\s*address|mac\s*address)\b")
+
+
+def find_device_id(text: str) -> List[Span]:
+    out = []
+    for m in _IPV4.finditer(text):
+        out.append(Span(m.start(0), m.end(0), "DEVICE_ID", 0.95, "regex"))
+    for m in _MAC.finditer(text):
+        out.append(Span(m.start(0), m.end(0), "DEVICE_ID", 0.95, "regex"))
+    for m in _IMEI.finditer(text):
+        if _ctx(text, m.start(1), _DEV_CTX):
+            out.append(Span(m.start(1), m.end(1), "DEVICE_ID", 0.96, "regex"))
+    return out
+
+
 ALL_FINDERS = {
     "GSTIN": find_gstin, "AADHAAR": find_aadhaar, "PAN": find_pan,
     "VOTER_ID": find_voter_id, "PASSPORT": find_passport,
     "PHONE": find_phone, "PINCODE": find_pincode, "UPI_ID": find_upi_id,
+    "EMAIL": find_email, "DL": find_dl, "IFSC": find_ifsc,
+    "BANK_ACCOUNT": find_bank_account, "CREDIT_DEBIT_CARD": find_card,
+    "DOB": find_dob, "RATION_CARD": find_ration_card, "UAN": find_uan,
+    "APAAR": find_apaar, "ABHA": find_abha, "PRAN": find_pran,
+    "DEVICE_ID": find_device_id,
 }
 
 

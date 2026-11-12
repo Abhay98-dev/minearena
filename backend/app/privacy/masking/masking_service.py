@@ -19,8 +19,11 @@ from ..detection.ner_engine import HONORIFICS, ROLE_WORDS, get_gliner
 from ..mapping import mapping_store
 from ..schemas import Span
 
-_STRUCTURED = ("AADHAAR", "PAN", "GSTIN", "VOTER_ID", "PASSPORT",
-               "PHONE", "PINCODE", "UPI_ID")
+_STRUCTURED = (
+    "AADHAAR", "PAN", "GSTIN", "VOTER_ID", "PASSPORT", "PHONE",
+    "UPI_ID", "EMAIL", "DL", "BANK_ACCOUNT", "IFSC", "CREDIT_DEBIT_CARD",
+    "DOB", "RATION_CARD", "UAN", "APAAR", "ABHA", "PRAN", "DEVICE_ID",
+)
 _NAME_TOKEN = re.compile(r"[A-Za-z][A-Za-z'\-]+")
 ALIAS = "alias"  # Span.source for a single-owner name token; masked with its owner's placeholder
 
@@ -92,6 +95,11 @@ def _propagate(text: str, spans: List[Span]) -> Tuple[List[Span], Dict[str, str]
 
 _PREV_NAMEISH = re.compile(r"(?:\b[A-Z]\.?|\b[A-Z][a-z]+)[ \t]+$")
 _NEXT_NAMEISH = re.compile(r"^[ \t]+([A-Z][a-z]+)")
+_DISTINCT_PERSON_CTX = re.compile(
+    r"(?i)\b(?:his|her|my|their|our|a)\s+(?:friend|colleague|coworker|brother|sister|father|mother|son|daughter|partner|boss|manager|client|customer|doctor|lawyer|relative)\b"
+    r"|\b(?:another|different|second|other)\b"
+    r"|\b(?:to|with|from)\s+(?:(?:his|her|my|their|our|a)\s+)?(?:friend|colleague|brother|sister|partner)?\b"
+)
 
 
 def _foreign_neighbour(text: str, s: int, e: int, owner_toks: set) -> bool:
@@ -159,16 +167,25 @@ def sanitize(text: str, request_id: str) -> dict:
 
     entities = []
     assigned = []
+    seen_persons = set()
     for s in spans:  # left-to-right so numbering follows first appearance
         value = text[s.start:s.end]
         owner: Optional[str] = None
+        distinct_key: Optional[str] = None
         if s.type == "PERSON" and s.source != "shared_token":
             owner = alias.get(mapping_store.normalize("PERSON", value))
+            norm_val = mapping_store.normalize("PERSON", value)
+            before = text[max(0, s.start - 40):s.start]
+            if _DISTINCT_PERSON_CTX.search(before):
+                if norm_val in seen_persons or any(w in before.lower() for w in ("friend", "another", "second", "different")):
+                    distinct_key = f"pos_{s.start}"
+            seen_persons.add(norm_val)
+
         if owner is not None:
-            ph = entry.placeholder_for(s.type, owner)
+            ph = entry.placeholder_for(s.type, owner, distinct_key=distinct_key)
             entry.add_surface(ph, s.type, value)  # guard also checks the alias text never leaves
         else:
-            ph = entry.placeholder_for(s.type, value)
+            ph = entry.placeholder_for(s.type, value, distinct_key=distinct_key)
         assigned.append((s, ph))
         entities.append({"type": s.type, "placeholder": ph, "start": s.start, "end": s.end,
                          "confidence": round(s.confidence, 3)})

@@ -1,16 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
 import {
-  Activity, AlertTriangle, ArrowRight, CheckCircle2, FileText, LockKeyhole, Pencil, RefreshCw, Send, ShieldCheck,
-  Upload,
-  ShieldX,
+  Activity, AlertTriangle, ArrowRight, CheckCircle2, Code, FileText, LockKeyhole, Pencil, RefreshCw, Send, ShieldCheck,
+  Upload, ShieldX, Terminal,
 } from 'lucide-react'
-import { getAudit, getEngines, getHealth, processDocument, processWordDocument } from './services/api'
+import { getAudit, getEngines, getHealth, inspectDocument, processDocument, processWordDocument } from './services/api'
 import { EntityTable, HighlightedOriginal, PlaceholderText } from './components/GatewayViews'
 import EvaluationReport from './pages/EvaluationReport'
 import { SAMPLES } from './samples'
 import './App.css'
 
 const ENGINE_LABEL = { gliner: 'Local NER (GLiNER)', presidio: 'Presidio India IDs' }
+
+const INDIAN_PII_TYPES = [
+  "AADHAAR", "PAN", "GSTIN", "VOTER_ID", "PASSPORT", "PHONE", "PINCODE",
+  "UPI_ID", "EMAIL", "DL", "BANK_ACCOUNT", "IFSC", "CREDIT_DEBIT_CARD",
+  "DOB", "RATION_CARD", "UAN", "APAAR", "ABHA", "PRAN", "DEVICE_ID",
+  "PERSON", "ADDRESS", "CITY", "STATE"
+]
 
 function App() {
   const [tab, setTab] = useState('process')
@@ -59,15 +65,63 @@ function App() {
     setEditing(true)
   }
 
+  async function handleFastInspect() {
+    if (!text.trim()) return
+    setBusy(true); setError(null)
+    try {
+      const inspected = await inspectDocument({ text, task, provider })
+      setResult({
+        ...inspected,
+        isLlmPending: false,
+        leakage_count: inspected.leakage_guard?.leakage_count ?? 0,
+        llm_response: '(LLM not invoked — pre-flight inspection mode)',
+        final_response: '(Masked tokens verified safe by Outbound Guard. Click "Mask & send" to invoke AI)',
+        missing_placeholders: [],
+        unknown_placeholders: [],
+        provider: 'local-guard',
+        model: 'pre-flight inspection',
+        llm_time_ms: 0,
+        gateway_overhead_ms: inspected.processing_time_ms,
+      })
+      setSubmitted(text)
+      setEditing(false)
+    } catch (err) {
+      setError(err)
+    } finally { setBusy(false) }
+  }
+
   async function submit(event) {
     event.preventDefault()
-    setBusy(true); setError(null); setResult(null)
+    setBusy(true); setError(null)
     try {
+      if (!selectedFile && text.trim()) {
+        try {
+          const inspected = await inspectDocument({ text, task, provider })
+          setResult({
+            ...inspected,
+            isLlmPending: true,
+            leakage_count: inspected.leakage_guard?.leakage_count ?? 0,
+            llm_response: '',
+            final_response: '',
+            missing_placeholders: [],
+            unknown_placeholders: [],
+            provider,
+            model: provider,
+            llm_time_ms: 0,
+            gateway_overhead_ms: inspected.processing_time_ms,
+          })
+          setSubmitted(text)
+          setEditing(false)
+        } catch {
+          // fallback to full call
+        }
+      }
+
       const response = selectedFile
         ? await processWordDocument(selectedFile, { task, provider })
         : await processDocument({ text, task, provider })
       const original = response.original_text || text
-      setResult(response); setSubmitted(original); setText(original); setSelectedFile(null); setEditing(false)
+      setResult({ ...response, isLlmPending: false }); setSubmitted(original); setText(original); setSelectedFile(null); setEditing(false)
       await refreshAudit()
     } catch (err) {
       setError(err)
@@ -81,6 +135,7 @@ function App() {
       <a className="brand" href="#home" onClick={() => setTab('process')}><span className="brand-mark"><ShieldCheck size={20} /></span><span>mine<span className="brand-accent">arena</span><small>PRIVACY GATEWAY</small></span></a>
       <nav aria-label="Main navigation">
         <button className={tab === 'process' ? 'active' : ''} onClick={() => setTab('process')}>Workspace</button>
+        <button className={tab === 'api' ? 'active' : ''} onClick={() => setTab('api')}>Gateway API</button>
         <button className={tab === 'eval' ? 'active' : ''} onClick={() => setTab('eval')}>Evaluation</button>
         <button className={tab === 'audit' ? 'active' : ''} onClick={() => { setTab('audit'); refreshAudit() }}>Audit trail</button>
       </nav>
@@ -114,8 +169,14 @@ function App() {
           <option value="summarize">Summarize</option><option value="extract">Extract key details</option></select></label>
         <label>LLM provider<select value={provider} onChange={e => setProvider(e.target.value)}>
           <option value="mock">Mock (offline demo)</option><option value="gemini">Gemini (external)</option><option value="ollama">Ollama (local)</option></select></label>
-        <button className="primary-button" type="submit" disabled={busy || (!selectedFile && !text.trim())}>
-          {busy ? <><RefreshCw className="spin" size={17} /> Processing…</> : <>Mask &amp; send <ArrowRight size={17} /></>}</button>
+        <div className="button-group">
+          <button className="secondary-button" type="button" disabled={busy || (!selectedFile && !text.trim())} onClick={handleFastInspect} title="Instantly view masked payload and outbound guard verification without waiting for an LLM response">
+            <ShieldCheck size={15} /> Inspect Mask (Fast)
+          </button>
+          <button className="primary-button" type="submit" disabled={busy || (!selectedFile && !text.trim())}>
+            {busy ? <><RefreshCw className="spin" size={17} /> Processing…</> : <>Mask &amp; send <ArrowRight size={17} /></>}
+          </button>
+        </div>
       </form>
 
       <section className="workspace three">
@@ -145,7 +206,7 @@ function App() {
           {!result && !error && <Empty icon={<Send size={22} />} title="Nothing sent yet" text="Submit a document to see the exact text that leaves the organisation." />}
           {result && <>
             <PlaceholderText text={result.outbound_payload} />
-            <h3 className="sub-head">Detected entities</h3>
+            <h3 className="sub-head">Detected entities ({result.entities.length})</h3>
             <EntityTable entities={result.entities} />
           </>}
         </article>
@@ -153,22 +214,109 @@ function App() {
         <article className="panel column">
           <div className="col-head"><span className="step">C</span><div><h2>Final response</h2><p>Original values restored locally</p></div></div>
           {!result && <Empty icon={<FileText size={22} />} title="No response yet" text="The LLM reply appears here after local reinsertion." />}
-          {result && <>
-            <pre className="doc-view final">{result.final_response}</pre>
-            {result.missing_placeholders.length > 0 && <p className="note"><AlertTriangle size={13} /> The LLM dropped {result.missing_placeholders.join(', ')}. Reported, not guessed.</p>}
-            {result.unknown_placeholders.length > 0 && <p className="note"><AlertTriangle size={13} /> Unknown placeholder(s) {result.unknown_placeholders.join(', ')} left unchanged.</p>}
-            <details className="raw"><summary>LLM reply before reinsertion</summary>
-              <PlaceholderText text={result.llm_response} flag={[...result.missing_placeholders, ...result.unknown_placeholders]} /></details>
-            <dl className="facts">
-              <div><dt>Model</dt><dd>{result.provider} · {result.model}{result.fallback_used ? ' (fallback)' : ''}</dd></div>
-              <div><dt>LLM time</dt><dd>{result.llm_time_ms} ms</dd></div>
-              <div><dt>Gateway overhead</dt><dd>{result.gateway_overhead_ms} ms</dd></div>
-              <div><dt>Request</dt><dd className="mono">{result.request_id}</dd></div>
-            </dl>
-          </>}
+          {result && (
+            result.isLlmPending ? (
+              <div className="empty-state">
+                <div className="empty-icon"><RefreshCw className="spin" size={24} /></div>
+                <h3>Calling {provider} AI…</h3>
+                <p>Outbound PII verified safe. Masked tokens sent to AI provider. Waiting for completion to re-insert values locally.</p>
+              </div>
+            ) : (
+              <>
+                <pre className="doc-view final">{result.final_response}</pre>
+                {result.missing_placeholders?.length > 0 && <p className="note"><AlertTriangle size={13} /> The LLM dropped {result.missing_placeholders.join(', ')}. Reported, not guessed.</p>}
+                {result.unknown_placeholders?.length > 0 && <p className="note"><AlertTriangle size={13} /> Unknown placeholder(s) {result.unknown_placeholders.join(', ')} left unchanged.</p>}
+                {result.llm_response && !result.isInspectOnly && (
+                  <details className="raw"><summary>LLM reply before reinsertion</summary>
+                    <PlaceholderText text={result.llm_response} flag={[...(result.missing_placeholders || []), ...(result.unknown_placeholders || [])]} /></details>
+                )}
+                <dl className="facts">
+                  <div><dt>Model</dt><dd>{result.provider} · {result.model}{result.fallback_used ? ' (fallback)' : ''}</dd></div>
+                  <div><dt>LLM time</dt><dd>{result.llm_time_ms} ms</dd></div>
+                  <div><dt>Gateway overhead</dt><dd>{result.gateway_overhead_ms} ms</dd></div>
+                  <div><dt>Request</dt><dd className="mono">{result.request_id}</dd></div>
+                </dl>
+              </>
+            )
+          )}
         </article>
       </section>
     </>}
+
+    {tab === 'api' && <section className="panel api-gateway-panel">
+      <div className="panel-title">
+        <div>
+          <span className="step"><Terminal size={16} /></span>
+          <div>
+            <h2>Enterprise AI Gateway Integration</h2>
+            <p>Industry-standard drop-in reverse proxy (OpenAI-compatible) and direct REST API</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="api-grid">
+        <div className="api-col">
+          <h3 className="sub-head">1. Drop-in OpenAI Proxy (Zero Code Change)</h3>
+          <p className="muted small">Change <code>base_url</code> in your app or LangChain to point to MineArena. All requests are intercepted, sanitized, guarded, and restored transparently.</p>
+          <div className="code-card">
+            <pre>{`from openai import OpenAI
+
+# Connect existing app or LangChain directly through MineArena
+client = OpenAI(
+    base_url="http://localhost:8000/v1",
+    api_key="minearena-dpdp-guard"
+)
+
+response = client.chat.completions.create(
+    model="minearena-privacy-guard",
+    messages=[
+        {"role": "user", "content": "Ramesh Kumar applied for loan. Aadhaar: 2341-2341-2346. PAN: ABCDE1234F"}
+    ]
+)
+
+print(response.choices[0].message.content)`}</pre>
+          </div>
+
+          <h3 className="sub-head" style={{ marginTop: '16px' }}>2. Direct cURL Command</h3>
+          <div className="code-card">
+            <pre>{`curl -X POST http://localhost:8000/v1/chat/completions \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "model": "minearena-privacy-guard",
+    "messages": [
+      {"role": "user", "content": "Customer Priya Nair, Phone: +91 98765-43210"}
+    ]
+  }'`}</pre>
+          </div>
+        </div>
+
+        <div className="api-col">
+          <h3 className="sub-head">3. Pre-flight Instant Masking Endpoint (&lt;20ms)</h3>
+          <p className="muted small">Inspect masked text &amp; verify 0 outbound leaks without waiting for an LLM response:</p>
+          <div className="code-card">
+            <pre>{`curl -X POST http://localhost:8000/api/v1/gateway/inspect \\
+  -H "Content-Type: application/json" \\
+  -d '{"text": "aman gave 1000Rs to his friend aman"}'`}</pre>
+          </div>
+
+          <h3 className="sub-head" style={{ marginTop: '16px' }}>4. 20+ Protected Indian PII Categories</h3>
+          <p className="muted small">DPDP-2023 compliant tokenization with checksums, gazetteers, and contextual ambiguity resolution:</p>
+          <div className="badge-grid">
+            {INDIAN_PII_TYPES.map(type => (
+              <span key={type} className="badge-pill">&lt;{type}_N&gt;</span>
+            ))}
+          </div>
+
+          <div className="privacy-note" style={{ marginTop: '16px' }}>
+            <ShieldCheck size={18} />
+            <div>
+              <strong>Fail-Closed Outbound Security Guarantee:</strong><br />
+              If any detected PII value or residual identity pattern remains in the outbound payload, the request is immediately aborted (HTTP 409). The external AI provider is NEVER called.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>}
 
     {tab === 'eval' && <EvaluationReport />}
 

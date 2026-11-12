@@ -9,7 +9,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.api.routes import audit, engines, gateway, health, metrics
+from app.api.routes import audit, engines, gateway, health, metrics, openai_proxy
 from app.core import config
 from app.core.errors import GatewayError
 from app.database import db
@@ -51,7 +51,8 @@ def root():
     """Landing response for anyone who opens the server URL directly (instead of a bare 404)."""
     return {"service": "MineArena PS-02 Privacy Gateway", "status": "ok",
             "docs": "/docs", "health": "/api/v1/health", "engines": "/api/v1/engines",
-            "process": "POST /api/v1/gateway/process", "evaluation": "/api/v1/evaluation"}
+            "process": "POST /api/v1/gateway/process", "inspect": "POST /api/v1/gateway/inspect",
+            "openai_proxy": "POST /v1/chat/completions"}
 
 
 app.include_router(health.router, prefix="/api/v1")
@@ -59,3 +60,4 @@ app.include_router(gateway.router, prefix="/api/v1")
 app.include_router(audit.router, prefix="/api/v1")
 app.include_router(metrics.router, prefix="/api/v1")
 app.include_router(engines.router, prefix="/api/v1")
+app.include_router(openai_proxy.router, prefix="/v1")

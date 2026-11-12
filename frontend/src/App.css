@@ -75,3 +75,16 @@ th.num{text-align:right}
 .hidden-file-input{display:none}
 .file-pick-button{position:absolute;top:9px;right:9px;width:31px;height:31px;display:grid;place-items:center;border:1px solid #dce7e6;border-radius:7px;background:#fff;color:#168e7c;box-shadow:0 1px 4px #263b4c12}
 .file-pick-button:hover,.file-pick-button:focus-visible{border-color:#8bcfc3;background:#eff9f7;outline:none}
+
+/* ---- Gateway Secondary Buttons & API Panel ---- */
+.secondary-button{height:40px;padding:0 18px;border:1px solid #c2dbd5;border-radius:7px;background:#f0faf7;color:#137869;font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:7px}
+.secondary-button:hover:not(:disabled){background:#e2f5f0;border-color:#99cfc4}
+.secondary-button:disabled{opacity:.6;cursor:wait}
+.button-group{display:flex;gap:8px;align-items:center}
+.api-gateway-panel{padding:24px;display:flex;flex-direction:column;gap:20px}
+.code-card{background:#1e293b;border-radius:9px;color:#f8fafc;padding:16px;overflow-x:auto;font:12px/1.6 'DM Mono',monospace}
+.code-card pre{margin:0;white-space:pre-wrap;word-break:break-all}
+.api-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:900px){.api-grid{grid-template-columns:1fr}}
+.badge-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.badge-pill{padding:5px 10px;background:#eff7f5;border:1px solid #d0ebe5;color:#127b6c;border-radius:6px;font-size:11px;font-weight:600}

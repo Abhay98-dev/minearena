@@ -8,7 +8,11 @@ from .india_gazetteer import find_contextual_places
 from .ner_engine import detect_names_addresses
 from .presidio_engine import detect_with_presidio, presidio_enabled
 
-_STRUCTURED = {"GSTIN", "AADHAAR", "PAN", "VOTER_ID", "PASSPORT", "PHONE", "UPI_ID"}
+_STRUCTURED = {
+    "GSTIN", "AADHAAR", "PAN", "VOTER_ID", "PASSPORT", "PHONE",
+    "UPI_ID", "EMAIL", "DL", "BANK_ACCOUNT", "IFSC", "CREDIT_DEBIT_CARD",
+    "DOB", "RATION_CARD", "UAN", "APAAR", "ABHA", "PRAN", "DEVICE_ID",
+}
 
 
 def _overlaps(a: Span, b: Span) -> bool:

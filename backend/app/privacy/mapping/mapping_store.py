@@ -24,13 +24,15 @@ def normalize(entity_type: str, value: str) -> str:
         if len(digits) == 11 and digits.startswith("0"):
             return digits[1:]
         return digits
-    if entity_type in ("AADHAAR", "PINCODE"):
+    if entity_type in ("AADHAAR", "PINCODE", "BANK_ACCOUNT", "CREDIT_DEBIT_CARD", "UAN", "APAAR", "ABHA", "PRAN"):
         return re.sub(r"\D", "", value)
-    if entity_type in ("PAN", "GSTIN", "VOTER_ID", "PASSPORT"):
+    if entity_type in ("PAN", "GSTIN", "VOTER_ID", "PASSPORT", "DL", "IFSC", "RATION_CARD"):
         return ID_SEPARATORS.sub("", value).upper()  # "ABCDE-1234-F" / "ABCDE 1234 F" == "ABCDE1234F"
-    if entity_type == "UPI_ID":
+    if entity_type in ("UPI_ID", "EMAIL"):
         return re.sub(r"\s+", "", value).casefold()
-    return " ".join(value.split()).casefold()  # PERSON / ADDRESS
+    if entity_type in ("DEVICE_ID", "DOB"):
+        return ID_SEPARATORS.sub("", value).casefold()
+    return " ".join(value.split()).casefold()  # PERSON / ADDRESS / CITY / STATE
 
 
 class MappingEntry:
@@ -44,8 +46,12 @@ class MappingEntry:
         self.types: Dict[str, str] = {}          # placeholder -> type
         self.surfaces: List[tuple] = []          # (placeholder, type, surface form) for leakage guard
 
-    def placeholder_for(self, entity_type: str, value: str) -> str:
-        key = (entity_type, normalize(entity_type, value))
+    def placeholder_for(self, entity_type: str, value: str, distinct_key: Optional[str] = None) -> str:
+        norm = normalize(entity_type, value)
+        if distinct_key:
+            key = (entity_type, f"{norm}__distinct_{distinct_key}")
+        else:
+            key = (entity_type, norm)
         with self._lock:
             ph = self.by_key.get(key)
             if ph is None:
