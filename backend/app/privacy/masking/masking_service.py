@@ -130,7 +130,8 @@ def _second_pass(text: str, spans: List[Span]) -> List[Span]:
     if g is None:
         return []
     draft = _draft(text, spans)
-    found = {draft[s.start:s.end]: s for s in g.predict(draft)}
+    # line-by-line: short context finds what whole-document context scored too low (e.g. a lone city)
+    found = {draft[s.start:s.end]: s for s in g.predict(draft, per_line=True, location_min=0.45)}
     covered = [(s.start, s.end) for s in spans]
     extra: List[Span] = []
     for value, s in found.items():

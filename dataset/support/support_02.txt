@@ -1,0 +1,5 @@
+Chat transcript TKT-23624
+User: hello, manoj banerjee here. mera card block ho gaya hai
+Bot: Please share your registered PAN.
+User: OKNPB1853O
+User: aur mera address Andheri West, Mumbai hai

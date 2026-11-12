@@ -1,0 +1,405 @@
+{
+  "generated_at": "2026-11-12T14:44:23+00:00",
+  "dataset": {
+    "documents": 20,
+    "entities": 76,
+    "hinglish_documents": 4,
+    "negative_documents": 0,
+    "per_type": {
+      "PERSON": 40,
+      "AADHAAR": 4,
+      "PAN": 6,
+      "GSTIN": 2,
+      "VOTER_ID": 2,
+      "PASSPORT": 4,
+      "ADDRESS": 18
+    },
+    "seed": 7,
+    "name": "held-out (never tuned on)"
+  },
+  "engines": {
+    "structured_ids": {
+      "status": "loaded"
+    },
+    "heuristics": {
+      "status": "loaded"
+    },
+    "gliner": {
+      "status": "loaded",
+      "mode": "both",
+      "model": "urchade/gliner_multi_pii-v1",
+      "threshold": 0.35
+    },
+    "presidio": {
+      "status": "loaded",
+      "recognizers": [
+        "CustomAADHAARRecognizer",
+        "CustomGSTINRecognizer",
+        "CustomPANRecognizer",
+        "CustomPASSPORTRecognizer",
+        "CustomVOTER_IDRecognizer",
+        "InAadhaarRecognizer",
+        "InGstinRecognizer",
+        "InPanRecognizer",
+        "InPassportRecognizer",
+        "InVoterRecognizer"
+      ]
+    }
+  },
+  "model_load_ms": 8183,
+  "detection": {
+    "full": {
+      "strict": {
+        "per_type": {
+          "PERSON": {
+            "precision": 0.792,
+            "recall": 0.95,
+            "f1": 0.864,
+            "tp": 38,
+            "fp": 10,
+            "fn": 2
+          },
+          "AADHAAR": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 4,
+            "fp": 0,
+            "fn": 0
+          },
+          "PAN": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 6,
+            "fp": 0,
+            "fn": 0
+          },
+          "GSTIN": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 2,
+            "fp": 0,
+            "fn": 0
+          },
+          "VOTER_ID": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 2,
+            "fp": 0,
+            "fn": 0
+          },
+          "PASSPORT": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 4,
+            "fp": 0,
+            "fn": 0
+          },
+          "ADDRESS": {
+            "precision": 0.778,
+            "recall": 0.778,
+            "f1": 0.778,
+            "tp": 14,
+            "fp": 4,
+            "fn": 4
+          }
+        },
+        "overall": {
+          "precision": 0.833,
+          "recall": 0.921,
+          "f1": 0.875,
+          "tp": 70,
+          "fp": 14,
+          "fn": 6
+        }
+      },
+      "relaxed": {
+        "per_type": {
+          "PERSON": {
+            "precision": 0.792,
+            "recall": 0.95,
+            "f1": 0.864,
+            "tp": 38,
+            "fp": 10,
+            "fn": 2
+          },
+          "AADHAAR": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 4,
+            "fp": 0,
+            "fn": 0
+          },
+          "PAN": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 6,
+            "fp": 0,
+            "fn": 0
+          },
+          "GSTIN": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 2,
+            "fp": 0,
+            "fn": 0
+          },
+          "VOTER_ID": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 2,
+            "fp": 0,
+            "fn": 0
+          },
+          "PASSPORT": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 4,
+            "fp": 0,
+            "fn": 0
+          },
+          "ADDRESS": {
+            "precision": 0.889,
+            "recall": 0.889,
+            "f1": 0.889,
+            "tp": 16,
+            "fp": 2,
+            "fn": 2
+          }
+        },
+        "overall": {
+          "precision": 0.857,
+          "recall": 0.947,
+          "f1": 0.9,
+          "tp": 72,
+          "fp": 12,
+          "fn": 4
+        }
+      },
+      "blocked_requests": [],
+      "latency_overhead_ms": {
+        "n": 20,
+        "mean": 236.9,
+        "median": 215.0,
+        "p95": 402,
+        "max": 436
+      }
+    },
+    "rules_only": {
+      "strict": {
+        "per_type": {
+          "PERSON": {
+            "precision": 0.857,
+            "recall": 0.3,
+            "f1": 0.444,
+            "tp": 12,
+            "fp": 2,
+            "fn": 28
+          },
+          "AADHAAR": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 4,
+            "fp": 0,
+            "fn": 0
+          },
+          "PAN": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 6,
+            "fp": 0,
+            "fn": 0
+          },
+          "GSTIN": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 2,
+            "fp": 0,
+            "fn": 0
+          },
+          "VOTER_ID": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 2,
+            "fp": 0,
+            "fn": 0
+          },
+          "PASSPORT": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 4,
+            "fp": 0,
+            "fn": 0
+          },
+          "ADDRESS": {
+            "precision": 0.375,
+            "recall": 0.167,
+            "f1": 0.231,
+            "tp": 3,
+            "fp": 5,
+            "fn": 15
+          }
+        },
+        "overall": {
+          "precision": 0.825,
+          "recall": 0.434,
+          "f1": 0.569,
+          "tp": 33,
+          "fp": 7,
+          "fn": 43
+        }
+      },
+      "relaxed": {
+        "per_type": {
+          "PERSON": {
+            "precision": 0.857,
+            "recall": 0.3,
+            "f1": 0.444,
+            "tp": 12,
+            "fp": 2,
+            "fn": 28
+          },
+          "AADHAAR": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 4,
+            "fp": 0,
+            "fn": 0
+          },
+          "PAN": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 6,
+            "fp": 0,
+            "fn": 0
+          },
+          "GSTIN": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 2,
+            "fp": 0,
+            "fn": 0
+          },
+          "VOTER_ID": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 2,
+            "fp": 0,
+            "fn": 0
+          },
+          "PASSPORT": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 4,
+            "fp": 0,
+            "fn": 0
+          },
+          "ADDRESS": {
+            "precision": 0.625,
+            "recall": 0.278,
+            "f1": 0.385,
+            "tp": 5,
+            "fp": 3,
+            "fn": 13
+          }
+        },
+        "overall": {
+          "precision": 0.875,
+          "recall": 0.461,
+          "f1": 0.603,
+          "tp": 35,
+          "fp": 5,
+          "fn": 41
+        }
+      },
+      "blocked_requests": [],
+      "latency_overhead_ms": {
+        "n": 20,
+        "mean": 0.2,
+        "median": 0.0,
+        "p95": 1,
+        "max": 1
+      }
+    },
+    "headline": "relaxed"
+  },
+  "leakage": {
+    "full_value_count": 0,
+    "full_value": [],
+    "token_residue_count": 0,
+    "token_residue": [],
+    "checked_payloads": 20,
+    "source": "audit_logs.sanitized_payload"
+  },
+  "reinsertion": {
+    "echo": {
+      "expected": 74,
+      "correct": 74,
+      "wrong_person": 0,
+      "dropped_reported": 0,
+      "unknown_seen": 0,
+      "unknown_left_unrestored": 0,
+      "documents": 20,
+      "accuracy": 1.0
+    },
+    "reorder": {
+      "expected": 74,
+      "correct": 74,
+      "wrong_person": 0,
+      "dropped_reported": 0,
+      "unknown_seen": 0,
+      "unknown_left_unrestored": 0,
+      "documents": 20,
+      "accuracy": 1.0
+    },
+    "paraphrase": {
+      "expected": 74,
+      "correct": 74,
+      "wrong_person": 0,
+      "dropped_reported": 0,
+      "unknown_seen": 0,
+      "unknown_left_unrestored": 0,
+      "documents": 20,
+      "accuracy": 1.0
+    },
+    "drop": {
+      "expected": 18,
+      "correct": 18,
+      "wrong_person": 0,
+      "dropped_reported": 56,
+      "unknown_seen": 0,
+      "unknown_left_unrestored": 0,
+      "documents": 20,
+      "accuracy": 1.0
+    },
+    "unknown": {
+      "expected": 74,
+      "correct": 74,
+      "wrong_person": 0,
+      "dropped_reported": 0,
+      "unknown_seen": 40,
+      "unknown_left_unrestored": 40,
+      "documents": 20,
+      "accuracy": 1.0
+    }
+  }
+}

@@ -1,0 +1,9 @@
+HEALTH INSURANCE CLAIM
+Policy No: POL/2026/99803
+Insured: Joseph Pillai
+Patient: Revathi Kulkarni (sister)
+Hospital: City Care Hospital, Sector 18, Noida
+Claim amount: Rs 4,98,000
+Insured PAN: YUTPP4798L
+Insured Aadhaar: 4122-8160-6488
+Employer GSTIN (group policy): 09QFNCZ8861L4ZD

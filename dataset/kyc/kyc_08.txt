@@ -1,0 +1,10 @@
+Video KYC transcript
+Agent: Aapka poora naam bataiye.
+Customer: Mera naam Kavitha Gupta hai.
+Agent: Aadhaar number?
+Customer: 5067 3830 2849
+Agent: Aur PAN?
+Customer: RSXPG2687B
+Agent: Aap kahan rehti hain?
+Customer: Plot 77, MG Road, Kochi, PIN 682331
+Agent: Dhanyavaad Kavitha ji.

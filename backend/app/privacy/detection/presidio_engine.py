@@ -12,6 +12,7 @@ NOT exercised in the offline build sandbox: run tests/privacy/test_presidio_opti
 """
 import logging
 import os
+import re
 from typing import List, Optional
 
 from ..schemas import Span
@@ -101,6 +102,22 @@ def detect_with_presidio(text: str) -> List[Span]:
     out: List[Span] = []
     for r in az.analyze(text=text, language="en", score_threshold=0.3):
         typ = PRESIDIO_MAP.get(r.entity_type)
-        if typ:
+        if typ and _shape_ok(typ, text[r.start:r.end]):
             out.append(Span(r.start, r.end, typ, float(r.score), "presidio"))
     return out
+
+
+# Presidio's built-in India patterns are looser than the real formats (its PAN pattern matched a date
+# like 23-04-1991 in testing). Keep a Presidio ID hit only if it has the basic shape of that ID type.
+_SHAPE = {
+    "AADHAAR": re.compile(r"\d{4}[ \-]?\d{4}[ \-]?\d{4}"),
+    "PAN": re.compile(r"[A-Za-z]{5}\d{4}[A-Za-z]"),
+    "GSTIN": re.compile(r"\d{2}[A-Za-z0-9]{13}"),
+    "VOTER_ID": re.compile(r"[A-Za-z]{3}\d{7}"),
+    "PASSPORT": re.compile(r"[A-Za-z]\d{7}"),
+}
+
+
+def _shape_ok(typ: str, value: str) -> bool:
+    rx = _SHAPE.get(typ)
+    return rx is None or rx.fullmatch(value.strip()) is not None
