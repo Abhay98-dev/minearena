@@ -75,6 +75,8 @@ def test_first_name_only_propagation():
     ("my name is rahul sharma.", "rahul sharma"),
     ("Applicant: rahul kumar submitted the form.", "rahul kumar"),
     ("Mera naam rahul kumar hai.", "rahul kumar"),
+    ("mera name abhay hai", "abhay"),
+    (":mera name abhay hai", "abhay"),
     ("Mr. rahul sharma applied for a loan.", "rahul sharma"),
     ("my name is rahul sharma and he works here.", "rahul sharma"),
 ])

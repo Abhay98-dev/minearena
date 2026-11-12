@@ -8,7 +8,7 @@ Use this file as the short context packet for teammates and future models. The f
 2. **Implementation clarifications, Round 1 scenarios, and evaluation definitions:** `MineArena_PS02_Master_Guide_1.md`.
 3. **Starter code:** contents of `minearena_code.zip`, copied into this workspace.
 
-The archive's contents are starter code, not proof of a working deployment. The previous 50-test baseline was extended with offline fake-model integration coverage. **[TESTED]** The current suite passes: 57 tests. GLiNER weight loading, Presidio with its spaCy model, Gemini, Ollama, and the real external provider path remain **[UNTESTED]**. Do not report performance numbers before the dataset evaluation runs.
+The archive's contents are starter code, not proof of a working deployment. The previous 50-test baseline was extended with offline fake-model integration coverage and lowercase Hinglish name trigger regressions. **[TESTED]** The current suite passes: 59 tests. GLiNER weight loading, Presidio with its spaCy model, Gemini, Ollama, and the real external provider path remain **[UNTESTED]**. Do not report performance numbers before the dataset evaluation runs.
 
 Current shared repository branch for Abhay's work: `feature/backend-gateway`, created from `origin/main`. Member 3 should branch from or pull this branch once it is pushed.
 

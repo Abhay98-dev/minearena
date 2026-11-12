@@ -21,7 +21,7 @@ _TOK = r"(?:[A-Za-z]\.|[A-Za-z][A-Za-z'\-]+)"  # "Rahul", "rahul", or an initial
 _NAME = _TOK + r"(?:[ \t]+" + _TOK + r"){0,4}"
 
 # "My name is X", "Mera naam X hai", "Mr./Shri X"
-_P_TRIGGER = re.compile(r"(?i:my\s+name\s+is|mera\s+naam|mera\s+nam|naam\s+hai|name\s+is)\s+(" + _NAME + r")")
+_P_TRIGGER = re.compile(r"(?i:my\s+name\s+is|mera\s+(?:naam|nam|name)|naam\s+hai|name\s+is)\s+(" + _NAME + r")")
 _P_HONORIFIC = re.compile(r"(?i:\b(?:Mr|Mrs|Ms|Miss|Shri|Smt|Sri|Dr|Kumari)\.?)\s+(" + _NAME + r")")
 _P_LABEL = re.compile(
     r"\b(?i:co-applicant|applicant|customer|claimant|policy\s*holder|policyholder|nominee|"
