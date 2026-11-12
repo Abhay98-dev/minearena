@@ -401,3 +401,17 @@ def test_care_of_relationship_pattern():
     assert "Ramesh Rao" not in r["sanitized_text"]
     assert "Suresh Rao" not in r["sanitized_text"]
     destroy_mapping(r["mapping_handle"])
+
+
+def test_origin_city_pune_se_hu_masked():
+    """Hinglish 'me pune se hu' (from user screenshot) must mask pune as ADDRESS."""
+    text = ("mera naam aditya kumar hai aur me pune se hu and my adhaar id is "
+            "4446.2253.9751 aur mera gstin hai 27AAAPA1234A1Z5 kya tum mere details ek baar check kar sakte ho?")
+    r = sanitize_document(text, "req_pune_se_hu")
+    s = r["sanitized_text"]
+    assert "pune" not in s.lower()
+    assert "<ADDRESS_1>" in s
+    assert "<PERSON_1>" in s
+    assert "<AADHAAR_1>" in s
+    assert "<GSTIN_1>" in s
+    destroy_mapping(r["mapping_handle"])

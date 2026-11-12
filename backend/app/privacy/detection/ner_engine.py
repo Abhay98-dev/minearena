@@ -84,6 +84,33 @@ _A_LIVES_LC = re.compile(
 _A_HINGLISH = re.compile(
     r"(?i)\b([a-z0-9][\w\-]*(?:[ \t,]+[a-z0-9][\w\-]*){0,3})[ \t]+(?:me|mein|main|mai|mei|mien|mai)[ \t]+"
     r"(?:hi[ \t]+)?r[ae]h?e?(?:t[aei]|n[ae])\b")
+# Hinglish origin: "pune se hu", "mumbai se hoon", "delhi se hai", "davangere se belong karta hu"
+_A_SE_HINGLISH = re.compile(
+    r"(?i)\b([a-z0-9][\w\-]*(?:[ \t,]+[a-z0-9][\w\-]*){0,3})[ \t]+(?:se|se\s+hi)[ \t]+"
+    r"(?:hu|hoon|hun|hai|hain|tha|thi|the|belong|aata|aati|aate)\b"
+)
+_A_FROM_EN = re.compile(
+    r"(?i)\b(?:from|native\s+of|based\s+out\s+of|originate[sd]?\s+from)\s+"
+    r"([a-z0-9][\w\-/]*(?:[ \t,]+[a-z0-9][\w\-/]*){0,3})"
+)
+_CITIES_STR = (
+    r"mumbai|delhi|bangalore|bengaluru|hyderabad|ahmedabad|chennai|kolkata|surat|pune|jaipur|"
+    r"lucknow|kanpur|nagpur|indore|thane|bhopal|visakhapatnam|patna|vadodara|ghaziabad|ludhiana|"
+    r"agra|nashik|faridabad|meerut|rajkot|varanasi|srinagar|aurangabad|dhanbad|amritsar|navi mumbai|"
+    r"allahabad|prayagraj|howrah|ranchi|gwalior|jabalpur|coimbatore|vijayawada|jodhpur|madurai|"
+    r"raipur|kota|chandigarh|guwahati|solapur|hubli|dharwad|mysore|mysuru|tiruchirappalli|bareilly|"
+    r"aligarh|tiruppur|gurgaon|gurugram|moradabad|jalandhar|bhubaneswar|salem|warangal|guntur|"
+    r"bhiwandi|saharanpur|gorakhpur|bikaner|amravati|noida|jamshedpur|bhilai|cuttack|firozabad|"
+    r"kochi|cochin|nellore|bhavnagar|dehradun|durgapur|asansol|rourkela|nanded|kolhapur|ajmer|"
+    r"akola|gulbarga|kalaburagi|jamnagar|ujjain|siliguri|jhansi|ulhasnagar|jammu|sangli|mangalore|"
+    r"mangaluru|erode|belgaum|belagavi|kurnool|davangere|malegaon|tirunelveli|panipat|shimla|"
+    r"rishikesh|haridwar|panaji|goa|kothrud|hadapsar|wakad|hinjewadi|baner|aundh|viman nagar|"
+    r"andheri|bandra|borivali|whitefield|koramangala|indiranagar"
+)
+_A_CITY_CONTEXT = re.compile(
+    r"(?i)(?:\b(?:in|at|from|se|near|around|me|mein|main|city|location|town|resident\s+of|lives?\s+in|staying\s+in|based\s+in)[ \t]+("
+    + _CITIES_STR + r")\b|\b(" + _CITIES_STR + r")[ \t]+(?:me|mein|main|se|city|town|shahar|sheher)\b)"
+)
 _PLACE_STOP = LC_STOP | {"log", "ham", "abhi", "filhal", "sab", "family", "parivar", "ghar", "yahan", "wahan", "idhar",
                          "udhar", "isi", "usi", "shahar", "sheher", "gaon", "city", "near", "since", "because", "so",
                          "we", "they", "he", "she", "it", "this", "that", "our", "on", "currently", "now", "still",
@@ -226,6 +253,15 @@ def heuristic_ner(text: str) -> List[Span]:
         add_words(m, "PERSON", 0.75, LC_STOP | ROLE_WORDS)
     for m in _A_HINGLISH.finditer(text):
         add_words(m, "ADDRESS", 0.75, _PLACE_STOP, tail=True)
+    for m in _A_SE_HINGLISH.finditer(text):
+        add_words(m, "ADDRESS", 0.78, _PLACE_STOP, tail=True)
+    for m in _A_FROM_EN.finditer(text):
+        if m.group(1).split()[0].lower().strip(",") in _PLACE_STOP | {"a", "an", "the"}:
+            continue
+        add_words(m, "ADDRESS", 0.75, _PLACE_STOP | {"a", "an", "the"})
+    for m in _A_CITY_CONTEXT.finditer(text):
+        grp = 1 if m.group(1) else 2
+        add(m, "ADDRESS", 0.85, grp=grp)
     for m in _A_LIVES_LC.finditer(text):
         # "i live in a flat" is not a place: skip when the first word is a stop word
         if m.group(1).split()[0].lower().strip(",") in _PLACE_STOP | {"a", "an", "the"}:
