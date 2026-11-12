@@ -209,3 +209,51 @@ def test_I_comma_name_pattern():
     r = sanitize_document("Dear Sir, I, Suresh Kumar Patil, request a loan.", "req18")
     assert "Suresh" not in r["sanitized_text"] and "<PERSON_1>" in r["sanitized_text"]
     destroy_mapping(r["mapping_handle"])
+
+
+def test_relation_and_verb_heuristics_regression():
+    r1 = sanitize_document("Priya Nair and her husband Arjun Nair visited the branch yesterday.", "req19")
+    assert "Priya" not in r1["sanitized_text"] and "Arjun" not in r1["sanitized_text"]
+    assert "<PERSON_1>" in r1["sanitized_text"] and "<PERSON_2>" in r1["sanitized_text"]
+    destroy_mapping(r1["mapping_handle"])
+
+    r2 = sanitize_document("Kabir Ahmed lives in Hyderabad.", "req20")
+    assert "Kabir Ahmed" not in r2["sanitized_text"] and "Hyderabad" not in r2["sanitized_text"]
+    assert "<PERSON_1>" in r2["sanitized_text"] and "<ADDRESS_1>" in r2["sanitized_text"]
+    destroy_mapping(r2["mapping_handle"])
+
+
+def test_reinsertion_adversarial_formatting():
+    r = sanitize_document("Applicant: Rahul Sharma\nCo-applicant: Priya Nair\nPAN: ABCDE1234F", "req21")
+    h = r["mapping_handle"]
+
+    # Markdown bold & backticks
+    out_md = reinsert_placeholders("**<PERSON_1>** has `<PAN_1>`.", h)
+    assert out_md["restored_text"] == "**Rahul Sharma** has `ABCDE1234F`."
+
+    # Adjacent placeholders
+    out_adj = reinsert_placeholders("<PERSON_1><PERSON_2>", h)
+    assert out_adj["restored_text"] == "Rahul SharmaPriya Nair"
+
+    # Possessive
+    out_pos = reinsert_placeholders("<PERSON_1>'s PAN is <PAN_1>.", h)
+    assert out_pos["restored_text"] == "Rahul Sharma's PAN is ABCDE1234F."
+
+    # Repeated 50x
+    out_rep = reinsert_placeholders(" ".join(["<PERSON_1>"] * 50), h)
+    assert out_rep["restored_text"] == " ".join(["Rahul Sharma"] * 50)
+
+    # Lowercase variant
+    out_lc = reinsert_placeholders("<person_1> and <pan_1>", h)
+    assert out_lc["restored_text"] == "Rahul Sharma and ABCDE1234F"
+
+    destroy_mapping(h)
+
+
+def test_reinsertion_unclosed_bracket_observation():
+    # Document observed behavior on malformed "<PERSON_1" (bare-form branch matches PERSON_1 after '<')
+    r = sanitize_document("My name is Rahul Sharma.", "req22")
+    h = r["mapping_handle"]
+    out = reinsert_placeholders("<PERSON_1", h)
+    assert out["restored_text"] == "<Rahul Sharma"
+    destroy_mapping(h)

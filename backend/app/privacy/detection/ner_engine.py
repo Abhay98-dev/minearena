@@ -15,6 +15,7 @@ from ..schemas import Span
 
 _TOK = r"(?:[A-Z]\.|[A-Z][A-Za-z'\-]+)"  # "Rahul" or an initial "K."
 _NAME = _TOK + r"(?:[ \t]+" + _TOK + r"){0,4}"
+_NAME_2 = _TOK + r"(?:[ \t]+" + _TOK + r"){1,4}"  # 2+ tokens: avoids matching lone first names or sentence-initial nouns
 
 # "My name is X", "Mera naam X hai", "Mr./Shri X"
 _P_TRIGGER = re.compile(r"(?i:my\s+name\s+is|mera\s+naam|mera\s+nam|naam\s+hai|name\s+is)\s+(" + _NAME + r")")
@@ -26,6 +27,18 @@ _P_LABEL = re.compile(
 )
 _P_I = re.compile(r"\bI,[ \t]*(" + _NAME + r")[ \t]*,")  # "I, Suresh Patil, residing at ..."
 _P_TRAIL = re.compile(r"\b(" + _NAME + r")[ \t]+(?i:ne|ka|ki|ke)\b")  # Hinglish: "Rahul Sharma ne ..."
+
+# "X and her/his husband/wife Y", "Full Name visited/lives/..."
+_P_RELATION = re.compile(
+    r"\b(?i:husband|wife|spouse|son|daughter|father|mother|brother|sister|friend|colleague|partner)[ \t]+"
+    + r"(" + _NAME + r")"
+)
+_P_COUPLE = re.compile(
+    r"\b(" + _NAME_2 + r")[ \t]+(?i:and[ \t]+(?:her|his)[ \t]+(?:husband|wife|spouse))\b"
+)
+_P_VERB = re.compile(
+    r"\b(" + _NAME_2 + r")[ \t]+(?i:visited|contacted|called|submitted|signed|applied|requested|deposited|withdrew|transferred|paid|lives|resides|resided|works)\b"
+)
 
 _A_LABEL = re.compile(
     r"(?im)\b(?:permanent\s+|residential\s+|current\s+|correspondence\s+)?address(?:\s+is)?[ \t]*[:\-]?[ \t]*(.+?)(?:\.(?=\s+[A-Z])|\.?[ \t]*$)"
@@ -84,6 +97,12 @@ def heuristic_ner(text: str) -> List[Span]:
         add(m, "PERSON", 0.8)
     for m in _P_TRAIL.finditer(text):
         add(m, "PERSON", 0.6, fix_stop=True)
+    for m in _P_RELATION.finditer(text):
+        add(m, "PERSON", 0.78)
+    for m in _P_COUPLE.finditer(text):
+        add(m, "PERSON", 0.78, fix_stop=True)
+    for m in _P_VERB.finditer(text):
+        add(m, "PERSON", 0.75, fix_stop=True)
     for m in _A_LABEL.finditer(text):
         add(m, "ADDRESS", 0.88)
     for m in _A_CITY.finditer(text):
