@@ -1,11 +1,8 @@
 import asyncio
 import os
 import sys
-import tempfile
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "backend"))
-os.environ["AUDIT_DB_PATH"] = os.path.join(tempfile.mkdtemp(), "audit.db")
-
 import pytest  # noqa: E402
 from app.core.errors import GatewayError  # noqa: E402
 from app.database import db  # noqa: E402
@@ -18,7 +15,8 @@ RAW = ["Rahul Sharma", "1234-5678-9012", "ABCDE1234F", "Pune"]
 
 
 @pytest.fixture(autouse=True)
-def _setup(monkeypatch):
+def _setup(monkeypatch, tmp_path):
+    monkeypatch.setattr(gw.config, "AUDIT_DB_PATH", str(tmp_path / "audit.db"))
     db.init_db()
     monkeypatch.setattr(gw.config, "LLM_FALLBACK", "")
     yield

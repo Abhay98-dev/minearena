@@ -8,9 +8,9 @@ Use this file as the short context packet for teammates and future models. The f
 2. **Implementation clarifications, Round 1 scenarios, and evaluation definitions:** `MineArena_PS02_Master_Guide_1.md`.
 3. **Starter code:** contents of `minearena_code.zip`, copied into this workspace.
 
-The archive's contents are starter code, not proof of a working deployment. **[TESTED]** The current workspace suite passes: 38 tests using Python 3.14.4, FastAPI 0.115.14, pytest 9.2.0. **[TESTED]** FastAPI startup, health, mock processing for the basic, Hinglish, repeated-name, and dropped-placeholder examples, audit, and metrics passed with heuristic detection. Gemini, GLiNER model loading, Presidio with its spaCy model, Ollama, and the real external provider path remain **[UNTESTED]**. The guide's earlier claim of 37 passing tests described a previous code snapshot. Do not report performance numbers before the dataset evaluation runs.
+The archive's contents are starter code, not proof of a working deployment. **[TESTED]** The current workspace suite passes: 43 tests using Python 3.14.4, FastAPI 0.115.14, pytest 9.2.0. **[TESTED]** FastAPI lifespan/startup, health, the Member 3 HTTP contract, CORS preflight, safe validation errors, blocked-request response/audit, mock processing for the basic, Hinglish, repeated-name, and dropped-placeholder examples, audit, and metrics passed with heuristic detection. Gemini, GLiNER model loading, Presidio with its spaCy model, Ollama, and the real external provider path remain **[UNTESTED]**. The guide's earlier 37/38-test counts referred to earlier snapshots. Do not report performance numbers before the dataset evaluation runs.
 
-The workspace currently has no initialized Git repository. Do not claim commits or branches exist.
+Current shared repository branch for Abhay's work: `feature/backend-gateway`, created from `origin/main`. Member 3 should branch from or pull this branch once it is pushed.
 
 ## Frozen interface
 

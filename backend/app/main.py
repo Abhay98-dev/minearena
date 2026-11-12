@@ -1,4 +1,6 @@
 """Run from repo root:  uvicorn app.main:app --reload --app-dir backend"""
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,13 +11,14 @@ from app.core import config
 from app.core.errors import GatewayError
 from app.database import db
 
-app = FastAPI(title="MineArena PS-02 Privacy Gateway")
-app.add_middleware(CORSMiddleware, allow_origins=config.CORS_ORIGINS, allow_methods=["*"], allow_headers=["*"])
-
-
-@app.on_event("startup")
-def _startup():
+@asynccontextmanager
+async def lifespan(_: FastAPI):
     db.init_db()
+    yield
+
+
+app = FastAPI(title="MineArena PS-02 Privacy Gateway", lifespan=lifespan)
+app.add_middleware(CORSMiddleware, allow_origins=config.CORS_ORIGINS, allow_methods=["*"], allow_headers=["*"])
 
 
 @app.exception_handler(GatewayError)
