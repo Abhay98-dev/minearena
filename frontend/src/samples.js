@@ -26,6 +26,17 @@ export const SAMPLES = [
       + 'Address: Plot 12, Hadadi Road, PJ Extension, Davangere 577002',
   },
   {
+    id: 'd7', label: 'D7 · Messy chat: lowercase Hinglish, dotted IDs', task: 'extract',
+    text: 'hi mera naam aditya hai aur me pune me reheta hu also mera adhaar no 5555-6666-7894 hai and mere dost ka '
+      + 'name rahul hai aur uska adhar no 1111.2222.8888 hai. pan = ABCDE 1234 F, a.id=2345/6789/0123',
+  },
+  {
+    id: 'd8', label: 'D8 · Raw JSON order / support payload', task: 'extract',
+    text: '{"ticket": "TKT-48213", "customer_name": "rahul sharma", "address": "Flat 302, Sai Residency, Kondapur, '
+      + 'Hyderabad - 500084", "city": "hyderabad", "pan": "ABCPS1234F", "aadhaar": "2341.2341.2346", '
+      + '"issue": "refund not received for order 4471", "agent": "Meera"}',
+  },
+  {
     id: 'd6', label: 'Free-text support ticket', task: 'summarize',
     text: 'Yesterday Kavitha Subramaniam raised a ticket saying the EMI was debited twice. Her brother Venkatesh also '
       + 'holds an account. She stays near Lalbagh, Basavanagudi, Bengaluru 560004.',

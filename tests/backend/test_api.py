@@ -141,3 +141,8 @@ def test_evaluation_report_endpoint(client, monkeypatch, tmp_path):
     report.write_text('{"leakage": {"count": 0}}', encoding="utf-8")
     monkeypatch.setattr(engines, "RESULTS", report)
     assert client.get("/api/v1/evaluation").json() == {"leakage": {"count": 0}}
+
+
+def test_root_is_a_landing_page_not_404(client):
+    body = client.get("/").json()
+    assert body["status"] == "ok" and body["docs"] == "/docs" and body["engines"] == "/api/v1/engines"

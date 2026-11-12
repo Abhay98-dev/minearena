@@ -58,19 +58,34 @@ def gstin_valid(g: str) -> bool:
 
 
 # ---------- regexes ----------
-_AADHAAR = re.compile(r"(?<![0-9A-Za-z])(\d{4}[ \-]?\d{4}[ \-]?\d{4})(?![0-9A-Za-z])")
+# Separators people actually type inside IDs: space, dash, dot, slash ("1111.2222.8888", "1234/5678/9012")
+_SEP = r"[ \-./]"
+_AADHAAR = re.compile(r"(?<![0-9A-Za-z])(?<![0-9][.\-/])(\d{4}" + _SEP + r"?\d{4}" + _SEP + r"?\d{4})(?![0-9A-Za-z]|[.\-/]\d)")
 _GSTIN = re.compile(r"(?<![0-9A-Za-z])(\d{2}[A-Za-z]{5}\d{4}[A-Za-z][1-9A-Za-z][Zz][0-9A-Za-z])(?![0-9A-Za-z])")
 _PAN = re.compile(r"(?<![0-9A-Za-z])([A-Za-z]{5}\d{4}[A-Za-z])(?![0-9A-Za-z])")
 _VOTER = re.compile(r"(?<![0-9A-Za-z])([A-Za-z]{3}\d{7})(?![0-9A-Za-z])")
 _PASSPORT = re.compile(r"(?<![0-9A-Za-z])([A-PR-WYa-pr-wy]\d{7})(?![0-9A-Za-z])")
+# Spaced / dashed forms ("ABCDE 1234 F", "XYZ 1234567", "K 1234567"). Only accepted with the ID's
+# keyword just before them, because spaced letter+digit groups are too common in ordinary text.
+_PAN_SPACED = re.compile(r"(?<![0-9A-Za-z])([A-Za-z]{5}[ \-]?\d{4}[ \-]?[A-Za-z])(?![0-9A-Za-z])")
+_VOTER_SPACED = re.compile(r"(?<![0-9A-Za-z])([A-Za-z]{3}[ \-]\d{7}|[A-Za-z]{3}[ \-]\d{3}[ \-]?\d{4})(?![0-9A-Za-z])")
+_PASSPORT_SPACED = re.compile(r"(?<![0-9A-Za-z])([A-PR-WYa-pr-wy][ \-]\d{7}|[A-PR-WYa-pr-wy][ \-]?\d{3}[ \-]\d{4})(?![0-9A-Za-z])")
 
-_AADHAAR_CTX = re.compile(r"(aadhaar|aadhar|adhar|adhaar|uidai|\buid\b|आधार)", re.I)
+_AADHAAR_CTX = re.compile(
+    r"(aadhaar|aadhar|adhar|adhaar|aadhhar|uidai|\buid\b|\bu\.\s?id\b|\ba\.\s?id\b|unique\s*id|e-?\s?kyc|आधार)", re.I)
 _PASSPORT_CTX = re.compile(r"(passport|पासपोर्ट)", re.I)
 _VOTER_CTX = re.compile(r"(voter|epic|election\s*card|मतदाता)", re.I)
+_PAN_CTX = re.compile(r"(\bpan\b|permanent\s+account|पैन)", re.I)
 _PAN_4TH = set("ABCFGHLJPT")  # valid PAN holder-type letters
+_CTX_WINDOW = 60
 
 
-def _ctx(text: str, start: int, rx: re.Pattern, window: int = 40) -> bool:
+def _ctx(text: str, start: int, rx: re.Pattern, window: int = _CTX_WINDOW) -> bool:
+    return bool(rx.search(text[max(0, start - window):start]))
+
+
+def _near(text: str, start: int, rx: re.Pattern, window: int = 30) -> bool:
+    """Keyword close before the value (tighter than _ctx; used for the spaced forms)."""
     return bool(rx.search(text[max(0, start - window):start]))
 
 
@@ -87,7 +102,7 @@ def find_aadhaar(text: str) -> List[Span]:
     for m in _AADHAAR.finditer(text):
         raw = m.group(1)
         digits = re.sub(r"\D", "", raw)
-        grouped = bool(re.search(r"[ \-]", raw))
+        grouped = bool(re.search(_SEP, raw))
         ctx = _ctx(text, m.start(1), _AADHAAR_CTX)
         valid = verhoeff_valid(digits) and digits[0] in "23456789"
         # accept: checksum-valid, OR grouped 4-4-4 format, OR aadhaar keyword nearby
@@ -98,13 +113,23 @@ def find_aadhaar(text: str) -> List[Span]:
     return out
 
 
+def _spaced(text: str, rx: re.Pattern, ctx: re.Pattern, typ: str, taken: List[Span]) -> List[Span]:
+    out = []
+    for m in rx.finditer(text):
+        if any(s.start < m.end(1) and m.start(1) < s.end for s in taken):
+            continue  # the compact form already covers it
+        if _near(text, m.start(1), ctx):
+            out.append(Span(m.start(1), m.end(1), typ, 0.9, "regex"))
+    return out
+
+
 def find_pan(text: str) -> List[Span]:
     out = []
     for m in _PAN.finditer(text):
         s = m.group(1)
         conf = 0.98 if (s[3].upper() in _PAN_4TH and s.isupper()) else 0.85
         out.append(Span(m.start(1), m.end(1), "PAN", conf, "regex"))
-    return out
+    return out + _spaced(text, _PAN_SPACED, _PAN_CTX, "PAN", out)
 
 
 def find_voter_id(text: str) -> List[Span]:
@@ -112,7 +137,7 @@ def find_voter_id(text: str) -> List[Span]:
     for m in _VOTER.finditer(text):
         conf = 0.95 if _ctx(text, m.start(1), _VOTER_CTX) else 0.85
         out.append(Span(m.start(1), m.end(1), "VOTER_ID", conf, "regex"))
-    return out
+    return out + _spaced(text, _VOTER_SPACED, _VOTER_CTX, "VOTER_ID", out)
 
 
 def find_passport(text: str) -> List[Span]:
@@ -120,7 +145,7 @@ def find_passport(text: str) -> List[Span]:
     for m in _PASSPORT.finditer(text):
         conf = 0.95 if _ctx(text, m.start(1), _PASSPORT_CTX) else 0.6
         out.append(Span(m.start(1), m.end(1), "PASSPORT", conf, "regex"))
-    return out
+    return out + _spaced(text, _PASSPORT_SPACED, _PASSPORT_CTX, "PASSPORT", out)
 
 
 ALL_FINDERS = {

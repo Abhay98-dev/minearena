@@ -2,6 +2,8 @@ import os
 import sys
 import threading
 
+import pytest
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "backend"))
 
 from app.privacy import (sanitize_document, validate_outbound_payload,  # noqa: E402
@@ -290,3 +292,105 @@ def test_reinsertion_unclosed_bracket_observation():
     out = reinsert_placeholders("<PERSON_1", h)
     assert out["restored_text"] == "<Rahul Sharma"
     destroy_mapping(h)
+
+
+# ---- teammate review (12 Nov): messy real-world input. Rules-only mode on purpose: these must hold
+# ---- even if GLiNER fails to load.
+SCREENSHOT_1 = ("hi mera naam aditya hai aur me pune me reheta hu also mera adhaar no 5555-6666-7894 hai and "
+                "mere dost ka name rahul hai aur uska adhar no 1111.2222.8888 hai")
+
+
+def test_screenshot_1_lowercase_hinglish_and_dotted_aadhaar():
+    r = sanitize_document(SCREENSHOT_1, "rev1")
+    s = r["sanitized_text"]
+    for raw in ("aditya", "pune", "5555-6666-7894", "1111.2222.8888", "rahul"):
+        assert raw not in s, raw
+    assert s.count("<AADHAAR_") == 2 and "<ADDRESS_1>" in s
+    assert " me <ADDRESS_1> me reheta" in s  # only the city, not the pronoun around it
+    assert r["leakage_check"] is True
+    destroy_mapping(r["mapping_handle"])
+
+
+@pytest.mark.parametrize("value", ["1234.5678.9012", "1234/5678/9012", "1234-5678-9012", "1234 5678 9012"])
+def test_aadhaar_any_separator_detected_and_guarded(value):
+    r = sanitize_document(f"Aadhaar: {value}", "rev2")
+    assert r["sanitized_text"] == "Aadhaar: <AADHAAR_1>"
+    destroy_mapping(r["mapping_handle"])
+    # the guard alone must also catch it (e.g. if detection had missed it)
+    h = sanitize_document("nothing here", "rev2b")["mapping_handle"]
+    assert validate_outbound_payload(f"aadhaar {value}", h)["safe"] is False
+    destroy_mapping(h)
+
+
+def test_dotted_numbers_that_are_not_aadhaar():
+    t = "Invoice 2024.1101.0001.77, version 1.2.3, amount 12,500.50"
+    r = sanitize_document(t, "rev3")
+    assert r["sanitized_text"] == t
+    destroy_mapping(r["mapping_handle"])
+
+
+def test_abbreviated_aadhaar_labels():
+    r = sanitize_document("a.id=2345 6789 0123, unique id=345678901234, u.id= 4567-8901-2345, ekyc id 567890123456",
+                          "rev4")
+    assert r["sanitized_text"] == "a.id=<AADHAAR_1>, unique id=<AADHAAR_2>, u.id= <AADHAAR_3>, ekyc id <AADHAAR_4>"
+    destroy_mapping(r["mapping_handle"])
+
+
+def test_spaced_ids_with_keyword_and_plain_text_without():
+    r = sanitize_document("pan = ABCDE 1234 F and voter = XYZ 1234567 and passport no K 1234567", "rev5")
+    assert r["sanitized_text"] == "pan = <PAN_1> and voter = <VOTER_ID_1> and passport no <PASSPORT_1>"
+    assert r["leakage_check"] is True
+    destroy_mapping(r["mapping_handle"])
+    # same shapes without the keyword are ordinary text
+    r2 = sanitize_document("Room ABC 1234567 and block A 1234567", "rev5b")
+    assert r2["entities"] == []
+    destroy_mapping(r2["mapping_handle"])
+
+
+def test_spaced_and_compact_pan_share_one_placeholder():
+    r = sanitize_document("PAN ABCDE1234F. Confirm pan: ABCDE-1234-F", "rev6")
+    assert r["sanitized_text"].count("<PAN_1>") == 2 and "<PAN_2>" not in r["sanitized_text"]
+    destroy_mapping(r["mapping_handle"])
+
+
+def test_json_payload_stays_valid_json():
+    import json
+    t = '{"name": "rahul sharma", "address": "12 MG Road, Pune 411001", "pan": "ABCDE1234F", "city": "pune"}'
+    r = sanitize_document(t, "rev7")
+    data = json.loads(r["sanitized_text"])  # masking must not break the structure
+    assert data == {"name": "<PERSON_1>", "address": "<ADDRESS_1>", "pan": "<PAN_1>", "city": "<ADDRESS_2>"}
+    destroy_mapping(r["mapping_handle"])
+
+
+def test_key_value_payload():
+    r = sanitize_document("Name=Rahul Sharma; city=Pune; PAN=ABCDE1234F", "rev8")
+    assert r["sanitized_text"] == "Name=<PERSON_1>; city=<ADDRESS_1>; PAN=<PAN_1>"
+    destroy_mapping(r["mapping_handle"])
+
+
+def test_lowercase_english_name_and_city():
+    r = sanitize_document("my name is aditya kulkarni and i live in nashik", "rev9")
+    assert r["sanitized_text"] == "my name is <PERSON_1> and i live in <ADDRESS_1>"
+    destroy_mapping(r["mapping_handle"])
+    r2 = sanitize_document("i live in a flat near the station", "rev9b")
+    assert r2["entities"] == []  # "a flat" is not a place
+    destroy_mapping(r2["mapping_handle"])
+
+
+@pytest.mark.parametrize("text,city", [
+    ("main mumbai mein rehti hoon", "mumbai"),
+    ("hum log delhi me rahte hain", "delhi"),
+    ("ramesh aur me pune me rehte hai", "pune"),
+    ("Sector 22, Noida mein rehte hain", "Noida"),
+    ("Mera ghar Kothrud me hai, Pune me rehna hai", "Pune"),
+])
+def test_hinglish_residence_spellings(text, city):
+    r = sanitize_document(text, "rev10")
+    assert city not in r["sanitized_text"]
+    destroy_mapping(r["mapping_handle"])
+
+
+def test_id_normalize_ignores_separators():
+    from app.privacy.mapping.mapping_store import normalize
+    assert normalize("PAN", "ABCDE-1234-F") == normalize("PAN", "abcde 1234 f") == "ABCDE1234F"
+    assert normalize("AADHAAR", "1111.2222.8888") == "111122228888"

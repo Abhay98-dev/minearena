@@ -13,11 +13,14 @@ class MappingNotFound(KeyError):
     pass
 
 
+ID_SEPARATORS = re.compile(r"[\s\-./]+")  # what people type inside IDs; ignored when comparing
+
+
 def normalize(entity_type: str, value: str) -> str:
     if entity_type == "AADHAAR":
         return re.sub(r"\D", "", value)
     if entity_type in ("PAN", "GSTIN", "VOTER_ID", "PASSPORT"):
-        return re.sub(r"\s+", "", value).upper()
+        return ID_SEPARATORS.sub("", value).upper()  # "ABCDE-1234-F" / "ABCDE 1234 F" == "ABCDE1234F"
     return " ".join(value.split()).casefold()  # PERSON / ADDRESS
 
 

@@ -13,6 +13,7 @@ NOT exercised in the offline build sandbox: run tests/privacy/test_presidio_opti
 import logging
 import os
 import re
+import threading
 from typing import List, Optional
 
 from ..schemas import Span
@@ -27,6 +28,7 @@ PRESIDIO_MAP = {
 _analyzer = None
 _failed = False
 _error = None
+_lock = threading.Lock()
 log = logging.getLogger("minearena.privacy")
 
 
@@ -71,13 +73,14 @@ def get_analyzer():
     if _failed:
         return None
     if _analyzer is None:
-        try:
-            _analyzer = _build()
-        except Exception as e:
-            _failed = True
-            _error = f"{type(e).__name__}: {str(e)[:200]}"
-            log.error("Presidio failed to load; using built-in India recognizers only. %s", _error)
-            return None
+        with _lock:  # concurrent first requests build the engine once
+            if _analyzer is None and not _failed:
+                try:
+                    _analyzer = _build()
+                except Exception as e:
+                    _failed = True
+                    _error = f"{type(e).__name__}: {str(e)[:200]}"
+                    log.error("Presidio failed to load; using built-in India recognizers only. %s", _error)
     return _analyzer
 
 
@@ -110,11 +113,12 @@ def detect_with_presidio(text: str) -> List[Span]:
 # Presidio's built-in India patterns are looser than the real formats (its PAN pattern matched a date
 # like 23-04-1991 in testing). Keep a Presidio ID hit only if it has the basic shape of that ID type.
 _SHAPE = {
-    "AADHAAR": re.compile(r"\d{4}[ \-]?\d{4}[ \-]?\d{4}"),
-    "PAN": re.compile(r"[A-Za-z]{5}\d{4}[A-Za-z]"),
+    # same separators as our own recognizers (space, dash, dot, slash) so Presidio and the guard agree
+    "AADHAAR": re.compile(r"\d{4}[ \-./]?\d{4}[ \-./]?\d{4}"),
+    "PAN": re.compile(r"[A-Za-z]{5}[ \-]?\d{4}[ \-]?[A-Za-z]"),
     "GSTIN": re.compile(r"\d{2}[A-Za-z0-9]{13}"),
-    "VOTER_ID": re.compile(r"[A-Za-z]{3}\d{7}"),
-    "PASSPORT": re.compile(r"[A-Za-z]\d{7}"),
+    "VOTER_ID": re.compile(r"[A-Za-z]{3}[ \-]?\d{7}"),
+    "PASSPORT": re.compile(r"[A-Za-z][ \-]?\d{7}"),
 }
 
 

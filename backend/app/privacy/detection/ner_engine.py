@@ -10,6 +10,7 @@ Everything runs locally. No network call is made at inference time
 import logging
 import os
 import re
+import threading
 from typing import List, Optional
 
 from ..schemas import Span
@@ -21,11 +22,27 @@ _NAME_2 = _TOK + r"(?:[ \t]+" + _TOK + r"){1,4}"  # 2+ tokens: avoids matching l
 # "My name is X", "Mera naam X hai", "Mr./Shri X"
 _P_TRIGGER = re.compile(r"(?i:my\s+name\s+is|mera\s+naam|mera\s+nam|naam\s+hai|name\s+is)\s+(" + _NAME + r")")
 _P_HONORIFIC = re.compile(r"\b(?:Mr|Mrs|Ms|Miss|Shri|Smt|Sri|Dr|Kumari)\.?\s+(" + _NAME + r")")
-_P_LABEL = re.compile(
-    r"\b(?i:co-applicant|applicant|customer|claimant|policy\s*holder|policyholder|nominee|"
-    r"account\s*holder|full\s*name|name|father'?s\s*name|mother'?s\s*name|spouse|guarantor|"
-    r"insured|beneficiary|patient)(?i:\s*name)?[ \t]*[:\-][ \t]*(" + _NAME + r")"
-)
+_LABELS_PERSON = (r"co-applicant|applicant|customer|claimant|policy\s*holder|policyholder|nominee|"
+                  r"account\s*holder|full\s*name|name|naam|father'?s\s*name|mother'?s\s*name|spouse|guarantor|"
+                  r"insured|beneficiary|patient|customer_name|full_name|first_name|last_name")
+# Label + delimiter in prose ("Name: X"), key=value ("name=X") and JSON ('"name": "X"')
+_DELIM = r"[\"']?[ \t]*[:=\-][ \t]*[\"']?"
+_P_LABEL = re.compile(r"\b(?i:" + _LABELS_PERSON + r")(?i:\s*name)?" + _DELIM + r"(" + _NAME + r")")
+
+# Lower-case names, as people type in chat: "mera naam aditya hai", "my name is aditya kulkarni and ...",
+# "mere dost ka name rahul hai", '"name": "rahul sharma"'. The value runs until a stop word.
+_LC_WORDS = r"[A-Za-z][A-Za-z'\-]+(?:[ \t]+[A-Za-z][A-Za-z'\-]+){0,3}"
+_P_TRIGGER_LC = re.compile(
+    r"(?i:\bmy\s+name\s+is|\bmy\s+name|\bmera\s+naam|\bmera\s+nam|\bmeraa\s+naam|\bname\s+is|\bnaam\s+hai|"
+    r"\b(?:ka|ki|ke)\s+(?:naam|name)(?:\s+(?:hai|is))?)[ \t]+(" + _LC_WORDS + r")")
+_P_LABEL_LC = re.compile(r"\b(?i:" + _LABELS_PERSON + r")" + _DELIM + r"(" + _LC_WORDS + r")")
+LC_STOP = {
+    "hai", "h", "hu", "hoon", "hun", "he", "hain", "tha", "thi", "and", "aur", "or", "but", "also", "bhi", "i", "is",
+    "was", "here", "from", "se", "ji", "my", "mera", "meri", "mere", "me", "mein", "main", "mai", "the", "a", "an",
+    "of", "to", "in", "at", "with", "for", "yeh", "ye", "woh", "wo", "ko", "ka", "ki", "ke", "ne", "nahi", "naam",
+    "name", "hello", "hi", "sir", "madam", "please", "pls", "plz", "thanks", "uska", "uski", "unka", "hamara", "hum",
+    "aap", "aapka", "number", "no", "id", "ok", "okay", "yes", "kya", "kaun", "not", "unknown", "na", "null", "none",
+}
 _P_I = re.compile(r"\bI,[ \t]*(" + _NAME + r")[ \t]*,")  # "I, Suresh Patil, residing at ..."
 _P_TRAIL = re.compile(r"\b(" + _NAME + r")[ \t]+(?i:ne|ka|ki|ke)\b")  # Hinglish: "Rahul Sharma ne ..."
 
@@ -41,15 +58,33 @@ _P_VERB = re.compile(
     r"\b(" + _NAME_2 + r")[ \t]+(?i:visited|contacted|called|submitted|signed|applied|requested|deposited|withdrew|transferred|paid|lives|resides|resided|works)\b"
 )
 
+# The value never runs past a double quote (JSON), ';' or '|', or into the next "key=" / '"key":'.
 _A_LABEL = re.compile(
-    r"(?im)\b(?:permanent\s+|residential\s+|current\s+|correspondence\s+)?address(?:\s+is)?[ \t]*[:\-]?[ \t]*(.+?)(?:\.(?=\s+[A-Z])|\.?[ \t]*$)"
+    r"(?im)\b(?:permanent\s+|residential\s+|current\s+|correspondence\s+|delivery\s+|billing\s+|shipping\s+|"
+    r"home\s+|office\s+)?(?:address|addr)(?:\s+is)?[\"']?[ \t]*[:=\-]?[ \t]*\"?"
+    r"([^\"\n;|]+?)"
+    r"(?=\"|\.\s+[A-Z]|\.?[ \t]*$|[ \t]*[;|]|,[ \t]*\"?[A-Za-z_][\w ]{0,20}\"?[ \t]*[:=])"
 )
-_A_CITY = re.compile(r"(?im)^[ \t]*(?:city|town|village|location|district|state)[ \t]*[:\-][ \t]*(.+?)[ \t]*$")
+_A_CITY = re.compile(
+    r"(?im)(?:^|[;,{|]|[ \t])[ \t]*[\"']?(?:city|town|village|location|district|state|pin\s*code|pincode)[\"']?"
+    r"[ \t]*[:=\-][ \t]*\"?([^\"\n;|,]+)")
 _A_LIVES = re.compile(
     r"(?i:lives?\s+(?:in|at)|reside[sd]?\s+(?:in|at)|residing\s+(?:in|at)|resident\s+of|staying\s+(?:in|at)|based\s+(?:in|at))\s+"
     r"((?:[0-9][\w/\-]*[ ,]+)?[A-Z][A-Za-z0-9\-]*(?:\.[A-Za-z0-9]+)*(?:[ ,]+[A-Z0-9][A-Za-z0-9\-]*(?:\.[A-Za-z0-9]+)*){0,5})"
 )
-_A_HINGLISH = re.compile(r"\b([A-Z][a-z]+(?:[ \t]+[A-Z][a-z]+){0,2})[ \t]+(?i:mein|me|main)[ \t]+(?i:rehta|rehti|rehte|rahta|rahti|rehna)")
+# Lower-case English residence: "i live in nashik", "staying at kothrud, pune and ..."
+_A_LIVES_LC = re.compile(
+    r"(?i)\b(?:live|lives|living|reside|resides|residing|stay|stays|staying|based|resident)\s+(?:in|at|of)\s+"
+    r"([a-z0-9][\w\-/]*(?:[ \t,]+[a-z0-9][\w\-/]*){0,4})")
+# Hinglish residence, any case and common spellings: "pune me reheta hu", "Mumbai mein rehti hoon",
+# "hum log delhi me rahte hain", "Sector 22, Noida mein rehte hain". Verb: reh/rah(e)ta/ti/te/na/ne.
+_A_HINGLISH = re.compile(
+    r"(?i)\b([a-z0-9][\w\-]*(?:[ \t,]+[a-z0-9][\w\-]*){0,3})[ \t]+(?:me|mein|main|mai|mei|mien|mai)[ \t]+"
+    r"(?:hi[ \t]+)?r[ae]h?e?(?:t[aei]|n[ae])\b")
+_PLACE_STOP = LC_STOP | {"log", "ham", "abhi", "filhal", "sab", "family", "parivar", "ghar", "yahan", "wahan", "idhar",
+                         "udhar", "isi", "usi", "shahar", "sheher", "gaon", "city", "near", "since", "because", "so",
+                         "we", "they", "he", "she", "it", "this", "that", "our", "on", "currently", "now", "still",
+                         "together", "alone", "with", "rent", "hostel", "pg"}
 
 # Role / form words that are never part of a name. Used to (a) strip them from the front of a
 # heuristic name span ("Applicant Priya Nair" -> "Priya Nair") and (b) reject GLiNER spans that are
@@ -94,9 +129,9 @@ log = logging.getLogger("minearena.privacy")
 
 def _strip(text: str, s: int, e: int):
     """Trim whitespace/punctuation from span edges."""
-    while s < e and text[s] in " \t,.;:-":
+    while s < e and text[s] in " \t,.;:-\"'":
         s += 1
-    while e > s and text[e - 1] in " \t,.;:-":
+    while e > s and text[e - 1] in " \t,.;:-\"'":
         e -= 1
     return s, e
 
@@ -152,8 +187,45 @@ def heuristic_ner(text: str) -> List[Span]:
         add(m, "ADDRESS", 0.8)
     for m in _A_LIVES.finditer(text):
         add(m, "ADDRESS", 0.8)
+
+    # lower-case / chat-style rules: keep only the words between the stop words
+    def add_words(m, typ, conf, stop, tail=False):
+        """Keep one run of non-stop words: the first run (after a trigger: "aditya hai ..." -> "aditya"),
+        or with tail=True the run right before the verb ("ramesh aur me pune me rehte" -> "pune")."""
+        ws = list(re.finditer(r"[\w\-/]+", text[m.start(1):m.end(1)]))
+        base = m.start(1)
+        if tail:
+            j = len(ws)
+            i = j
+            while i > 0 and ws[i - 1].group(0).lower() not in stop:
+                i -= 1
+        else:
+            i = 0
+            while i < len(ws) and ws[i].group(0).lower() in stop:
+                i += 1
+            j = i
+            capitalised = i < len(ws) and ws[i].group(0)[:1].isupper()
+            while j < len(ws) and ws[j].group(0).lower() not in stop:
+                if capitalised and typ == "PERSON" and not ws[j].group(0)[:1].isupper():
+                    break  # "Rahul Sharma submitted ..." -> "Rahul Sharma"
+                j += 1
+        if j <= i:
+            return
+        s, e = _strip(text, base + ws[i].start(), base + ws[j - 1].end())
+        if e - s >= 2 and re.search(r"[A-Za-z]", text[s:e]) and not (typ == "PERSON" and _only_role_words(text[s:e])):
+            out.append(Span(s, e, typ, conf, "heuristic"))
+
+    for m in _P_TRIGGER_LC.finditer(text):
+        add_words(m, "PERSON", 0.8, LC_STOP | ROLE_WORDS)
+    for m in _P_LABEL_LC.finditer(text):
+        add_words(m, "PERSON", 0.75, LC_STOP | ROLE_WORDS)
     for m in _A_HINGLISH.finditer(text):
-        add(m, "ADDRESS", 0.75, fix_stop=True)
+        add_words(m, "ADDRESS", 0.75, _PLACE_STOP, tail=True)
+    for m in _A_LIVES_LC.finditer(text):
+        # "i live in a flat" is not a place: skip when the first word is a stop word
+        if m.group(1).split()[0].lower().strip(",") in _PLACE_STOP | {"a", "an", "the"}:
+            continue
+        add_words(m, "ADDRESS", 0.7, _PLACE_STOP | {"a", "an", "the"})
     return out
 
 
@@ -174,8 +246,12 @@ def _trim_person(text: str, s: int, e: int):
 
 
 def _only_role_words(text: str) -> bool:
+    """True if the span holds no possible name: only role words, honorifics or function words
+    ("me", "aur", "hai"), or a single token shorter than 3 letters."""
     toks = [t.lower().rstrip(".") for t in _WORD.findall(text)]
-    return not toks or all(t in ROLE_WORDS or t in HONORIFICS for t in toks)
+    if len(toks) == 1 and len(re.sub(r"[^a-z]", "", toks[0])) < 3:
+        return True
+    return not toks or all(t in ROLE_WORDS or t in HONORIFICS or t in LC_STOP for t in toks)
 
 
 def _minus_placeholders(text: str, s: int, e: int):
@@ -210,7 +286,10 @@ class GlinerNER:
     def __init__(self, model_id: Optional[str] = None, threshold: Optional[float] = None):
         from gliner import GLiNER  # lazy import; optional dependency
         self.model_id = model_id or os.getenv("GLINER_MODEL", "urchade/gliner_multi_pii-v1")
-        self.model = GLiNER.from_pretrained(self.model_id)
+        try:  # offline-first: use the cached weights without touching the network (hackathon Wi-Fi)
+            self.model = GLiNER.from_pretrained(self.model_id, local_files_only=True)
+        except Exception:  # not cached yet -> download once
+            self.model = GLiNER.from_pretrained(self.model_id)
         self.threshold = threshold if threshold is not None else float(os.getenv("GLINER_THRESHOLD", "0.35"))
 
     def _chunks(self, text: str, base: int = 0):
@@ -273,6 +352,7 @@ class GlinerNER:
 _gliner_singleton: Optional[GlinerNER] = None
 _gliner_failed = False
 _gliner_error: Optional[str] = None
+_gliner_lock = threading.Lock()
 
 
 def get_gliner() -> Optional[GlinerNER]:
@@ -283,15 +363,17 @@ def get_gliner() -> Optional[GlinerNER]:
     if mode not in ("gliner", "both") or _gliner_failed:
         return None
     if _gliner_singleton is None:
-        try:
-            _gliner_singleton = GlinerNER()
-            log.info("GLiNER loaded: %s (threshold %.2f)", _gliner_singleton.model_id, _gliner_singleton.threshold)
-        except Exception as e:  # missing package / weights: degrade to heuristics, but say so
-            _gliner_failed = True
-            _gliner_error = f"{type(e).__name__}: {str(e)[:200]}"
-            log.error("GLiNER failed to load; names/addresses fall back to regex heuristics only. %s",
-                      _gliner_error)
-            return None
+        with _gliner_lock:  # two first requests at once must not load the 1 GB model twice
+            if _gliner_singleton is None and not _gliner_failed:
+                try:
+                    _gliner_singleton = GlinerNER()
+                    log.info("GLiNER loaded: %s (threshold %.2f)", _gliner_singleton.model_id,
+                             _gliner_singleton.threshold)
+                except Exception as e:  # missing package / weights: degrade to heuristics, but say so
+                    _gliner_failed = True
+                    _gliner_error = f"{type(e).__name__}: {str(e)[:200]}"
+                    log.error("GLiNER failed to load; names/addresses fall back to regex heuristics only. %s",
+                              _gliner_error)
     return _gliner_singleton
 
 

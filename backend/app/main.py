@@ -46,6 +46,14 @@ async def _any(_: Request, e: Exception):
     return JSONResponse(status_code=500, content=GatewayError("INTERNAL_ERROR").to_dict())
 
 
+@app.get("/", include_in_schema=False)
+def root():
+    """Landing response for anyone who opens the server URL directly (instead of a bare 404)."""
+    return {"service": "MineArena PS-02 Privacy Gateway", "status": "ok",
+            "docs": "/docs", "health": "/api/v1/health", "engines": "/api/v1/engines",
+            "process": "POST /api/v1/gateway/process", "evaluation": "/api/v1/evaluation"}
+
+
 app.include_router(health.router, prefix="/api/v1")
 app.include_router(gateway.router, prefix="/api/v1")
 app.include_router(audit.router, prefix="/api/v1")

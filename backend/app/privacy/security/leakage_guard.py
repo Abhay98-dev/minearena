@@ -24,6 +24,7 @@ def validate(sanitized_text: str, mapping_handle: str) -> dict:
     findings: List[dict] = []
     folded = sanitized_text.casefold()
     digits_only = re.sub(r"\D", "", sanitized_text)
+    compact = mapping_store.ID_SEPARATORS.sub("", folded)  # same separators normalize() strips
     seen = set()
     for ph, typ, value in entry.surfaces:
         if (ph, value) in seen:
@@ -33,7 +34,7 @@ def validate(sanitized_text: str, mapping_handle: str) -> dict:
         if typ == "AADHAAR":
             hit = len(norm) >= 12 and norm in digits_only
         elif typ in _ID_TYPES:
-            hit = norm.casefold() in re.sub(r"\s+", "", folded)
+            hit = norm.casefold() in compact
         else:
             v = " ".join(value.split()).casefold()
             hit = bool(v) and re.search(r"(?<![a-z0-9])" + re.escape(v) + r"(?![a-z0-9])", " ".join(folded.split())) is not None
