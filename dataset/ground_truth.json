@@ -1,0 +1,2059 @@
+{
+  "seed": 42,
+  "documents": [
+    {
+      "document_id": "loan_01",
+      "category": "loan",
+      "text": "LOAN APPLICATION FORM\nApplicant Name: Rajesh Sharma\nPAN: ULFPS5534W\nAadhaar: 7594-0781-6187\nVoter ID: MIC3953767\nResidential Address: Flat 290, Lotus Residency, PJ Extension, Davangere - 577542\nLoan Amount: Rs 41,24,000\nTenure: 12 months\nPurpose: medical expenses\n",
+      "entities": [
+        {
+          "text": "Rajesh Sharma",
+          "type": "PERSON",
+          "start": 38,
+          "end": 51,
+          "ref": "p1"
+        },
+        {
+          "text": "ULFPS5534W",
+          "type": "PAN",
+          "start": 57,
+          "end": 67,
+          "ref": "pan1"
+        },
+        {
+          "text": "7594-0781-6187",
+          "type": "AADHAAR",
+          "start": 77,
+          "end": 91,
+          "ref": "aad1"
+        },
+        {
+          "text": "MIC3953767",
+          "type": "VOTER_ID",
+          "start": 102,
+          "end": 112,
+          "ref": "voter1"
+        },
+        {
+          "text": "Flat 290, Lotus Residency, PJ Extension, Davangere - 577542",
+          "type": "ADDRESS",
+          "start": 134,
+          "end": 193,
+          "ref": "a1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "loan_02",
+      "category": "loan",
+      "text": "Home loan request HL/2024/9348. Ananya Shaikh and her husband Pranav Shaikh visited the Canara Bank branch on 03/01/2024 to apply for a joint home loan of Rs 38,61,000. Ananya submitted her PAN IQTPS6383W and Pranav submitted Aadhaar 5039 1171 8227. The couple currently lives at H.No. 9-20-26, Indira Nagar, Lucknow 226482.",
+      "entities": [
+        {
+          "text": "Ananya Shaikh",
+          "type": "PERSON",
+          "start": 32,
+          "end": 45,
+          "ref": "p1"
+        },
+        {
+          "text": "Pranav Shaikh",
+          "type": "PERSON",
+          "start": 62,
+          "end": 75,
+          "ref": "p2"
+        },
+        {
+          "text": "Ananya",
+          "type": "PERSON",
+          "start": 169,
+          "end": 175,
+          "ref": "p1"
+        },
+        {
+          "text": "IQTPS6383W",
+          "type": "PAN",
+          "start": 194,
+          "end": 204,
+          "ref": "pan1"
+        },
+        {
+          "text": "Pranav",
+          "type": "PERSON",
+          "start": 209,
+          "end": 215,
+          "ref": "p2"
+        },
+        {
+          "text": "5039 1171 8227",
+          "type": "AADHAAR",
+          "start": 234,
+          "end": 248,
+          "ref": "aad2"
+        },
+        {
+          "text": "H.No. 9-20-26, Indira Nagar, Lucknow 226482",
+          "type": "ADDRESS",
+          "start": 280,
+          "end": 323,
+          "ref": "a1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "loan_03",
+      "category": "loan",
+      "text": "MSME Business Loan - Metro Hardware Mart\nProprietor: Rohit Verma\nGSTIN: 09CNVCT9985I4Z3\nProprietor PAN: QQFPV0812C\nBusiness address: Plot 62, Film City Road, Noida, PIN 201013\nAnnual turnover: Rs 26,96,000\nGuarantor: Ananya Reddy (Voter ID VWK3462475)\n",
+      "entities": [
+        {
+          "text": "Rohit Verma",
+          "type": "PERSON",
+          "start": 53,
+          "end": 64,
+          "ref": "p1"
+        },
+        {
+          "text": "09CNVCT9985I4Z3",
+          "type": "GSTIN",
+          "start": 72,
+          "end": 87,
+          "ref": "gst1"
+        },
+        {
+          "text": "QQFPV0812C",
+          "type": "PAN",
+          "start": 104,
+          "end": 114,
+          "ref": "pan1"
+        },
+        {
+          "text": "Plot 62, Film City Road, Noida, PIN 201013",
+          "type": "ADDRESS",
+          "start": 133,
+          "end": 175,
+          "ref": "a1"
+        },
+        {
+          "text": "Ananya Reddy",
+          "type": "PERSON",
+          "start": 217,
+          "end": 229,
+          "ref": "p2"
+        },
+        {
+          "text": "VWK3462475",
+          "type": "VOTER_ID",
+          "start": 240,
+          "end": 250,
+          "ref": "voter1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "loan_04",
+      "category": "loan",
+      "text": "Sir, mera naam Joseph Rao hai aur mujhe Rs 33,43,000 ka personal loan chahiye. Main Vidyanagar, Davangere mein rehta hoon. Mera PAN ZBLPR3315Y hai aur Aadhaar 2052 4278 6803 hai. Joseph ki salary Rs 85,000 per month hai.",
+      "entities": [
+        {
+          "text": "Joseph Rao",
+          "type": "PERSON",
+          "start": 15,
+          "end": 25,
+          "ref": "p1"
+        },
+        {
+          "text": "Vidyanagar, Davangere",
+          "type": "ADDRESS",
+          "start": 84,
+          "end": 105,
+          "ref": "c1"
+        },
+        {
+          "text": "ZBLPR3315Y",
+          "type": "PAN",
+          "start": 132,
+          "end": 142,
+          "ref": "pan1"
+        },
+        {
+          "text": "2052 4278 6803",
+          "type": "AADHAAR",
+          "start": 159,
+          "end": 173,
+          "ref": "aad1"
+        },
+        {
+          "text": "Joseph",
+          "type": "PERSON",
+          "start": 179,
+          "end": 185,
+          "ref": "p1"
+        }
+      ],
+      "hinglish": true
+    },
+    {
+      "document_id": "loan_05",
+      "category": "loan",
+      "text": "Credit officer note: Met Rekha Kapoor today regarding loan account LN56397338. Rekha works as a accountant in Powai, Mumbai and wants to top up the loan. Co-applicant Abhishek Bose was not present. Documents verified: PAN VCJPK8951Y, passport R9831727.",
+      "entities": [
+        {
+          "text": "Rekha Kapoor",
+          "type": "PERSON",
+          "start": 25,
+          "end": 37,
+          "ref": "p1"
+        },
+        {
+          "text": "Rekha",
+          "type": "PERSON",
+          "start": 79,
+          "end": 84,
+          "ref": "p1"
+        },
+        {
+          "text": "Powai, Mumbai",
+          "type": "ADDRESS",
+          "start": 110,
+          "end": 123,
+          "ref": "c1"
+        },
+        {
+          "text": "Abhishek Bose",
+          "type": "PERSON",
+          "start": 167,
+          "end": 180,
+          "ref": "p2"
+        },
+        {
+          "text": "VCJPK8951Y",
+          "type": "PAN",
+          "start": 222,
+          "end": 232,
+          "ref": "pan1"
+        },
+        {
+          "text": "R9831727",
+          "type": "PASSPORT",
+          "start": 243,
+          "end": 251,
+          "ref": "pass1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "loan_06",
+      "category": "loan",
+      "text": "LOAN APPLICATION FORM\nApplicant Name: Vikram Bose\nPAN: MKVPB6272T\nAadhaar: 8036-6909-6702\nVoter ID: IYN4170805\nResidential Address: Plot 43, Bull Temple Road, Bengaluru, PIN 560623\nLoan Amount: Rs 36,86,000\nTenure: 36 months\nPurpose: working capital\n",
+      "entities": [
+        {
+          "text": "Vikram Bose",
+          "type": "PERSON",
+          "start": 38,
+          "end": 49,
+          "ref": "p1"
+        },
+        {
+          "text": "MKVPB6272T",
+          "type": "PAN",
+          "start": 55,
+          "end": 65,
+          "ref": "pan1"
+        },
+        {
+          "text": "8036-6909-6702",
+          "type": "AADHAAR",
+          "start": 75,
+          "end": 89,
+          "ref": "aad1"
+        },
+        {
+          "text": "IYN4170805",
+          "type": "VOTER_ID",
+          "start": 100,
+          "end": 110,
+          "ref": "voter1"
+        },
+        {
+          "text": "Plot 43, Bull Temple Road, Bengaluru, PIN 560623",
+          "type": "ADDRESS",
+          "start": 132,
+          "end": 180,
+          "ref": "a1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "loan_07",
+      "category": "loan",
+      "text": "Home loan request HL/2026/4571. Kiran Mehta and her husband Ashok Mehta visited the Canara Bank branch on 23/05/2025 to apply for a joint home loan of Rs 16,26,000. Kiran submitted her PAN KAPPM5273L and Ashok submitted Aadhaar 969453147379. The couple currently lives at H.No. 1-28-54, Shivaji Nagar, Pune 411865.",
+      "entities": [
+        {
+          "text": "Kiran Mehta",
+          "type": "PERSON",
+          "start": 32,
+          "end": 43,
+          "ref": "p1"
+        },
+        {
+          "text": "Ashok Mehta",
+          "type": "PERSON",
+          "start": 60,
+          "end": 71,
+          "ref": "p2"
+        },
+        {
+          "text": "Kiran",
+          "type": "PERSON",
+          "start": 165,
+          "end": 170,
+          "ref": "p1"
+        },
+        {
+          "text": "KAPPM5273L",
+          "type": "PAN",
+          "start": 189,
+          "end": 199,
+          "ref": "pan1"
+        },
+        {
+          "text": "Ashok",
+          "type": "PERSON",
+          "start": 204,
+          "end": 209,
+          "ref": "p2"
+        },
+        {
+          "text": "969453147379",
+          "type": "AADHAAR",
+          "start": 228,
+          "end": 240,
+          "ref": "aad2"
+        },
+        {
+          "text": "H.No. 1-28-54, Shivaji Nagar, Pune 411865",
+          "type": "ADDRESS",
+          "start": 272,
+          "end": 313,
+          "ref": "a1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "loan_08",
+      "category": "loan",
+      "text": "MSME Business Loan - Shree Ganesh Traders\nProprietor: Anil Bose\nGSTIN: 33HFRCF1206O8ZS\nProprietor PAN: OOJPB9649T\nBusiness address: Plot 57, LB Road, Chennai, PIN 600710\nAnnual turnover: Rs 88,98,000\nGuarantor: Kavitha Deshmukh (Voter ID JBH4471349)\n",
+      "entities": [
+        {
+          "text": "Anil Bose",
+          "type": "PERSON",
+          "start": 54,
+          "end": 63,
+          "ref": "p1"
+        },
+        {
+          "text": "33HFRCF1206O8ZS",
+          "type": "GSTIN",
+          "start": 71,
+          "end": 86,
+          "ref": "gst1"
+        },
+        {
+          "text": "OOJPB9649T",
+          "type": "PAN",
+          "start": 103,
+          "end": 113,
+          "ref": "pan1"
+        },
+        {
+          "text": "Plot 57, LB Road, Chennai, PIN 600710",
+          "type": "ADDRESS",
+          "start": 132,
+          "end": 169,
+          "ref": "a1"
+        },
+        {
+          "text": "Kavitha Deshmukh",
+          "type": "PERSON",
+          "start": 211,
+          "end": 227,
+          "ref": "p2"
+        },
+        {
+          "text": "JBH4471349",
+          "type": "VOTER_ID",
+          "start": 238,
+          "end": 248,
+          "ref": "voter1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "loan_09",
+      "category": "loan",
+      "text": "Sir, mera naam Deepak Shaikh hai aur mujhe Rs 4,31,000 ka personal loan chahiye. Main Whitefield, Bengaluru mein rehta hoon. Mera PAN NBGPS8597U hai aur Aadhaar 3756-5512-5675 hai. Deepak ki salary Rs 87,000 per month hai.",
+      "entities": [
+        {
+          "text": "Deepak Shaikh",
+          "type": "PERSON",
+          "start": 15,
+          "end": 28,
+          "ref": "p1"
+        },
+        {
+          "text": "Whitefield, Bengaluru",
+          "type": "ADDRESS",
+          "start": 86,
+          "end": 107,
+          "ref": "c1"
+        },
+        {
+          "text": "NBGPS8597U",
+          "type": "PAN",
+          "start": 134,
+          "end": 144,
+          "ref": "pan1"
+        },
+        {
+          "text": "3756-5512-5675",
+          "type": "AADHAAR",
+          "start": 161,
+          "end": 175,
+          "ref": "aad1"
+        },
+        {
+          "text": "Deepak",
+          "type": "PERSON",
+          "start": 181,
+          "end": 187,
+          "ref": "p1"
+        }
+      ],
+      "hinglish": true
+    },
+    {
+      "document_id": "loan_10",
+      "category": "loan",
+      "text": "Credit officer note: Met Madhuri Mishra today regarding loan account LN87835998. Madhuri works as a accountant in Vidyanagar, Davangere and wants to top up the loan. Co-applicant Arjun Joshi was not present. Documents verified: PAN HUVPM4316D, passport H5923747.",
+      "entities": [
+        {
+          "text": "Madhuri Mishra",
+          "type": "PERSON",
+          "start": 25,
+          "end": 39,
+          "ref": "p1"
+        },
+        {
+          "text": "Madhuri",
+          "type": "PERSON",
+          "start": 81,
+          "end": 88,
+          "ref": "p1"
+        },
+        {
+          "text": "Vidyanagar, Davangere",
+          "type": "ADDRESS",
+          "start": 114,
+          "end": 135,
+          "ref": "c1"
+        },
+        {
+          "text": "Arjun Joshi",
+          "type": "PERSON",
+          "start": 179,
+          "end": 190,
+          "ref": "p2"
+        },
+        {
+          "text": "HUVPM4316D",
+          "type": "PAN",
+          "start": 232,
+          "end": 242,
+          "ref": "pan1"
+        },
+        {
+          "text": "H5923747",
+          "type": "PASSPORT",
+          "start": 253,
+          "end": 261,
+          "ref": "pass1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "loan_11",
+      "category": "loan",
+      "text": "LOAN APPLICATION FORM\nApplicant Name: Anil Pandey\nPAN: XKZPP1712Y\nAadhaar: 4104-7095-2141\nVoter ID: DVH7098593\nResidential Address: H.No. 4-21-25, Edappally, Kochi 682097\nLoan Amount: Rs 43,11,000\nTenure: 60 months\nPurpose: medical expenses\n",
+      "entities": [
+        {
+          "text": "Anil Pandey",
+          "type": "PERSON",
+          "start": 38,
+          "end": 49,
+          "ref": "p1"
+        },
+        {
+          "text": "XKZPP1712Y",
+          "type": "PAN",
+          "start": 55,
+          "end": 65,
+          "ref": "pan1"
+        },
+        {
+          "text": "4104-7095-2141",
+          "type": "AADHAAR",
+          "start": 75,
+          "end": 89,
+          "ref": "aad1"
+        },
+        {
+          "text": "DVH7098593",
+          "type": "VOTER_ID",
+          "start": 100,
+          "end": 110,
+          "ref": "voter1"
+        },
+        {
+          "text": "H.No. 4-21-25, Edappally, Kochi 682097",
+          "type": "ADDRESS",
+          "start": 132,
+          "end": 170,
+          "ref": "a1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "loan_12",
+      "category": "loan",
+      "text": "Home loan request HL/2026/3222. Rekha Fernandes and her husband Naveen Fernandes visited the Canara Bank branch on 15/06/2026 to apply for a joint home loan of Rs 32,24,000. Rekha submitted her PAN ALZPF3950F and Naveen submitted Aadhaar 7290 4228 4210. The couple currently lives at 165 FC Road, Hadapsar, Pune 411431.",
+      "entities": [
+        {
+          "text": "Rekha Fernandes",
+          "type": "PERSON",
+          "start": 32,
+          "end": 47,
+          "ref": "p1"
+        },
+        {
+          "text": "Naveen Fernandes",
+          "type": "PERSON",
+          "start": 64,
+          "end": 80,
+          "ref": "p2"
+        },
+        {
+          "text": "Rekha",
+          "type": "PERSON",
+          "start": 174,
+          "end": 179,
+          "ref": "p1"
+        },
+        {
+          "text": "ALZPF3950F",
+          "type": "PAN",
+          "start": 198,
+          "end": 208,
+          "ref": "pan1"
+        },
+        {
+          "text": "Naveen",
+          "type": "PERSON",
+          "start": 213,
+          "end": 219,
+          "ref": "p2"
+        },
+        {
+          "text": "7290 4228 4210",
+          "type": "AADHAAR",
+          "start": 238,
+          "end": 252,
+          "ref": "aad2"
+        },
+        {
+          "text": "165 FC Road, Hadapsar, Pune 411431",
+          "type": "ADDRESS",
+          "start": 284,
+          "end": 318,
+          "ref": "a1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "loan_13",
+      "category": "loan",
+      "text": "MSME Business Loan - Metro Hardware Mart\nProprietor: Pranav Singh\nGSTIN: 19WYJCI5502E7ZK\nProprietor PAN: RLDPS4936R\nBusiness address: Plot 13, Sector V, Kolkata, PIN 700711\nAnnual turnover: Rs 32,99,000\nGuarantor: Rekha Agarwal (Voter ID CEX0183667)\n",
+      "entities": [
+        {
+          "text": "Pranav Singh",
+          "type": "PERSON",
+          "start": 53,
+          "end": 65,
+          "ref": "p1"
+        },
+        {
+          "text": "19WYJCI5502E7ZK",
+          "type": "GSTIN",
+          "start": 73,
+          "end": 88,
+          "ref": "gst1"
+        },
+        {
+          "text": "RLDPS4936R",
+          "type": "PAN",
+          "start": 105,
+          "end": 115,
+          "ref": "pan1"
+        },
+        {
+          "text": "Plot 13, Sector V, Kolkata, PIN 700711",
+          "type": "ADDRESS",
+          "start": 134,
+          "end": 172,
+          "ref": "a1"
+        },
+        {
+          "text": "Rekha Agarwal",
+          "type": "PERSON",
+          "start": 214,
+          "end": 227,
+          "ref": "p2"
+        },
+        {
+          "text": "CEX0183667",
+          "type": "VOTER_ID",
+          "start": 238,
+          "end": 248,
+          "ref": "voter1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "loan_14",
+      "category": "loan",
+      "text": "Sir, mera naam Arjun Mehta hai aur mujhe Rs 10,30,000 ka personal loan chahiye. Main Delhi mein rehta hoon. Mera PAN MAKPM2975C hai aur Aadhaar 962268388518 hai. Arjun ki salary Rs 71,000 per month hai.",
+      "entities": [
+        {
+          "text": "Arjun Mehta",
+          "type": "PERSON",
+          "start": 15,
+          "end": 26,
+          "ref": "p1"
+        },
+        {
+          "text": "Delhi",
+          "type": "ADDRESS",
+          "start": 85,
+          "end": 90,
+          "ref": "c1"
+        },
+        {
+          "text": "MAKPM2975C",
+          "type": "PAN",
+          "start": 117,
+          "end": 127,
+          "ref": "pan1"
+        },
+        {
+          "text": "962268388518",
+          "type": "AADHAAR",
+          "start": 144,
+          "end": 156,
+          "ref": "aad1"
+        },
+        {
+          "text": "Arjun",
+          "type": "PERSON",
+          "start": 162,
+          "end": 167,
+          "ref": "p1"
+        }
+      ],
+      "hinglish": true
+    },
+    {
+      "document_id": "loan_15",
+      "category": "loan",
+      "text": "Credit officer note: Met Gurpreet Kamath today regarding loan account LN17539294. Gurpreet works as a shop owner in Davangere and wants to top up the loan. Co-applicant Deepak Desai was not present. Documents verified: PAN JIXPK9251S, passport H9214188.",
+      "entities": [
+        {
+          "text": "Gurpreet Kamath",
+          "type": "PERSON",
+          "start": 25,
+          "end": 40,
+          "ref": "p1"
+        },
+        {
+          "text": "Gurpreet",
+          "type": "PERSON",
+          "start": 82,
+          "end": 90,
+          "ref": "p1"
+        },
+        {
+          "text": "Davangere",
+          "type": "ADDRESS",
+          "start": 116,
+          "end": 125,
+          "ref": "c1"
+        },
+        {
+          "text": "Deepak Desai",
+          "type": "PERSON",
+          "start": 169,
+          "end": 181,
+          "ref": "p2"
+        },
+        {
+          "text": "JIXPK9251S",
+          "type": "PAN",
+          "start": 223,
+          "end": 233,
+          "ref": "pan1"
+        },
+        {
+          "text": "H9214188",
+          "type": "PASSPORT",
+          "start": 244,
+          "end": 252,
+          "ref": "pass1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "kyc_01",
+      "category": "kyc",
+      "text": "KYC FORM\nName: Bhavna Ansari\nFather's Name: Rajesh Ansari\nDOB: 24-04-1988\nAadhaar No: 341247826139\nPAN: KDWPA5220J\nVoter ID: HJD0369711\nAddress: Plot 48, Arya Samaj Road, Delhi, PIN 110392\nNominee: Gopal Chauhan (father)\n",
+      "entities": [
+        {
+          "text": "Bhavna Ansari",
+          "type": "PERSON",
+          "start": 15,
+          "end": 28,
+          "ref": "p1"
+        },
+        {
+          "text": "Rajesh Ansari",
+          "type": "PERSON",
+          "start": 44,
+          "end": 57,
+          "ref": "p2"
+        },
+        {
+          "text": "341247826139",
+          "type": "AADHAAR",
+          "start": 86,
+          "end": 98,
+          "ref": "aad1"
+        },
+        {
+          "text": "KDWPA5220J",
+          "type": "PAN",
+          "start": 104,
+          "end": 114,
+          "ref": "pan1"
+        },
+        {
+          "text": "HJD0369711",
+          "type": "VOTER_ID",
+          "start": 125,
+          "end": 135,
+          "ref": "voter1"
+        },
+        {
+          "text": "Plot 48, Arya Samaj Road, Delhi, PIN 110392",
+          "type": "ADDRESS",
+          "start": 145,
+          "end": 188,
+          "ref": "a1"
+        },
+        {
+          "text": "Gopal Chauhan",
+          "type": "PERSON",
+          "start": 198,
+          "end": 211,
+          "ref": "p3"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "kyc_02",
+      "category": "kyc",
+      "text": "Dear Customer, this is to confirm that the re-KYC for Abhishek Reddy has been completed. The following documents were verified: Voter ID CKV4479627, Passport M2059640. Updated correspondence address: H.No. 9-11-83, PJ Extension, Davangere 577195. Please contact the branch if Abhishek wishes to change the nominee.",
+      "entities": [
+        {
+          "text": "Abhishek Reddy",
+          "type": "PERSON",
+          "start": 54,
+          "end": 68,
+          "ref": "p1"
+        },
+        {
+          "text": "CKV4479627",
+          "type": "VOTER_ID",
+          "start": 137,
+          "end": 147,
+          "ref": "voter1"
+        },
+        {
+          "text": "M2059640",
+          "type": "PASSPORT",
+          "start": 158,
+          "end": 166,
+          "ref": "pass1"
+        },
+        {
+          "text": "H.No. 9-11-83, PJ Extension, Davangere 577195",
+          "type": "ADDRESS",
+          "start": 200,
+          "end": 245,
+          "ref": "a1"
+        },
+        {
+          "text": "Abhishek",
+          "type": "PERSON",
+          "start": 276,
+          "end": 284,
+          "ref": "p1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "kyc_03",
+      "category": "kyc",
+      "text": "Video KYC transcript\nAgent: Aapka poora naam bataiye.\nCustomer: Mera naam Ayesha Deshmukh hai.\nAgent: Aadhaar number?\nCustomer: 3447 3947 3121\nAgent: Aur PAN?\nCustomer: ZLQPD3132H\nAgent: Aap kahan rehti hain?\nCustomer: 128 Sector 10 Road, Karol Bagh, Delhi 110431\nAgent: Dhanyavaad Ayesha ji.",
+      "entities": [
+        {
+          "text": "Ayesha Deshmukh",
+          "type": "PERSON",
+          "start": 74,
+          "end": 89,
+          "ref": "p1"
+        },
+        {
+          "text": "3447 3947 3121",
+          "type": "AADHAAR",
+          "start": 128,
+          "end": 142,
+          "ref": "aad1"
+        },
+        {
+          "text": "ZLQPD3132H",
+          "type": "PAN",
+          "start": 169,
+          "end": 179,
+          "ref": "pan1"
+        },
+        {
+          "text": "128 Sector 10 Road, Karol Bagh, Delhi 110431",
+          "type": "ADDRESS",
+          "start": 219,
+          "end": 263,
+          "ref": "a1"
+        },
+        {
+          "text": "Ayesha",
+          "type": "PERSON",
+          "start": 282,
+          "end": 288,
+          "ref": "p1"
+        }
+      ],
+      "hinglish": true
+    },
+    {
+      "document_id": "kyc_04",
+      "category": "kyc",
+      "text": "Joint account opening: Primary holder Smt. Revathi Ansari, secondary holder Shri Vikram Ansari. PAN of primary holder KHOPA1473E, PAN of secondary holder DBJPA6963F. Both reside at Plot 81, Main Road, Noida, PIN 201439.",
+      "entities": [
+        {
+          "text": "Revathi Ansari",
+          "type": "PERSON",
+          "start": 43,
+          "end": 57,
+          "ref": "p1"
+        },
+        {
+          "text": "Vikram Ansari",
+          "type": "PERSON",
+          "start": 81,
+          "end": 94,
+          "ref": "p2"
+        },
+        {
+          "text": "KHOPA1473E",
+          "type": "PAN",
+          "start": 118,
+          "end": 128,
+          "ref": "pan1"
+        },
+        {
+          "text": "DBJPA6963F",
+          "type": "PAN",
+          "start": 154,
+          "end": 164,
+          "ref": "pan2"
+        },
+        {
+          "text": "Plot 81, Main Road, Noida, PIN 201439",
+          "type": "ADDRESS",
+          "start": 181,
+          "end": 218,
+          "ref": "a1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "kyc_05",
+      "category": "kyc",
+      "text": "Account holder S. Naveen (Aadhaar 9298-2595-2695) requested an address change to Flat 381, Green Residency, Indiranagar, Bengaluru - 560986. Passport T3857865 was submitted as proof of address.",
+      "entities": [
+        {
+          "text": "S. Naveen",
+          "type": "PERSON",
+          "start": 15,
+          "end": 24,
+          "ref": "p1"
+        },
+        {
+          "text": "9298-2595-2695",
+          "type": "AADHAAR",
+          "start": 34,
+          "end": 48,
+          "ref": "aad1"
+        },
+        {
+          "text": "Flat 381, Green Residency, Indiranagar, Bengaluru - 560986",
+          "type": "ADDRESS",
+          "start": 81,
+          "end": 139,
+          "ref": "a1"
+        },
+        {
+          "text": "T3857865",
+          "type": "PASSPORT",
+          "start": 150,
+          "end": 158,
+          "ref": "pass1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "kyc_06",
+      "category": "kyc",
+      "text": "KYC FORM\nName: Asha Pandey\nFather's Name: Sanjay Pandey\nDOB: 23-04-1991\nAadhaar No: 5083 3016 5718\nPAN: RXXPP0262B\nVoter ID: IGZ1527420\nAddress: H.No. 3-4-79, Sector 18, Noida 201733\nNominee: Mohammed Banerjee (father)\n",
+      "entities": [
+        {
+          "text": "Asha Pandey",
+          "type": "PERSON",
+          "start": 15,
+          "end": 26,
+          "ref": "p1"
+        },
+        {
+          "text": "Sanjay Pandey",
+          "type": "PERSON",
+          "start": 42,
+          "end": 55,
+          "ref": "p2"
+        },
+        {
+          "text": "5083 3016 5718",
+          "type": "AADHAAR",
+          "start": 84,
+          "end": 98,
+          "ref": "aad1"
+        },
+        {
+          "text": "RXXPP0262B",
+          "type": "PAN",
+          "start": 104,
+          "end": 114,
+          "ref": "pan1"
+        },
+        {
+          "text": "IGZ1527420",
+          "type": "VOTER_ID",
+          "start": 125,
+          "end": 135,
+          "ref": "voter1"
+        },
+        {
+          "text": "H.No. 3-4-79, Sector 18, Noida 201733",
+          "type": "ADDRESS",
+          "start": 145,
+          "end": 182,
+          "ref": "a1"
+        },
+        {
+          "text": "Mohammed Banerjee",
+          "type": "PERSON",
+          "start": 192,
+          "end": 209,
+          "ref": "p3"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "kyc_07",
+      "category": "kyc",
+      "text": "Dear Customer, this is to confirm that the re-KYC for Imran Mehta has been completed. The following documents were verified: Voter ID SCB6518017, Passport B8622656. Updated correspondence address: 246 Main Road, Sector 62, Noida 201414. Please contact the branch if Imran wishes to change the nominee.",
+      "entities": [
+        {
+          "text": "Imran Mehta",
+          "type": "PERSON",
+          "start": 54,
+          "end": 65,
+          "ref": "p1"
+        },
+        {
+          "text": "SCB6518017",
+          "type": "VOTER_ID",
+          "start": 134,
+          "end": 144,
+          "ref": "voter1"
+        },
+        {
+          "text": "B8622656",
+          "type": "PASSPORT",
+          "start": 155,
+          "end": 163,
+          "ref": "pass1"
+        },
+        {
+          "text": "246 Main Road, Sector 62, Noida 201414",
+          "type": "ADDRESS",
+          "start": 197,
+          "end": 235,
+          "ref": "a1"
+        },
+        {
+          "text": "Imran",
+          "type": "PERSON",
+          "start": 266,
+          "end": 271,
+          "ref": "p1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "kyc_08",
+      "category": "kyc",
+      "text": "Video KYC transcript\nAgent: Aapka poora naam bataiye.\nCustomer: Mera naam Kavitha Gupta hai.\nAgent: Aadhaar number?\nCustomer: 5067 3830 2849\nAgent: Aur PAN?\nCustomer: RSXPG2687B\nAgent: Aap kahan rehti hain?\nCustomer: Plot 77, MG Road, Kochi, PIN 682331\nAgent: Dhanyavaad Kavitha ji.",
+      "entities": [
+        {
+          "text": "Kavitha Gupta",
+          "type": "PERSON",
+          "start": 74,
+          "end": 87,
+          "ref": "p1"
+        },
+        {
+          "text": "5067 3830 2849",
+          "type": "AADHAAR",
+          "start": 126,
+          "end": 140,
+          "ref": "aad1"
+        },
+        {
+          "text": "RSXPG2687B",
+          "type": "PAN",
+          "start": 167,
+          "end": 177,
+          "ref": "pan1"
+        },
+        {
+          "text": "Plot 77, MG Road, Kochi, PIN 682331",
+          "type": "ADDRESS",
+          "start": 217,
+          "end": 252,
+          "ref": "a1"
+        },
+        {
+          "text": "Kavitha",
+          "type": "PERSON",
+          "start": 271,
+          "end": 278,
+          "ref": "p1"
+        }
+      ],
+      "hinglish": true
+    },
+    {
+      "document_id": "kyc_09",
+      "category": "kyc",
+      "text": "Joint account opening: Primary holder Smt. Swati Rao, secondary holder Shri Aniket Rao. PAN of primary holder XUXPR7725F, PAN of secondary holder EXRPR7280Q. Both reside at Plot 98, 2nd Avenue, Chennai, PIN 600587.",
+      "entities": [
+        {
+          "text": "Swati Rao",
+          "type": "PERSON",
+          "start": 43,
+          "end": 52,
+          "ref": "p1"
+        },
+        {
+          "text": "Aniket Rao",
+          "type": "PERSON",
+          "start": 76,
+          "end": 86,
+          "ref": "p2"
+        },
+        {
+          "text": "XUXPR7725F",
+          "type": "PAN",
+          "start": 110,
+          "end": 120,
+          "ref": "pan1"
+        },
+        {
+          "text": "EXRPR7280Q",
+          "type": "PAN",
+          "start": 146,
+          "end": 156,
+          "ref": "pan2"
+        },
+        {
+          "text": "Plot 98, 2nd Avenue, Chennai, PIN 600587",
+          "type": "ADDRESS",
+          "start": 173,
+          "end": 213,
+          "ref": "a1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "kyc_10",
+      "category": "kyc",
+      "text": "Account holder R. Vikram (Aadhaar 8591 8033 9744) requested an address change to 22 Sector 10 Road, Karol Bagh, Delhi 110870. Passport N3943114 was submitted as proof of address.",
+      "entities": [
+        {
+          "text": "R. Vikram",
+          "type": "PERSON",
+          "start": 15,
+          "end": 24,
+          "ref": "p1"
+        },
+        {
+          "text": "8591 8033 9744",
+          "type": "AADHAAR",
+          "start": 34,
+          "end": 48,
+          "ref": "aad1"
+        },
+        {
+          "text": "22 Sector 10 Road, Karol Bagh, Delhi 110870",
+          "type": "ADDRESS",
+          "start": 81,
+          "end": 124,
+          "ref": "a1"
+        },
+        {
+          "text": "N3943114",
+          "type": "PASSPORT",
+          "start": 135,
+          "end": 143,
+          "ref": "pass1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "kyc_11",
+      "category": "kyc",
+      "text": "KYC FORM\nName: Ritu Mishra\nFather's Name: Rajesh Mishra\nDOB: 06-07-1988\nAadhaar No: 8464 7154 3794\nPAN: UTEPM4593P\nVoter ID: FVY8073741\nAddress: H.No. 8-5-9, Kukatpally, Hyderabad 500622\nNominee: Tushar Rao (brother)\n",
+      "entities": [
+        {
+          "text": "Ritu Mishra",
+          "type": "PERSON",
+          "start": 15,
+          "end": 26,
+          "ref": "p1"
+        },
+        {
+          "text": "Rajesh Mishra",
+          "type": "PERSON",
+          "start": 42,
+          "end": 55,
+          "ref": "p2"
+        },
+        {
+          "text": "8464 7154 3794",
+          "type": "AADHAAR",
+          "start": 84,
+          "end": 98,
+          "ref": "aad1"
+        },
+        {
+          "text": "UTEPM4593P",
+          "type": "PAN",
+          "start": 104,
+          "end": 114,
+          "ref": "pan1"
+        },
+        {
+          "text": "FVY8073741",
+          "type": "VOTER_ID",
+          "start": 125,
+          "end": 135,
+          "ref": "voter1"
+        },
+        {
+          "text": "H.No. 8-5-9, Kukatpally, Hyderabad 500622",
+          "type": "ADDRESS",
+          "start": 145,
+          "end": 186,
+          "ref": "a1"
+        },
+        {
+          "text": "Tushar Rao",
+          "type": "PERSON",
+          "start": 196,
+          "end": 206,
+          "ref": "p3"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "kyc_12",
+      "category": "kyc",
+      "text": "Dear Customer, this is to confirm that the re-KYC for Ashok Naidu has been completed. The following documents were verified: Voter ID OSN6033419, Passport D5255371. Updated correspondence address: H.No. 7-15-99, Dadar East, Mumbai 400143. Please contact the branch if Ashok wishes to change the nominee.",
+      "entities": [
+        {
+          "text": "Ashok Naidu",
+          "type": "PERSON",
+          "start": 54,
+          "end": 65,
+          "ref": "p1"
+        },
+        {
+          "text": "OSN6033419",
+          "type": "VOTER_ID",
+          "start": 134,
+          "end": 144,
+          "ref": "voter1"
+        },
+        {
+          "text": "D5255371",
+          "type": "PASSPORT",
+          "start": 155,
+          "end": 163,
+          "ref": "pass1"
+        },
+        {
+          "text": "H.No. 7-15-99, Dadar East, Mumbai 400143",
+          "type": "ADDRESS",
+          "start": 197,
+          "end": 237,
+          "ref": "a1"
+        },
+        {
+          "text": "Ashok",
+          "type": "PERSON",
+          "start": 268,
+          "end": 273,
+          "ref": "p1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "kyc_13",
+      "category": "kyc",
+      "text": "Video KYC transcript\nAgent: Aapka poora naam bataiye.\nCustomer: Mera naam Ritu Mishra hai.\nAgent: Aadhaar number?\nCustomer: 425790507239\nAgent: Aur PAN?\nCustomer: IHRPM4279X\nAgent: Aap kahan rehti hain?\nCustomer: 126 ITPL Main Road, Koramangala, Bengaluru 560627\nAgent: Dhanyavaad Ritu ji.",
+      "entities": [
+        {
+          "text": "Ritu Mishra",
+          "type": "PERSON",
+          "start": 74,
+          "end": 85,
+          "ref": "p1"
+        },
+        {
+          "text": "425790507239",
+          "type": "AADHAAR",
+          "start": 124,
+          "end": 136,
+          "ref": "aad1"
+        },
+        {
+          "text": "IHRPM4279X",
+          "type": "PAN",
+          "start": 163,
+          "end": 173,
+          "ref": "pan1"
+        },
+        {
+          "text": "126 ITPL Main Road, Koramangala, Bengaluru 560627",
+          "type": "ADDRESS",
+          "start": 213,
+          "end": 262,
+          "ref": "a1"
+        },
+        {
+          "text": "Ritu",
+          "type": "PERSON",
+          "start": 281,
+          "end": 285,
+          "ref": "p1"
+        }
+      ],
+      "hinglish": true
+    },
+    {
+      "document_id": "kyc_14",
+      "category": "kyc",
+      "text": "Joint account opening: Primary holder Smt. Sneha Pandey, secondary holder Shri Aniket Pandey. PAN of primary holder ZKVPP0017A, PAN of secondary holder DFOPP7063W. Both reside at Plot 66, Main Road, Noida, PIN 201671.",
+      "entities": [
+        {
+          "text": "Sneha Pandey",
+          "type": "PERSON",
+          "start": 43,
+          "end": 55,
+          "ref": "p1"
+        },
+        {
+          "text": "Aniket Pandey",
+          "type": "PERSON",
+          "start": 79,
+          "end": 92,
+          "ref": "p2"
+        },
+        {
+          "text": "ZKVPP0017A",
+          "type": "PAN",
+          "start": 116,
+          "end": 126,
+          "ref": "pan1"
+        },
+        {
+          "text": "DFOPP7063W",
+          "type": "PAN",
+          "start": 152,
+          "end": 162,
+          "ref": "pan2"
+        },
+        {
+          "text": "Plot 66, Main Road, Noida, PIN 201671",
+          "type": "ADDRESS",
+          "start": 179,
+          "end": 216,
+          "ref": "a1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "kyc_15",
+      "category": "kyc",
+      "text": "Account holder M. Aniket (Aadhaar 7234 1389 9948) requested an address change to Plot 45, Arya Samaj Road, Delhi, PIN 110311. Passport U4241418 was submitted as proof of address.",
+      "entities": [
+        {
+          "text": "M. Aniket",
+          "type": "PERSON",
+          "start": 15,
+          "end": 24,
+          "ref": "p1"
+        },
+        {
+          "text": "7234 1389 9948",
+          "type": "AADHAAR",
+          "start": 34,
+          "end": 48,
+          "ref": "aad1"
+        },
+        {
+          "text": "Plot 45, Arya Samaj Road, Delhi, PIN 110311",
+          "type": "ADDRESS",
+          "start": 81,
+          "end": 124,
+          "ref": "a1"
+        },
+        {
+          "text": "U4241418",
+          "type": "PASSPORT",
+          "start": 135,
+          "end": 143,
+          "ref": "pass1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "support_01",
+      "category": "support",
+      "text": "Ticket #TKT-97304\nFrom: Imran Sharma\nSubject: EMI debited twice\nHi team, my EMI was debited twice this month. My PAN is BPLPS6220R and my shop GSTIN is 19CSLFI1802H9Z5. Please refund the extra amount.\n- Imran",
+      "entities": [
+        {
+          "text": "Imran Sharma",
+          "type": "PERSON",
+          "start": 24,
+          "end": 36,
+          "ref": "p1"
+        },
+        {
+          "text": "BPLPS6220R",
+          "type": "PAN",
+          "start": 120,
+          "end": 130,
+          "ref": "pan1"
+        },
+        {
+          "text": "19CSLFI1802H9Z5",
+          "type": "GSTIN",
+          "start": 152,
+          "end": 167,
+          "ref": "gst1"
+        },
+        {
+          "text": "Imran",
+          "type": "PERSON",
+          "start": 203,
+          "end": 208,
+          "ref": "p1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "support_02",
+      "category": "support",
+      "text": "Chat transcript TKT-23624\nUser: hello, manoj banerjee here. mera card block ho gaya hai\nBot: Please share your registered PAN.\nUser: OKNPB1853O\nUser: aur mera address Andheri West, Mumbai hai",
+      "entities": [
+        {
+          "text": "manoj banerjee",
+          "type": "PERSON",
+          "start": 39,
+          "end": 53,
+          "ref": "p1"
+        },
+        {
+          "text": "OKNPB1853O",
+          "type": "PAN",
+          "start": 133,
+          "end": 143,
+          "ref": "pan1"
+        },
+        {
+          "text": "Andheri West, Mumbai",
+          "type": "ADDRESS",
+          "start": 167,
+          "end": 187,
+          "ref": "c1"
+        }
+      ],
+      "hinglish": true
+    },
+    {
+      "document_id": "support_03",
+      "category": "support",
+      "text": "Yesterday Deepika Chatterjee raised a complaint that the branch at Pune refused to update her Aadhaar 8383-8065-7879. Her brother Rohit Menon also holds an account with us. Deepika has asked for a callback.",
+      "entities": [
+        {
+          "text": "Deepika Chatterjee",
+          "type": "PERSON",
+          "start": 10,
+          "end": 28,
+          "ref": "p1"
+        },
+        {
+          "text": "Pune",
+          "type": "ADDRESS",
+          "start": 67,
+          "end": 71,
+          "ref": "c1"
+        },
+        {
+          "text": "8383-8065-7879",
+          "type": "AADHAAR",
+          "start": 102,
+          "end": 116,
+          "ref": "aad1"
+        },
+        {
+          "text": "Rohit Menon",
+          "type": "PERSON",
+          "start": 130,
+          "end": 141,
+          "ref": "p2"
+        },
+        {
+          "text": "Deepika",
+          "type": "PERSON",
+          "start": 173,
+          "end": 180,
+          "ref": "p1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "support_04",
+      "category": "support",
+      "text": "Ticket #TKT-49552\nFrom: Aniket Mukherjee\nSubject: EMI debited twice\nHi team, my EMI was debited twice this month. My PAN is WCLPM4100M and my shop GSTIN is 29PZSFD3271Z1Z7. Please refund the extra amount.\n- Aniket",
+      "entities": [
+        {
+          "text": "Aniket Mukherjee",
+          "type": "PERSON",
+          "start": 24,
+          "end": 40,
+          "ref": "p1"
+        },
+        {
+          "text": "WCLPM4100M",
+          "type": "PAN",
+          "start": 124,
+          "end": 134,
+          "ref": "pan1"
+        },
+        {
+          "text": "29PZSFD3271Z1Z7",
+          "type": "GSTIN",
+          "start": 156,
+          "end": 171,
+          "ref": "gst1"
+        },
+        {
+          "text": "Aniket",
+          "type": "PERSON",
+          "start": 207,
+          "end": 213,
+          "ref": "p1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "support_05",
+      "category": "support",
+      "text": "Chat transcript TKT-84943\nUser: hello, sanjay khan here. mera card block ho gaya hai\nBot: Please share your registered PAN.\nUser: VLZPK8693R\nUser: aur mera address Gomti Nagar, Lucknow hai",
+      "entities": [
+        {
+          "text": "sanjay khan",
+          "type": "PERSON",
+          "start": 39,
+          "end": 50,
+          "ref": "p1"
+        },
+        {
+          "text": "VLZPK8693R",
+          "type": "PAN",
+          "start": 130,
+          "end": 140,
+          "ref": "pan1"
+        },
+        {
+          "text": "Gomti Nagar, Lucknow",
+          "type": "ADDRESS",
+          "start": 164,
+          "end": 184,
+          "ref": "c1"
+        }
+      ],
+      "hinglish": true
+    },
+    {
+      "document_id": "support_06",
+      "category": "support",
+      "text": "Yesterday Kavitha Kamath raised a complaint that the branch at Whitefield, Bengaluru refused to update her Aadhaar 2544-4713-2477. Her brother Anil Thakur also holds an account with us. Kavitha has asked for a callback.",
+      "entities": [
+        {
+          "text": "Kavitha Kamath",
+          "type": "PERSON",
+          "start": 10,
+          "end": 24,
+          "ref": "p1"
+        },
+        {
+          "text": "Whitefield, Bengaluru",
+          "type": "ADDRESS",
+          "start": 63,
+          "end": 84,
+          "ref": "c1"
+        },
+        {
+          "text": "2544-4713-2477",
+          "type": "AADHAAR",
+          "start": 115,
+          "end": 129,
+          "ref": "aad1"
+        },
+        {
+          "text": "Anil Thakur",
+          "type": "PERSON",
+          "start": 143,
+          "end": 154,
+          "ref": "p2"
+        },
+        {
+          "text": "Kavitha",
+          "type": "PERSON",
+          "start": 186,
+          "end": 193,
+          "ref": "p1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "support_07",
+      "category": "support",
+      "text": "Ticket #TKT-94245\nFrom: Venkatesh Pillai\nSubject: EMI debited twice\nHi team, my EMI was debited twice this month. My PAN is KXWPP3875Q and my shop GSTIN is 33ZRYFX2513L4ZW. Please refund the extra amount.\n- Venkatesh",
+      "entities": [
+        {
+          "text": "Venkatesh Pillai",
+          "type": "PERSON",
+          "start": 24,
+          "end": 40,
+          "ref": "p1"
+        },
+        {
+          "text": "KXWPP3875Q",
+          "type": "PAN",
+          "start": 124,
+          "end": 134,
+          "ref": "pan1"
+        },
+        {
+          "text": "33ZRYFX2513L4ZW",
+          "type": "GSTIN",
+          "start": 156,
+          "end": 171,
+          "ref": "gst1"
+        },
+        {
+          "text": "Venkatesh",
+          "type": "PERSON",
+          "start": 207,
+          "end": 216,
+          "ref": "p1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "support_08",
+      "category": "support",
+      "text": "Ticket #TKT-51079: The mobile app crashes when opening the statements page. Affected version 4.2.1. Customer reports the issue since 05/04/2025. Account ending XXXX4430. Priority: medium. Assigned to the digital banking team.",
+      "entities": [],
+      "hinglish": false
+    },
+    {
+      "document_id": "support_09",
+      "category": "support",
+      "text": "Ticket #TKT-79603: Customer asked about the interest rate on fixed deposits for 444 days. Current rate 7.25%. IFSC HDFC0001234 shared. No further action needed.",
+      "entities": [],
+      "hinglish": false
+    },
+    {
+      "document_id": "support_10",
+      "category": "support",
+      "text": "Ticket #TKT-27536: Branch ATM at the main market is out of cash. Reported by the branch manager at 10:45 AM. Cash replenishment scheduled with vendor ref VND-268.",
+      "entities": [],
+      "hinglish": false
+    },
+    {
+      "document_id": "insurance_01",
+      "category": "insurance",
+      "text": "HEALTH INSURANCE CLAIM\nPolicy No: POL/2023/95664\nInsured: Suresh Saxena\nPatient: Deepika Mishra (wife)\nHospital: Sunrise Multispeciality Hospital, Davangere\nClaim amount: Rs 26,12,000\nInsured PAN: SVPPS2181X\nInsured Aadhaar: 611739348357\nEmployer GSTIN (group policy): 29FBJCD5561D1ZD\n",
+      "entities": [
+        {
+          "text": "Suresh Saxena",
+          "type": "PERSON",
+          "start": 58,
+          "end": 71,
+          "ref": "p1"
+        },
+        {
+          "text": "Deepika Mishra",
+          "type": "PERSON",
+          "start": 81,
+          "end": 95,
+          "ref": "p2"
+        },
+        {
+          "text": "Davangere",
+          "type": "ADDRESS",
+          "start": 147,
+          "end": 156,
+          "ref": "c1"
+        },
+        {
+          "text": "SVPPS2181X",
+          "type": "PAN",
+          "start": 197,
+          "end": 207,
+          "ref": "pan1"
+        },
+        {
+          "text": "611739348357",
+          "type": "AADHAAR",
+          "start": 225,
+          "end": 237,
+          "ref": "aad1"
+        },
+        {
+          "text": "29FBJCD5561D1ZD",
+          "type": "GSTIN",
+          "start": 269,
+          "end": 284,
+          "ref": "gst1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "insurance_02",
+      "category": "insurance",
+      "text": "Motor claim CLM-562094: The policyholder Rahul Pillai reported that the car met with an accident near Davangere on 28/03/2024. The surveyor spoke to Rahul and to the witness Bhavna Agarwal. Claimant address: Plot 85, Hadadi Road, Davangere, PIN 577358. Passport W1757113 was given as ID.",
+      "entities": [
+        {
+          "text": "Rahul Pillai",
+          "type": "PERSON",
+          "start": 41,
+          "end": 53,
+          "ref": "p1"
+        },
+        {
+          "text": "Davangere",
+          "type": "ADDRESS",
+          "start": 102,
+          "end": 111,
+          "ref": "c1"
+        },
+        {
+          "text": "Rahul",
+          "type": "PERSON",
+          "start": 149,
+          "end": 154,
+          "ref": "p1"
+        },
+        {
+          "text": "Bhavna Agarwal",
+          "type": "PERSON",
+          "start": 174,
+          "end": 188,
+          "ref": "p2"
+        },
+        {
+          "text": "Plot 85, Hadadi Road, Davangere, PIN 577358",
+          "type": "ADDRESS",
+          "start": 208,
+          "end": 251,
+          "ref": "a1"
+        },
+        {
+          "text": "W1757113",
+          "type": "PASSPORT",
+          "start": 262,
+          "end": 270,
+          "ref": "pass1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "insurance_03",
+      "category": "insurance",
+      "text": "Mere pati Dinesh Bhat ka 23/02/2024 ko dehant ho gaya. Main Ananya Bhat, nominee, claim file kar rahi hoon. Policy POL/2026/34979 hai. Hamara pata hai Flat 987, Lotus Residency, Aliganj, Lucknow - 226982. Mera Aadhaar 6654-7226-9848 hai.",
+      "entities": [
+        {
+          "text": "Dinesh Bhat",
+          "type": "PERSON",
+          "start": 10,
+          "end": 21,
+          "ref": "p1"
+        },
+        {
+          "text": "Ananya Bhat",
+          "type": "PERSON",
+          "start": 60,
+          "end": 71,
+          "ref": "p2"
+        },
+        {
+          "text": "Flat 987, Lotus Residency, Aliganj, Lucknow - 226982",
+          "type": "ADDRESS",
+          "start": 151,
+          "end": 203,
+          "ref": "a1"
+        },
+        {
+          "text": "6654-7226-9848",
+          "type": "AADHAAR",
+          "start": 218,
+          "end": 232,
+          "ref": "aad2"
+        }
+      ],
+      "hinglish": true
+    },
+    {
+      "document_id": "insurance_04",
+      "category": "insurance",
+      "text": "HEALTH INSURANCE CLAIM\nPolicy No: POL/2026/99803\nInsured: Joseph Pillai\nPatient: Revathi Kulkarni (sister)\nHospital: City Care Hospital, Sector 18, Noida\nClaim amount: Rs 4,98,000\nInsured PAN: YUTPP4798L\nInsured Aadhaar: 4122-8160-6488\nEmployer GSTIN (group policy): 09QFNCZ8861L4ZD\n",
+      "entities": [
+        {
+          "text": "Joseph Pillai",
+          "type": "PERSON",
+          "start": 58,
+          "end": 71,
+          "ref": "p1"
+        },
+        {
+          "text": "Revathi Kulkarni",
+          "type": "PERSON",
+          "start": 81,
+          "end": 97,
+          "ref": "p2"
+        },
+        {
+          "text": "Sector 18, Noida",
+          "type": "ADDRESS",
+          "start": 137,
+          "end": 153,
+          "ref": "c1"
+        },
+        {
+          "text": "YUTPP4798L",
+          "type": "PAN",
+          "start": 193,
+          "end": 203,
+          "ref": "pan1"
+        },
+        {
+          "text": "4122-8160-6488",
+          "type": "AADHAAR",
+          "start": 221,
+          "end": 235,
+          "ref": "aad1"
+        },
+        {
+          "text": "09QFNCZ8861L4ZD",
+          "type": "GSTIN",
+          "start": 267,
+          "end": 282,
+          "ref": "gst1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "insurance_05",
+      "category": "insurance",
+      "text": "Motor claim CLM-910883: The policyholder Venkatesh Sharma reported that the car met with an accident near Dadar East, Mumbai on 18/12/2025. The surveyor spoke to Venkatesh and to the witness Madhuri Reddy. Claimant address: Plot 92, SV Road, Mumbai, PIN 400861. Passport U9143536 was given as ID.",
+      "entities": [
+        {
+          "text": "Venkatesh Sharma",
+          "type": "PERSON",
+          "start": 41,
+          "end": 57,
+          "ref": "p1"
+        },
+        {
+          "text": "Dadar East, Mumbai",
+          "type": "ADDRESS",
+          "start": 106,
+          "end": 124,
+          "ref": "c1"
+        },
+        {
+          "text": "Venkatesh",
+          "type": "PERSON",
+          "start": 162,
+          "end": 171,
+          "ref": "p1"
+        },
+        {
+          "text": "Madhuri Reddy",
+          "type": "PERSON",
+          "start": 191,
+          "end": 204,
+          "ref": "p2"
+        },
+        {
+          "text": "Plot 92, SV Road, Mumbai, PIN 400861",
+          "type": "ADDRESS",
+          "start": 224,
+          "end": 260,
+          "ref": "a1"
+        },
+        {
+          "text": "U9143536",
+          "type": "PASSPORT",
+          "start": 271,
+          "end": 279,
+          "ref": "pass1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "insurance_06",
+      "category": "insurance",
+      "text": "Mere pati Vikram Rao ka 04/03/2026 ko dehant ho gaya. Main Neha Rao, nominee, claim file kar rahi hoon. Policy POL/2026/53365 hai. Hamara pata hai H.No. 7-6-1, Gomti Nagar, Lucknow 226949. Mera Aadhaar 9812 9142 8341 hai.",
+      "entities": [
+        {
+          "text": "Vikram Rao",
+          "type": "PERSON",
+          "start": 10,
+          "end": 20,
+          "ref": "p1"
+        },
+        {
+          "text": "Neha Rao",
+          "type": "PERSON",
+          "start": 59,
+          "end": 67,
+          "ref": "p2"
+        },
+        {
+          "text": "H.No. 7-6-1, Gomti Nagar, Lucknow 226949",
+          "type": "ADDRESS",
+          "start": 147,
+          "end": 187,
+          "ref": "a1"
+        },
+        {
+          "text": "9812 9142 8341",
+          "type": "AADHAAR",
+          "start": 202,
+          "end": 216,
+          "ref": "aad2"
+        }
+      ],
+      "hinglish": true
+    },
+    {
+      "document_id": "insurance_07",
+      "category": "insurance",
+      "text": "HEALTH INSURANCE CLAIM\nPolicy No: POL/2024/59369\nInsured: Anil Reddy\nPatient: Usha Kapoor (mother)\nHospital: Lifeline Nursing Home, Ahmedabad\nClaim amount: Rs 15,72,000\nInsured PAN: ESSPR2280S\nInsured Aadhaar: 5184 3222 5915\nEmployer GSTIN (group policy): 24XVJCX1379P8ZK\n",
+      "entities": [
+        {
+          "text": "Anil Reddy",
+          "type": "PERSON",
+          "start": 58,
+          "end": 68,
+          "ref": "p1"
+        },
+        {
+          "text": "Usha Kapoor",
+          "type": "PERSON",
+          "start": 78,
+          "end": 89,
+          "ref": "p2"
+        },
+        {
+          "text": "Ahmedabad",
+          "type": "ADDRESS",
+          "start": 132,
+          "end": 141,
+          "ref": "c1"
+        },
+        {
+          "text": "ESSPR2280S",
+          "type": "PAN",
+          "start": 182,
+          "end": 192,
+          "ref": "pan1"
+        },
+        {
+          "text": "5184 3222 5915",
+          "type": "AADHAAR",
+          "start": 210,
+          "end": 224,
+          "ref": "aad1"
+        },
+        {
+          "text": "24XVJCX1379P8ZK",
+          "type": "GSTIN",
+          "start": 256,
+          "end": 271,
+          "ref": "gst1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "insurance_08",
+      "category": "insurance",
+      "text": "Motor claim CLM-552457: The policyholder Manoj Fernandes reported that the car met with an accident near Aliganj, Lucknow on 27/03/2026. The surveyor spoke to Manoj and to the witness Ritu Patil. Claimant address: 66 Kapoorthala Road, Gomti Nagar, Lucknow 226599. Passport A5279611 was given as ID.",
+      "entities": [
+        {
+          "text": "Manoj Fernandes",
+          "type": "PERSON",
+          "start": 41,
+          "end": 56,
+          "ref": "p1"
+        },
+        {
+          "text": "Aliganj, Lucknow",
+          "type": "ADDRESS",
+          "start": 105,
+          "end": 121,
+          "ref": "c1"
+        },
+        {
+          "text": "Manoj",
+          "type": "PERSON",
+          "start": 159,
+          "end": 164,
+          "ref": "p1"
+        },
+        {
+          "text": "Ritu Patil",
+          "type": "PERSON",
+          "start": 184,
+          "end": 194,
+          "ref": "p2"
+        },
+        {
+          "text": "66 Kapoorthala Road, Gomti Nagar, Lucknow 226599",
+          "type": "ADDRESS",
+          "start": 214,
+          "end": 262,
+          "ref": "a1"
+        },
+        {
+          "text": "A5279611",
+          "type": "PASSPORT",
+          "start": 273,
+          "end": 281,
+          "ref": "pass1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "insurance_09",
+      "category": "insurance",
+      "text": "Claim CLM-806765: Windshield replacement approved for Rs 15,57,000. Garage invoice verified. Deductible of Rs 1,000 applied. Payment will be released in 3 working days.",
+      "entities": [],
+      "hinglish": false
+    },
+    {
+      "document_id": "insurance_10",
+      "category": "insurance",
+      "text": "Policy renewal reminder: Policy POL/2025/39661 is due for renewal on 12/11/2025. Premium Rs 16,93,000. Renew online to keep the no-claim bonus.",
+      "entities": [],
+      "hinglish": false
+    }
+  ]
+}

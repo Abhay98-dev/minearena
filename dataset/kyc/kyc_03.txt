@@ -1,0 +1,10 @@
+Video KYC transcript
+Agent: Aapka poora naam bataiye.
+Customer: Mera naam Ayesha Deshmukh hai.
+Agent: Aadhaar number?
+Customer: 3447 3947 3121
+Agent: Aur PAN?
+Customer: ZLQPD3132H
+Agent: Aap kahan rehti hain?
+Customer: 128 Sector 10 Road, Karol Bagh, Delhi 110431
+Agent: Dhanyavaad Ayesha ji.

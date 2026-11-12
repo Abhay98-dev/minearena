@@ -1,0 +1,10 @@
+Video KYC transcript
+Agent: Aapka poora naam bataiye.
+Customer: Mera naam Ritu Mishra hai.
+Agent: Aadhaar number?
+Customer: 425790507239
+Agent: Aur PAN?
+Customer: IHRPM4279X
+Agent: Aap kahan rehti hain?
+Customer: 126 ITPL Main Road, Koramangala, Bengaluru 560627
+Agent: Dhanyavaad Ritu ji.

@@ -65,7 +65,17 @@ ROLE_WORDS = {
     "insurance", "relationship", "representative", "staff", "member", "owner", "proprietor", "director",
     "partner", "witness", "signatory", "borrower", "lender", "employer", "tenant", "landlord", "doctor",
     "hospital", "company", "pvt", "ltd", "limited", "private", "city", "state", "district",
+    # Hinglish fillers that sit next to names ("Mera naam X hai", "Dhanyavaad X ji")
+    "mera", "meri", "mere", "naam", "nam", "hai", "hain", "dhanyavaad", "dhanyawad", "shukriya", "namaste",
+    "aap", "aapka", "aapki", "main", "hum", "pati", "patni", "beta", "beti", "bhaiya", "didi", "sahab", "saheb",
+    "haan", "nahi", "aur", "bhi", "wala", "wali", "poora", "pura", "bataiye", "batao", "bataye", "kya", "kahan",
+    # greetings and form-field words
+    "hi", "hello", "regards", "thanks", "thank", "primary", "secondary", "joint", "business", "residential",
+    "correspondence", "permanent", "current", "office", "registered",
 }
+# A "location" hit containing one of these is an organisation, not a place ("Canara Bank branch")
+ORG_MARKERS = {"bank", "hospital", "traders", "mart", "enterprises", "foods", "ltd", "pvt", "limited", "nursing",
+               "insurance", "finance", "industries", "services", "solutions", "technologies", "store", "stores"}
 # Honorifics are kept out of PERSON values so the same person is not split into "Smt. X" and "X".
 HONORIFICS = {"mr", "mrs", "ms", "miss", "shri", "sri", "smt", "dr", "kumari", "late", "prof", "w/o", "s/o", "d/o", "c/o"}
 
@@ -193,7 +203,7 @@ class GlinerNER:
     """
 
     LABELS = {"person": "PERSON", "address": "ADDRESS", "location": "ADDRESS"}
-    LOCATION_MIN_SCORE = 0.8   # bare "location" hits are noisier ("branch", "Pune branch")
+    LOCATION_MIN_SCORE = 0.6   # bare "location" hits are noisier; role words ("branch") are filtered separately
     CHUNK_WORDS = 250          # model max_len is 384 words; stay well under it
     CHUNK_OVERLAP = 30
 
@@ -203,28 +213,45 @@ class GlinerNER:
         self.model = GLiNER.from_pretrained(self.model_id)
         self.threshold = threshold if threshold is not None else float(os.getenv("GLINER_THRESHOLD", "0.35"))
 
-    def _chunks(self, text: str):
+    def _chunks(self, text: str, base: int = 0):
         """Word-window chunks with overlap, yielded as (char_offset, chunk_text)."""
         words = list(re.finditer(r"\S+", text))
         if len(words) <= self.CHUNK_WORDS:
-            yield 0, text
+            yield base, text
             return
         step = self.CHUNK_WORDS - self.CHUNK_OVERLAP
         for i in range(0, len(words), step):
             win = words[i:i + self.CHUNK_WORDS]
             a, b = win[0].start(), win[-1].end()
-            yield a, text[a:b]
+            yield base + a, text[a:b]
             if i + self.CHUNK_WORDS >= len(words):
                 break
 
-    def predict(self, text: str) -> List[Span]:
+    def _lines(self, text: str):
+        """One chunk per non-empty line. Short local context scores entities like a city at the end of
+        "Hospital: X, Ahmedabad" much higher than whole-document context does."""
+        for m in re.finditer(r"[^\n]+", text):
+            if re.search(r"[A-Za-z]{2}", m.group(0)):
+                yield from self._chunks(m.group(0), m.start())
+
+    def _infer(self, chunks):
+        texts = [c for _, c in chunks]
+        if hasattr(self.model, "inference"):  # batched (gliner >= 0.2.2x)
+            return self.model.inference(texts, list(self.LABELS), threshold=self.threshold, batch_size=16)
+        return [self.model.predict_entities(t, list(self.LABELS), threshold=self.threshold) for t in texts]
+
+    def predict(self, text: str, per_line: bool = False, location_min: Optional[float] = None) -> List[Span]:
+        chunks = list(self._lines(text) if per_line else self._chunks(text))
+        if not chunks:
+            return []
+        loc_min = self.LOCATION_MIN_SCORE if location_min is None else location_min
         best = {}
-        for off, chunk in self._chunks(text):
-            for ent in self.model.predict_entities(chunk, list(self.LABELS), threshold=self.threshold):
+        for (off, _), ents in zip(chunks, self._infer(chunks)):
+            for ent in ents:
                 label = ent["label"]
                 typ = self.LABELS.get(label)
                 score = float(ent.get("score", 0.5))
-                if not typ or (label == "location" and score < self.LOCATION_MIN_SCORE):
+                if not typ or (label == "location" and score < loc_min):
                     continue
                 for s, e in _minus_placeholders(text, off + ent["start"], off + ent["end"]):
                     if typ == "PERSON":
@@ -234,7 +261,8 @@ class GlinerNER:
                         s, e = se
                     if e - s < 2 or _only_role_words(text[s:e]) or not re.search(r"[A-Za-z]", text[s:e]):
                         continue
-                    if label == "location" and not text[s].isupper():
+                    if label == "location" and (not text[s].isupper() or
+                                                {t.lower() for t in _WORD.findall(text[s:e])} & ORG_MARKERS):
                         continue
                     key = (s, e, typ)
                     if score > best.get(key, -1):

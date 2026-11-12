@@ -1,0 +1,9 @@
+HEALTH INSURANCE CLAIM
+Policy No: POL/2024/59369
+Insured: Anil Reddy
+Patient: Usha Kapoor (mother)
+Hospital: Lifeline Nursing Home, Ahmedabad
+Claim amount: Rs 15,72,000
+Insured PAN: ESSPR2280S
+Insured Aadhaar: 5184 3222 5915
+Employer GSTIN (group policy): 24XVJCX1379P8ZK

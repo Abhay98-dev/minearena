@@ -1,0 +1,697 @@
+{
+  "seed": 7,
+  "documents": [
+    {
+      "document_id": "heldout_01",
+      "category": "heldout",
+      "text": "From: Sneha Agarwal\nTo: grievance cell\n\nRespected Sir/Madam,\nI am writing to report that my savings account was frozen without notice. My PAN RVFPA1993L and Aadhaar 8613 1860 9131 are already linked. Kindly restore access at the earliest.\n\nThanking you,\nSneha Agarwal\n10 Main Road, Sector 62, Noida 201181",
+      "entities": [
+        {
+          "text": "Sneha Agarwal",
+          "type": "PERSON",
+          "start": 6,
+          "end": 19,
+          "ref": "p1"
+        },
+        {
+          "text": "RVFPA1993L",
+          "type": "PAN",
+          "start": 142,
+          "end": 152,
+          "ref": "pan1"
+        },
+        {
+          "text": "8613 1860 9131",
+          "type": "AADHAAR",
+          "start": 165,
+          "end": 179,
+          "ref": "aad1"
+        },
+        {
+          "text": "Sneha Agarwal",
+          "type": "PERSON",
+          "start": 254,
+          "end": 267,
+          "ref": "p1"
+        },
+        {
+          "text": "10 Main Road, Sector 62, Noida 201181",
+          "type": "ADDRESS",
+          "start": 268,
+          "end": 305,
+          "ref": "a1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "heldout_02",
+      "category": "heldout",
+      "text": "[10:42] Imran: bhai mera passport D3901396 wala form kab tak verify hoga?\n[10:44] Agent Suresh: sir 2 din lagenge, aapka address Pune hi hai na?\n[10:45] Imran: haan wahi",
+      "entities": [
+        {
+          "text": "Imran",
+          "type": "PERSON",
+          "start": 8,
+          "end": 13,
+          "ref": "p1"
+        },
+        {
+          "text": "D3901396",
+          "type": "PASSPORT",
+          "start": 34,
+          "end": 42,
+          "ref": "pass1"
+        },
+        {
+          "text": "Suresh",
+          "type": "PERSON",
+          "start": 88,
+          "end": 94,
+          "ref": "p2"
+        },
+        {
+          "text": "Pune",
+          "type": "ADDRESS",
+          "start": 129,
+          "end": 133,
+          "ref": "c1"
+        },
+        {
+          "text": "Imran",
+          "type": "PERSON",
+          "start": 153,
+          "end": 158,
+          "ref": "p1"
+        }
+      ],
+      "hinglish": true
+    },
+    {
+      "document_id": "heldout_03",
+      "category": "heldout",
+      "text": "Family floater policy POL/2026/75752 covers Asha Bose, her husband Manoj Nair and their daughter Divya Kapoor. Premium is paid from the account of Manoj. All three live at 157 ITPL Main Road, Basavanagudi, Bengaluru 560388. Proposer PAN: GPTPB9075Z.",
+      "entities": [
+        {
+          "text": "Asha Bose",
+          "type": "PERSON",
+          "start": 44,
+          "end": 53,
+          "ref": "p1"
+        },
+        {
+          "text": "Manoj Nair",
+          "type": "PERSON",
+          "start": 67,
+          "end": 77,
+          "ref": "p2"
+        },
+        {
+          "text": "Divya Kapoor",
+          "type": "PERSON",
+          "start": 97,
+          "end": 109,
+          "ref": "p3"
+        },
+        {
+          "text": "Manoj",
+          "type": "PERSON",
+          "start": 147,
+          "end": 152,
+          "ref": "p2"
+        },
+        {
+          "text": "157 ITPL Main Road, Basavanagudi, Bengaluru 560388",
+          "type": "ADDRESS",
+          "start": 172,
+          "end": 222,
+          "ref": "a1"
+        },
+        {
+          "text": "GPTPB9075Z",
+          "type": "PAN",
+          "start": 238,
+          "end": 248,
+          "ref": "pan1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "heldout_04",
+      "category": "heldout",
+      "text": "SMS: Dear Rahul, your loan LN40675978 EMI of Rs 32,000 is due on 11/09/2026. Ignore if paid.",
+      "entities": [
+        {
+          "text": "Rahul",
+          "type": "PERSON",
+          "start": 10,
+          "end": 15,
+          "ref": "p1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "heldout_05",
+      "category": "heldout",
+      "text": "Field verification report: Visited the residence of Dinesh Banerjee near Vidyanagar, Davangere. His wife Sunita Bose confirmed that the family has stayed there for 6 years. Voter ID VPR6843353 sighted. Recommend approval.",
+      "entities": [
+        {
+          "text": "Dinesh Banerjee",
+          "type": "PERSON",
+          "start": 52,
+          "end": 67,
+          "ref": "p1"
+        },
+        {
+          "text": "Vidyanagar, Davangere",
+          "type": "ADDRESS",
+          "start": 73,
+          "end": 94,
+          "ref": "c1"
+        },
+        {
+          "text": "Sunita Bose",
+          "type": "PERSON",
+          "start": 105,
+          "end": 116,
+          "ref": "p2"
+        },
+        {
+          "text": "VPR6843353",
+          "type": "VOTER_ID",
+          "start": 182,
+          "end": 192,
+          "ref": "voter1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "heldout_06",
+      "category": "heldout",
+      "text": "Customer Gurpreet Naidu (GSTIN 09IAOCP1881V9ZP) disputes invoice HL/2025/5987. She says the goods were never delivered to Flat 642, Sai Residency, Indira Nagar, Lucknow - 226833.",
+      "entities": [
+        {
+          "text": "Gurpreet Naidu",
+          "type": "PERSON",
+          "start": 9,
+          "end": 23,
+          "ref": "p1"
+        },
+        {
+          "text": "09IAOCP1881V9ZP",
+          "type": "GSTIN",
+          "start": 31,
+          "end": 46,
+          "ref": "gst1"
+        },
+        {
+          "text": "Flat 642, Sai Residency, Indira Nagar, Lucknow - 226833",
+          "type": "ADDRESS",
+          "start": 122,
+          "end": 177,
+          "ref": "a1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "heldout_07",
+      "category": "heldout",
+      "text": "Succession claim: Rahul Khan has passed away. His son Siddharth Khan (Aadhaar 2776 4265 6515) has applied for transfer of the fixed deposit. Siddharth will visit the branch with the death certificate.",
+      "entities": [
+        {
+          "text": "Rahul Khan",
+          "type": "PERSON",
+          "start": 18,
+          "end": 28,
+          "ref": "p1"
+        },
+        {
+          "text": "Siddharth Khan",
+          "type": "PERSON",
+          "start": 54,
+          "end": 68,
+          "ref": "p2"
+        },
+        {
+          "text": "2776 4265 6515",
+          "type": "AADHAAR",
+          "start": 78,
+          "end": 92,
+          "ref": "aad2"
+        },
+        {
+          "text": "Siddharth",
+          "type": "PERSON",
+          "start": 141,
+          "end": 150,
+          "ref": "p2"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "heldout_08",
+      "category": "heldout",
+      "text": "naam: swati joshi\npata: 88 Vibhuti Khand, Gomti Nagar, Lucknow 226283\npan: IHMPJ6764A\nloan chahiye Rs 5,48,000",
+      "entities": [
+        {
+          "text": "swati joshi",
+          "type": "PERSON",
+          "start": 6,
+          "end": 17,
+          "ref": "p1"
+        },
+        {
+          "text": "88 Vibhuti Khand, Gomti Nagar, Lucknow 226283",
+          "type": "ADDRESS",
+          "start": 24,
+          "end": 69,
+          "ref": "a1"
+        },
+        {
+          "text": "IHMPJ6764A",
+          "type": "PAN",
+          "start": 75,
+          "end": 85,
+          "ref": "pan1"
+        }
+      ],
+      "hinglish": true
+    },
+    {
+      "document_id": "heldout_09",
+      "category": "heldout",
+      "text": "Minutes of the hearing: Complainant Vikram Mukherjee stated that the agent Pooja Bhat collected his passport U8654610 and did not return it. The complainant resides at Plot 26, Gariahat Road, Kolkata, PIN 700705.",
+      "entities": [
+        {
+          "text": "Vikram Mukherjee",
+          "type": "PERSON",
+          "start": 36,
+          "end": 52,
+          "ref": "p1"
+        },
+        {
+          "text": "Pooja Bhat",
+          "type": "PERSON",
+          "start": 75,
+          "end": 85,
+          "ref": "p2"
+        },
+        {
+          "text": "U8654610",
+          "type": "PASSPORT",
+          "start": 109,
+          "end": 117,
+          "ref": "pass1"
+        },
+        {
+          "text": "Plot 26, Gariahat Road, Kolkata, PIN 700705",
+          "type": "ADDRESS",
+          "start": 168,
+          "end": 211,
+          "ref": "a1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "heldout_10",
+      "category": "heldout",
+      "text": "Hello team, I moved from Nittuvalli, Davangere last month. Please update my communication address to Flat 579, Sai Residency, PJ Extension, Davangere - 577544. - Kavitha Sethi, customer since 2015",
+      "entities": [
+        {
+          "text": "Nittuvalli, Davangere",
+          "type": "ADDRESS",
+          "start": 25,
+          "end": 46,
+          "ref": "c1"
+        },
+        {
+          "text": "Flat 579, Sai Residency, PJ Extension, Davangere - 577544",
+          "type": "ADDRESS",
+          "start": 101,
+          "end": 158,
+          "ref": "a1"
+        },
+        {
+          "text": "Kavitha Sethi",
+          "type": "PERSON",
+          "start": 162,
+          "end": 175,
+          "ref": "p1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "heldout_11",
+      "category": "heldout",
+      "text": "From: Ayesha Fernandes\nTo: grievance cell\n\nRespected Sir/Madam,\nI am writing to report that my savings account was frozen without notice. My PAN VREPF8126W and Aadhaar 7203-4093-0560 are already linked. Kindly restore access at the earliest.\n\nThanking you,\nAyesha Fernandes\n10 Kapoorthala Road, Indira Nagar, Lucknow 226401",
+      "entities": [
+        {
+          "text": "Ayesha Fernandes",
+          "type": "PERSON",
+          "start": 6,
+          "end": 22,
+          "ref": "p1"
+        },
+        {
+          "text": "VREPF8126W",
+          "type": "PAN",
+          "start": 145,
+          "end": 155,
+          "ref": "pan1"
+        },
+        {
+          "text": "7203-4093-0560",
+          "type": "AADHAAR",
+          "start": 168,
+          "end": 182,
+          "ref": "aad1"
+        },
+        {
+          "text": "Ayesha Fernandes",
+          "type": "PERSON",
+          "start": 257,
+          "end": 273,
+          "ref": "p1"
+        },
+        {
+          "text": "10 Kapoorthala Road, Indira Nagar, Lucknow 226401",
+          "type": "ADDRESS",
+          "start": 274,
+          "end": 323,
+          "ref": "a1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "heldout_12",
+      "category": "heldout",
+      "text": "[10:42] Mohammed: bhai mera passport W2327423 wala form kab tak verify hoga?\n[10:44] Agent Bhavesh: sir 2 din lagenge, aapka address Lucknow hi hai na?\n[10:45] Mohammed: haan wahi",
+      "entities": [
+        {
+          "text": "Mohammed",
+          "type": "PERSON",
+          "start": 8,
+          "end": 16,
+          "ref": "p1"
+        },
+        {
+          "text": "W2327423",
+          "type": "PASSPORT",
+          "start": 37,
+          "end": 45,
+          "ref": "pass1"
+        },
+        {
+          "text": "Bhavesh",
+          "type": "PERSON",
+          "start": 91,
+          "end": 98,
+          "ref": "p2"
+        },
+        {
+          "text": "Lucknow",
+          "type": "ADDRESS",
+          "start": 133,
+          "end": 140,
+          "ref": "c1"
+        },
+        {
+          "text": "Mohammed",
+          "type": "PERSON",
+          "start": 160,
+          "end": 168,
+          "ref": "p1"
+        }
+      ],
+      "hinglish": true
+    },
+    {
+      "document_id": "heldout_13",
+      "category": "heldout",
+      "text": "Family floater policy POL/2026/90371 covers Bhavna Subramaniam, her husband Arjun Pillai and their daughter Tanvi Gupta. Premium is paid from the account of Arjun. All three live at H.No. 5-13-48, Maninagar, Ahmedabad 380914. Proposer PAN: PHTPS0000S.",
+      "entities": [
+        {
+          "text": "Bhavna Subramaniam",
+          "type": "PERSON",
+          "start": 44,
+          "end": 62,
+          "ref": "p1"
+        },
+        {
+          "text": "Arjun Pillai",
+          "type": "PERSON",
+          "start": 76,
+          "end": 88,
+          "ref": "p2"
+        },
+        {
+          "text": "Tanvi Gupta",
+          "type": "PERSON",
+          "start": 108,
+          "end": 119,
+          "ref": "p3"
+        },
+        {
+          "text": "Arjun",
+          "type": "PERSON",
+          "start": 157,
+          "end": 162,
+          "ref": "p2"
+        },
+        {
+          "text": "H.No. 5-13-48, Maninagar, Ahmedabad 380914",
+          "type": "ADDRESS",
+          "start": 182,
+          "end": 224,
+          "ref": "a1"
+        },
+        {
+          "text": "PHTPS0000S",
+          "type": "PAN",
+          "start": 240,
+          "end": 250,
+          "ref": "pan1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "heldout_14",
+      "category": "heldout",
+      "text": "SMS: Dear Aniket, your loan LN55166387 EMI of Rs 58,000 is due on 16/02/2024. Ignore if paid.",
+      "entities": [
+        {
+          "text": "Aniket",
+          "type": "PERSON",
+          "start": 10,
+          "end": 16,
+          "ref": "p1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "heldout_15",
+      "category": "heldout",
+      "text": "Field verification report: Visited the residence of Tushar Rao near Pune. His wife Kiran Sethi confirmed that the family has stayed there for 6 years. Voter ID OER9905958 sighted. Recommend approval.",
+      "entities": [
+        {
+          "text": "Tushar Rao",
+          "type": "PERSON",
+          "start": 52,
+          "end": 62,
+          "ref": "p1"
+        },
+        {
+          "text": "Pune",
+          "type": "ADDRESS",
+          "start": 68,
+          "end": 72,
+          "ref": "c1"
+        },
+        {
+          "text": "Kiran Sethi",
+          "type": "PERSON",
+          "start": 83,
+          "end": 94,
+          "ref": "p2"
+        },
+        {
+          "text": "OER9905958",
+          "type": "VOTER_ID",
+          "start": 160,
+          "end": 170,
+          "ref": "voter1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "heldout_16",
+      "category": "heldout",
+      "text": "Customer Sneha Banerjee (GSTIN 29VVFFQ5067D1ZC) disputes invoice HL/2025/9417. She says the goods were never delivered to H.No. 4-29-50, PJ Extension, Davangere 577643.",
+      "entities": [
+        {
+          "text": "Sneha Banerjee",
+          "type": "PERSON",
+          "start": 9,
+          "end": 23,
+          "ref": "p1"
+        },
+        {
+          "text": "29VVFFQ5067D1ZC",
+          "type": "GSTIN",
+          "start": 31,
+          "end": 46,
+          "ref": "gst1"
+        },
+        {
+          "text": "H.No. 4-29-50, PJ Extension, Davangere 577643",
+          "type": "ADDRESS",
+          "start": 122,
+          "end": 167,
+          "ref": "a1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "heldout_17",
+      "category": "heldout",
+      "text": "Succession claim: Rohit Joshi has passed away. His son Imran Joshi (Aadhaar 734577691524) has applied for transfer of the fixed deposit. Imran will visit the branch with the death certificate.",
+      "entities": [
+        {
+          "text": "Rohit Joshi",
+          "type": "PERSON",
+          "start": 18,
+          "end": 29,
+          "ref": "p1"
+        },
+        {
+          "text": "Imran Joshi",
+          "type": "PERSON",
+          "start": 55,
+          "end": 66,
+          "ref": "p2"
+        },
+        {
+          "text": "734577691524",
+          "type": "AADHAAR",
+          "start": 76,
+          "end": 88,
+          "ref": "aad2"
+        },
+        {
+          "text": "Imran",
+          "type": "PERSON",
+          "start": 137,
+          "end": 142,
+          "ref": "p2"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "heldout_18",
+      "category": "heldout",
+      "text": "naam: anjali fernandes\npata: 9 Karve Road, Hadapsar, Pune 411518\npan: QLGPF7153K\nloan chahiye Rs 24,27,000",
+      "entities": [
+        {
+          "text": "anjali fernandes",
+          "type": "PERSON",
+          "start": 6,
+          "end": 22,
+          "ref": "p1"
+        },
+        {
+          "text": "9 Karve Road, Hadapsar, Pune 411518",
+          "type": "ADDRESS",
+          "start": 29,
+          "end": 64,
+          "ref": "a1"
+        },
+        {
+          "text": "QLGPF7153K",
+          "type": "PAN",
+          "start": 70,
+          "end": 80,
+          "ref": "pan1"
+        }
+      ],
+      "hinglish": true
+    },
+    {
+      "document_id": "heldout_19",
+      "category": "heldout",
+      "text": "Minutes of the hearing: Complainant Siddharth D'Souza stated that the agent Divya Banerjee collected his passport K4636669 and did not return it. The complainant resides at Flat 350, Sai Residency, Borivali, Mumbai - 400320.",
+      "entities": [
+        {
+          "text": "Siddharth D'Souza",
+          "type": "PERSON",
+          "start": 36,
+          "end": 53,
+          "ref": "p1"
+        },
+        {
+          "text": "Divya Banerjee",
+          "type": "PERSON",
+          "start": 76,
+          "end": 90,
+          "ref": "p2"
+        },
+        {
+          "text": "K4636669",
+          "type": "PASSPORT",
+          "start": 114,
+          "end": 122,
+          "ref": "pass1"
+        },
+        {
+          "text": "Flat 350, Sai Residency, Borivali, Mumbai - 400320",
+          "type": "ADDRESS",
+          "start": 173,
+          "end": 223,
+          "ref": "a1"
+        }
+      ],
+      "hinglish": false
+    },
+    {
+      "document_id": "heldout_20",
+      "category": "heldout",
+      "text": "Hello team, I moved from Lucknow last month. Please update my communication address to Plot 70, Kapoorthala Road, Lucknow, PIN 226349. - Kavitha Kamath, customer since 2015",
+      "entities": [
+        {
+          "text": "Lucknow",
+          "type": "ADDRESS",
+          "start": 25,
+          "end": 32,
+          "ref": "c1"
+        },
+        {
+          "text": "Plot 70, Kapoorthala Road, Lucknow, PIN 226349",
+          "type": "ADDRESS",
+          "start": 87,
+          "end": 133,
+          "ref": "a1"
+        },
+        {
+          "text": "Kavitha Kamath",
+          "type": "PERSON",
+          "start": 137,
+          "end": 151,
+          "ref": "p1"
+        }
+      ],
+      "hinglish": false
+    }
+  ]
+}

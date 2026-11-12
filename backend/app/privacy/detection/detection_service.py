@@ -40,10 +40,11 @@ def _subtract(span: Span, blockers: List[Span], text: str) -> List[Span]:
 
 
 def resolve_overlaps(spans: List[Span], text: str) -> List[Span]:
-    """Deterministic: structured IDs win over NER; then longer span, type priority, confidence, earlier start.
+    """Deterministic: structured IDs win over NER; then longer span, our exact-format regex over Presidio
+    (its PAN pattern also matches Voter IDs), type priority, confidence, earlier start.
     NER spans that overlap a chosen structured span are trimmed, not dropped (so address text is still masked)."""
     structured = sorted((s for s in spans if s.type in _STRUCTURED),
-                        key=lambda s: (-s.length, TYPE_PRIORITY[s.type], -s.confidence, s.start))
+                        key=lambda s: (-s.length, s.source != "regex", TYPE_PRIORITY[s.type], -s.confidence, s.start))
     chosen: List[Span] = []
     for s in structured:
         if not any(_overlaps(s, c) for c in chosen):
@@ -58,12 +59,29 @@ def resolve_overlaps(spans: List[Span], text: str) -> List[Span]:
     return sorted(chosen, key=lambda s: s.start)
 
 
+# ", PIN 682331" / " - 411005" / " Pincode: 560 004" right after an address belongs to it
+_PIN_TAIL = re.compile(r"[ \t]*[,\-]?[ \t]*(?:PIN|Pin|pin|Pincode|PINCODE|pincode)?(?:[ \t]*code)?[ \t]*[:\-]?[ \t]*"
+                       r"\d{3}[ \t]?\d{3}(?!\d)")
+
+
+def extend_address_pins(spans: List[Span], text: str) -> List[Span]:
+    out = []
+    for i, s in enumerate(spans):
+        if s.type == "ADDRESS":
+            m = _PIN_TAIL.match(text, s.end)
+            nxt = spans[i + 1].start if i + 1 < len(spans) else len(text)
+            if m and m.end() <= nxt:
+                s = Span(s.start, m.end(), s.type, s.confidence, s.source)
+        out.append(s)
+    return out
+
+
 def detect(text: str) -> List[Span]:
     spans = ir.find_all_structured(text)
     spans.extend(detect_names_addresses(text))
     if presidio_enabled():
         spans.extend(detect_with_presidio(text))
-    return resolve_overlaps(spans, text)
+    return extend_address_pins(resolve_overlaps(spans, text), text)
 
 
 def engine_status() -> dict:
