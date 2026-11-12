@@ -60,7 +60,14 @@ def resolve_overlaps(spans: List[Span], text: str) -> List[Span]:
 
 def detect(text: str) -> List[Span]:
     spans = ir.find_all_structured(text)
-    spans.extend(detect_names_addresses(text))
     if presidio_enabled():
-        spans.extend(detect_with_presidio(text))
+        presidio_spans = detect_with_presidio(text)
+        if presidio_spans is None:
+            # GLiNER fallback if Presidio (or its NLP model) is unavailable.
+            spans.extend(detect_names_addresses(text))
+        else:
+            spans.extend(detect_names_addresses(text, include_gliner=False))
+            spans.extend(presidio_spans)
+    else:
+        spans.extend(detect_names_addresses(text))
     return resolve_overlaps(spans, text)

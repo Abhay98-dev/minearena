@@ -19,7 +19,7 @@ def _propagate(text: str, spans: List[Span]) -> List[Span]:
 
     needles: Dict[str, str] = {}  # surface -> type
     for (typ, _), surface in values.items():
-        if typ in ("AADHAAR", "PAN", "GSTIN", "VOTER_ID", "PASSPORT"):
+        if typ in ("AADHAAR", "PAN", "GSTIN", "VOTER_ID", "PASSPORT", "EMAIL_ADDRESS", "PHONE_NUMBER"):
             continue  # structured IDs are format-detected everywhere already
         needles[surface] = typ
 

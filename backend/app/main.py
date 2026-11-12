@@ -10,10 +10,14 @@ from app.api.routes import audit, gateway, health, metrics
 from app.core import config
 from app.core.errors import GatewayError
 from app.database import db
+from app.privacy.detection.presidio_engine import initialize_presidio
+from app.privacy.detection.presidio_engine import presidio_enabled
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     db.init_db()
+    if presidio_enabled():
+        initialize_presidio()
     yield
 
 

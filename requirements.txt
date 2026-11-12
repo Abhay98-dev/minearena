@@ -7,7 +7,7 @@ httpx>=0.27
 python-dotenv>=1.0
 # --- privacy engine (Member 2) : required by the problem statement ---
 presidio-analyzer>=2.2
-spacy>=3.7            # then: python -m spacy download en_core_web_sm
-gliner>=0.2           # local NER; first run downloads weights ONCE (pre-download before demo)
+spacy>=3.7            # NLP engine; then: python -m spacy download en_core_web_sm
+gliner>=0.2           # pulls its model runtime (including PyTorch/Transformers); CPU works; weights fetched on first use
 # --- tests ---
 pytest>=8.0

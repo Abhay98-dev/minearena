@@ -8,7 +8,7 @@ Use this file as the short context packet for teammates and future models. The f
 2. **Implementation clarifications, Round 1 scenarios, and evaluation definitions:** `MineArena_PS02_Master_Guide_1.md`.
 3. **Starter code:** contents of `minearena_code.zip`, copied into this workspace.
 
-The archive's contents are starter code, not proof of a working deployment. **[TESTED]** The current workspace suite passes: 50 tests using Python 3.14.4, FastAPI 0.115.14, pytest 9.2.0. **[TESTED]** FastAPI lifespan/startup, health, the Member 3 HTTP contract, CORS preflight, safe validation errors, blocked-request response/audit, mock processing, and lowercase-name/Hinglish regressions passed with heuristic detection. Gemini, GLiNER model loading, Presidio with its spaCy model, Ollama, and the real external provider path remain **[UNTESTED]**. Earlier test counts described earlier snapshots. Do not report performance numbers before the dataset evaluation runs.
+The archive's contents are starter code, not proof of a working deployment. The previous 50-test baseline was extended with offline fake-model integration coverage. **[TESTED]** The current suite passes: 57 tests. GLiNER weight loading, Presidio with its spaCy model, Gemini, Ollama, and the real external provider path remain **[UNTESTED]**. Do not report performance numbers before the dataset evaluation runs.
 
 Current shared repository branch for Abhay's work: `feature/backend-gateway`, created from `origin/main`. Member 3 should branch from or pull this branch once it is pushed.
 
@@ -19,7 +19,7 @@ Current shared repository branch for Abhay's work: `feature/backend-gateway`, cr
 - **Other routes:** `GET /api/v1/health`, `/api/v1/audit`, `/api/v1/audit/{request_id}`, `/api/v1/metrics`.
 - **Success response:** includes `request_id`, `status`, `original_text`, `sanitized_text`, `outbound_payload`, `entities` (offsets into original text), `llm_response`, `final_response`, `provider`, `model`, `fallback_used`, `leakage_detected`, `leakage_count`, `processing_time_ms`, `llm_time_ms`, `gateway_overhead_ms`, `missing_placeholders`, and `unknown_placeholders`. Never include the local mapping or its handle.
 - **Error response:** `{"error":{"code":"...","message":"...","request_id":"...|null","details":{}}}`. Stable codes/statuses: `INVALID_REQUEST` 400, `INPUT_TOO_LARGE` 413, `PII_PROCESSING_FAILED` 422, `LLM_PROVIDER_ERROR` 502, `LLM_PROVIDER_TIMEOUT` 504, `REINSERTION_FAILED` 500, `PRIVACY_ENGINE_UNAVAILABLE` 503, `OUTBOUND_PII_LEAKAGE_BLOCKED` 409, `INTERNAL_ERROR` 500. Messages/details must never contain PII or secrets.
-- **Canonical entity labels:** `PERSON`, `AADHAAR`, `PAN`, `GSTIN`, `VOTER_ID`, `PASSPORT`, `ADDRESS`; placeholders are `<TYPE_N>`.
+- **Canonical entity labels:** `PERSON`, `AADHAAR`, `PAN`, `GSTIN`, `VOTER_ID`, `PASSPORT`, `ADDRESS`, `ORGANIZATION`, `LOCATION`, `EMAIL_ADDRESS`, `PHONE_NUMBER`; placeholders are `<TYPE_N>`.
 
 ## Project in plain language
 
@@ -71,6 +71,12 @@ For a blocked request, the audit records status and safe finding metadata but st
 ## Detection choice: graph or transformer?
 
 Use local GLiNER NER (a model-based span detector) for names and addresses, plus rule/context patterns and India-specific ID recognizers; Presidio orchestrates/customizes detection when enabled. The heuristic name rules accept lowercase text in recognized contexts such as “my name is …”, honorifics, applicant labels, and Hinglish. This improves the reported case but does not guarantee detection of every free-text name. **Do not use GraphRAG**: it is for graph-based retrieval, does not provide the masking spans this pipeline needs, and may make its own LLM calls. ModernBERT fine-tuning is a later option only if measured name/address recall is weak. No training or graph method is required for Round 1.
+
+### GLiNER + Presidio setup
+
+With `PRIVACY_USE_PRESIDIO=1`, Presidio's registry includes India-ID regex wrappers, available built-in India recognizers, and an additive GLiNER `EntityRecognizer`. Set `PRIVACY_NER=both` to enable model-backed spans alongside heuristics; the model singleton is warmed at application startup. If GLiNER initialization or inference fails, it returns no findings and the other recognizers continue. Entity mappings include PERSON, ORGANIZATION, LOCATION, EMAIL_ADDRESS, and PHONE_NUMBER. Email and Indian mobile numbers also use local regex recognizers, so they do not rely on GLiNER. The API shapes and placeholder workflow are unchanged.
+
+`requirements.txt` declares `presidio-analyzer`, `spacy`, and `gliner`. GLiNER brings its ML runtime dependencies (including PyTorch and Transformers) transitively. Install these on the machine that will run the model, install the configured spaCy model, and make GLiNER weights available locally. No packages or weights were installed/downloaded in this coding workspace. Offline tests use fake model output and do not establish live model quality or startup latency.
 
 ## Abhay (Member 1): next steps
 
@@ -142,14 +148,14 @@ Useful supporting points:
 
 - “Here is the exact payload that passed the guard and went to the provider.”
 - “If the model drops a label, we report it; we do not invent a replacement.”
-- “The detector runs locally. Structured IDs use India-specific recognizers; names and addresses use local NER and context rules.”
+- “The detector runs locally. Structured IDs, emails, and Indian mobile numbers use patterns; names, organizations, and locations can also use local NER and context rules.”
 - Do not claim perfect recall or DPDP compliance. Missed free-text names/addresses are a known risk; report measured results.
 
 ## Team handoffs
 
-- **Member 2 — privacy engine:** install and probe GLiNER on synthetic Indian-English/Hinglish examples; check the Presidio-enabled path; report top missed patterns; add regression coverage only within `backend/app/privacy/` and `tests/privacy/`.
+- **Member 2 — privacy engine:** run the fake-model integration tests, then install/probe GLiNER and Presidio on synthetic Indian-English/Hinglish examples; report missed patterns and actual initialization latency.
 - **Member 3 — frontend/data/evaluation:** independently build the three-panel UI, generate about 50 synthetic documents with programmatic entity spans, and calculate per-type strict/relaxed precision/recall/F1, reinsertion accuracy, leakage, and added latency. Use mock responses until backend is available.
-- **Shared:** use only synthetic data, preserve the public contracts, and label evidence as tested/unverified. Do not add EMAIL/PHONE or change entity/response names without team agreement.
+- **Shared:** use only synthetic data, preserve the public request/response contract, and label evidence as tested/unverified.
 
 ### Evaluation definitions for Member 3
 

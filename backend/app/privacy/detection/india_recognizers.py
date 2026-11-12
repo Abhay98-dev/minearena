@@ -63,6 +63,8 @@ _GSTIN = re.compile(r"(?<![0-9A-Za-z])(\d{2}[A-Za-z]{5}\d{4}[A-Za-z][1-9A-Za-z][
 _PAN = re.compile(r"(?<![0-9A-Za-z])([A-Za-z]{5}\d{4}[A-Za-z])(?![0-9A-Za-z])")
 _VOTER = re.compile(r"(?<![0-9A-Za-z])([A-Za-z]{3}\d{7})(?![0-9A-Za-z])")
 _PASSPORT = re.compile(r"(?<![0-9A-Za-z])([A-PR-WYa-pr-wy]\d{7})(?![0-9A-Za-z])")
+_EMAIL = re.compile(r"(?<![\w.+-])[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?(?:\.[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?)+(?![\w.-])", re.I)
+_PHONE = re.compile(r"(?<!\d)(?:(?:\+?91)[\s-]?)?([6-9]\d{4}[\s-]?\d{5})(?!\d)")
 
 _AADHAAR_CTX = re.compile(r"(aadhaar|aadhar|adhar|adhaar|uidai|\buid\b|आधार)", re.I)
 _PASSPORT_CTX = re.compile(r"(passport|पासपोर्ट)", re.I)
@@ -123,9 +125,22 @@ def find_passport(text: str) -> List[Span]:
     return out
 
 
+def find_email(text: str) -> List[Span]:
+    return [Span(m.start(), m.end(), "EMAIL_ADDRESS", 0.99, "regex") for m in _EMAIL.finditer(text)]
+
+
+def find_phone(text: str) -> List[Span]:
+    out = []
+    for m in _PHONE.finditer(text):
+        # Include an optional +91 prefix in the masked span.
+        out.append(Span(m.start(), m.end(), "PHONE_NUMBER", 0.9, "regex"))
+    return out
+
+
 ALL_FINDERS = {
     "GSTIN": find_gstin, "AADHAAR": find_aadhaar, "PAN": find_pan,
     "VOTER_ID": find_voter_id, "PASSPORT": find_passport,
+    "EMAIL_ADDRESS": find_email, "PHONE_NUMBER": find_phone,
 }
 
 

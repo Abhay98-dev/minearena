@@ -14,7 +14,7 @@ class MappingNotFound(KeyError):
 
 
 def normalize(entity_type: str, value: str) -> str:
-    if entity_type == "AADHAAR":
+    if entity_type in ("AADHAAR", "PHONE_NUMBER"):
         return re.sub(r"\D", "", value)
     if entity_type in ("PAN", "GSTIN", "VOTER_ID", "PASSPORT"):
         return re.sub(r"\s+", "", value).upper()

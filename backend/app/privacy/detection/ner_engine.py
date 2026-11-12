@@ -9,9 +9,13 @@ Everything runs locally. No network call is made at inference time
 """
 import os
 import re
+import logging
+import math
 from typing import List, Optional
 
 from ..schemas import Span
+
+logger = logging.getLogger(__name__)
 
 _TOK = r"(?:[A-Za-z]\.|[A-Za-z][A-Za-z'\-]+)"  # "Rahul", "rahul", or an initial "K."
 _NAME = _TOK + r"(?:[ \t]+" + _TOK + r"){0,4}"
@@ -118,7 +122,11 @@ def heuristic_ner(text: str) -> List[Span]:
 class GlinerNER:
     """Local GLiNER wrapper. Model id configurable via GLINER_MODEL."""
 
-    LABELS = {"person name": "PERSON", "address": "ADDRESS", "city": "ADDRESS"}
+    LABELS = {
+        "person": "PERSON", "person name": "PERSON", "organization": "ORGANIZATION",
+        "location": "LOCATION", "city": "LOCATION", "address": "ADDRESS",
+        "email address": "EMAIL_ADDRESS", "phone number": "PHONE_NUMBER",
+    }
 
     def __init__(self, model_id: Optional[str] = None, threshold: float = 0.5):
         from gliner import GLiNER  # lazy import; optional dependency
@@ -138,11 +146,21 @@ class GlinerNER:
 
     def predict(self, text: str) -> List[Span]:
         out: List[Span] = []
+        if not text:
+            return out
         for off, chunk in self._chunks(text):
             for ent in self.model.predict_entities(chunk, list(self.LABELS), threshold=self.threshold):
-                typ = self.LABELS.get(ent["label"])
-                if typ:
-                    out.append(Span(off + ent["start"], off + ent["end"], typ, float(ent.get("score", 0.5)), "gliner"))
+                if not isinstance(ent, dict):
+                    continue
+                typ = self.LABELS.get(str(ent.get("label", "")).casefold().strip())
+                start, end = ent.get("start"), ent.get("end")
+                try:
+                    start, end = int(start), int(end)
+                    score = float(ent.get("score", 0.5))
+                except (TypeError, ValueError, OverflowError):
+                    continue
+                if typ and 0 <= start < end <= len(chunk) and math.isfinite(score):
+                    out.append(Span(off + start, off + end, typ, min(1.0, max(0.0, score)), "gliner"))
         return out
 
 
@@ -159,15 +177,19 @@ def get_gliner() -> Optional[GlinerNER]:
     if _gliner_singleton is None:
         try:
             _gliner_singleton = GlinerNER()
-        except Exception:  # missing package / weights: degrade to heuristics
+        except Exception as exc:  # missing package / weights: degrade to heuristics
+            logger.warning("GLiNER initialization failed (%s); continuing without GLiNER", type(exc).__name__)
             _gliner_failed = True
             return None
     return _gliner_singleton
 
 
-def detect_names_addresses(text: str) -> List[Span]:
+def detect_names_addresses(text: str, include_gliner: bool = True) -> List[Span]:
     spans = heuristic_ner(text)
-    g = get_gliner()
+    g = get_gliner() if include_gliner else None
     if g is not None:
-        spans.extend(g.predict(text))
+        try:
+            spans.extend(g.predict(text))
+        except Exception as exc:
+            logger.warning("GLiNER inference failed (%s); continuing with other recognizers", type(exc).__name__)
     return spans
