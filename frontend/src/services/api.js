@@ -42,6 +42,15 @@ export function processDocument(payload) {
   return request('/gateway/process', { method: 'POST', body: JSON.stringify(payload) })
 }
 
+export function processWordDocument(file, { task, provider }) {
+  const query = new URLSearchParams({ filename: file.name, task, provider })
+  return request(`/gateway/process-file?${query}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' },
+    body: file,
+  })
+}
+
 export async function getAudit(limit = 50) {
   const data = await request(`/audit?limit=${limit}`)
   return data.records || []

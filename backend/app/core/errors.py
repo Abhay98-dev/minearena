@@ -2,12 +2,15 @@
 from typing import Optional
 
 STATUS = {
-    "INVALID_REQUEST": 400, "INPUT_TOO_LARGE": 413, "PII_PROCESSING_FAILED": 422,
+    "INVALID_REQUEST": 400, "INVALID_DOCUMENT": 400, "UNSUPPORTED_FILE": 415,
+    "INPUT_TOO_LARGE": 413, "PII_PROCESSING_FAILED": 422,
     "LLM_PROVIDER_ERROR": 502, "LLM_PROVIDER_TIMEOUT": 504, "REINSERTION_FAILED": 500,
     "PRIVACY_ENGINE_UNAVAILABLE": 503, "OUTBOUND_PII_LEAKAGE_BLOCKED": 409, "INTERNAL_ERROR": 500,
 }
 SAFE_MESSAGE = {
     "INVALID_REQUEST": "Missing or invalid text, task or provider.",
+    "INVALID_DOCUMENT": "The uploaded Word document is invalid or contains no readable text.",
+    "UNSUPPORTED_FILE": "Upload a Word .docx document.",
     "INPUT_TOO_LARGE": "Input exceeds the configured size limit.",
     "PII_PROCESSING_FAILED": "Local PII detection or masking failed.",
     "LLM_PROVIDER_ERROR": "The external LLM provider returned an error.",

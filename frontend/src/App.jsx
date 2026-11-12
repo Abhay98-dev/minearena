@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Activity, AlertTriangle, ArrowRight, CheckCircle2, FileText, LockKeyhole, Pencil, RefreshCw, Send, ShieldCheck,
+  Upload,
   ShieldX,
 } from 'lucide-react'
-import { getAudit, getEngines, getHealth, processDocument } from './services/api'
+import { getAudit, getEngines, getHealth, processDocument, processWordDocument } from './services/api'
 import { EntityTable, HighlightedOriginal, PlaceholderText } from './components/GatewayViews'
 import EvaluationReport from './pages/EvaluationReport'
 import { SAMPLES } from './samples'
@@ -14,6 +15,8 @@ const ENGINE_LABEL = { gliner: 'Local NER (GLiNER)', presidio: 'Presidio India I
 function App() {
   const [tab, setTab] = useState('process')
   const [text, setText] = useState(SAMPLES[0].text)
+  const [selectedFile, setSelectedFile] = useState(null)
+  const fileInput = useRef(null)
   const [task, setTask] = useState(SAMPLES[0].task)
   const [provider, setProvider] = useState('mock')
   const [result, setResult] = useState(null)
@@ -38,15 +41,33 @@ function App() {
   function loadSample(id) {
     const s = SAMPLES.find(x => x.id === id)
     if (!s) return
-    setText(s.text); setTask(s.task); setResult(null); setError(null); setEditing(true)
+    setText(s.text); setSelectedFile(null); setTask(s.task); setResult(null); setError(null); setEditing(true)
+  }
+
+  function chooseFile(event) {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+    if (!file.name.toLowerCase().endsWith('.docx')) {
+      setSelectedFile(null)
+      setError({ code: 'UNSUPPORTED_FILE', message: 'Choose a Word document in .docx format.' })
+      return
+    }
+    setSelectedFile(file)
+    setResult(null)
+    setError(null)
+    setEditing(true)
   }
 
   async function submit(event) {
     event.preventDefault()
     setBusy(true); setError(null); setResult(null)
     try {
-      const response = await processDocument({ text, task, provider })
-      setResult(response); setSubmitted(text); setEditing(false)
+      const response = selectedFile
+        ? await processWordDocument(selectedFile, { task, provider })
+        : await processDocument({ text, task, provider })
+      const original = response.original_text || text
+      setResult(response); setSubmitted(original); setText(original); setSelectedFile(null); setEditing(false)
       await refreshAudit()
     } catch (err) {
       setError(err)
@@ -93,7 +114,7 @@ function App() {
           <option value="summarize">Summarize</option><option value="extract">Extract key details</option></select></label>
         <label>LLM provider<select value={provider} onChange={e => setProvider(e.target.value)}>
           <option value="mock">Mock (offline demo)</option><option value="gemini">Gemini (external)</option><option value="ollama">Ollama (local)</option></select></label>
-        <button className="primary-button" type="submit" disabled={busy || !text.trim()}>
+        <button className="primary-button" type="submit" disabled={busy || (!selectedFile && !text.trim())}>
           {busy ? <><RefreshCw className="spin" size={17} /> Processing…</> : <>Mask &amp; send <ArrowRight size={17} /></>}</button>
       </form>
 
@@ -102,8 +123,14 @@ function App() {
           <div className="col-head"><span className="step">A</span><div><h2>Original input</h2><p>Stays on this server</p></div>
             {result && !editing && <button className="text-button" onClick={() => setEditing(true)}><Pencil size={13} /> Edit</button>}</div>
           {editing || !result
-            ? <><textarea aria-label="Document text" value={text} onChange={e => setText(e.target.value)} maxLength={20000} required />
-              <div className="editor-meta"><span>{text.length.toLocaleString()} / 20,000</span><span>Use synthetic data only</span></div></>
+            ? <><div className="text-entry-wrap">
+                <textarea aria-label="Document text" value={text} onChange={e => { setText(e.target.value); setSelectedFile(null) }} maxLength={20000} required={!selectedFile} />
+                <input ref={fileInput} className="hidden-file-input" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={chooseFile} />
+                <button className="file-pick-button" type="button" aria-label="Choose a Word document" title="Upload a Word .docx document" onClick={() => fileInput.current?.click()}>
+                  <Upload size={16} />
+                </button>
+              </div>
+              <div className="editor-meta"><span>{selectedFile ? `Selected: ${selectedFile.name} · Word document` : `${text.length.toLocaleString()} / 20,000 characters`}</span><span>{selectedFile ? 'File text will be processed instead of the text box' : 'Use synthetic data only'}</span></div></>
             : <><HighlightedOriginal text={submitted} entities={result.entities} />
               <p className="muted small">{result.entities.length} detected mention(s), marked with their type.</p></>}
         </article>

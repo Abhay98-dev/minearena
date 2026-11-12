@@ -23,6 +23,8 @@ Check that every detection layer actually loaded: `GET http://localhost:8000/api
 
 For an offline request, send `"provider":"mock"` to `POST /api/v1/gateway/process`. Set `MOCK_MODE` (`echo|reorder|paraphrase|drop|unknown|fail|timeout`) to make the mock LLM misbehave.
 
+To submit a modern Word `.docx`, use `POST /api/v1/gateway/process-file` with the document bytes as the request body and `filename`, `task`, and `provider` as query parameters. Text entry remains available. Both input methods feed the same privacy pipeline; paragraphs and tables are extracted, so one document can contain multiple people or records.
+
 ## How detection works
 
 | Layer | Finds | How |

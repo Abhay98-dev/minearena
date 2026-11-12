@@ -69,3 +69,9 @@ th.num{text-align:right}
 
 @media(max-width:1200px){.workspace.three{grid-template-columns:repeat(2,minmax(0,1fr))}.workspace.three .column:last-child{grid-column:1/-1}}
 @media(max-width:900px){.workspace.three{grid-template-columns:1fr}.control-bar{grid-template-columns:1fr 1fr}.control-bar label:first-child{grid-column:1/-1}.control-bar .primary-button{grid-column:1/-1;width:100%}}
+
+.text-entry-wrap{position:relative}
+.text-entry-wrap textarea{padding-right:48px}
+.hidden-file-input{display:none}
+.file-pick-button{position:absolute;top:9px;right:9px;width:31px;height:31px;display:grid;place-items:center;border:1px solid #dce7e6;border-radius:7px;background:#fff;color:#168e7c;box-shadow:0 1px 4px #263b4c12}
+.file-pick-button:hover,.file-pick-button:focus-visible{border-color:#8bcfc3;background:#eff9f7;outline:none}
