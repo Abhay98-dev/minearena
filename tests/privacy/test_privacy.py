@@ -394,3 +394,10 @@ def test_id_normalize_ignores_separators():
     from app.privacy.mapping.mapping_store import normalize
     assert normalize("PAN", "ABCDE-1234-F") == normalize("PAN", "abcde 1234 f") == "ABCDE1234F"
     assert normalize("AADHAAR", "1111.2222.8888") == "111122228888"
+
+
+def test_care_of_relationship_pattern():
+    r = sanitize_document("Kamla Devi W/O Ramesh Rao, C/O Suresh Rao", "req_careof")
+    assert "Ramesh Rao" not in r["sanitized_text"]
+    assert "Suresh Rao" not in r["sanitized_text"]
+    destroy_mapping(r["mapping_handle"])

@@ -51,6 +51,9 @@ _P_RELATION = re.compile(
     r"\b(?i:husband|wife|spouse|son|daughter|father|mother|brother|sister|friend|colleague|partner)[ \t]+"
     + r"(" + _NAME + r")"
 )
+_P_CAREOF = re.compile(
+    r"\b(?:C/O|S/O|D/O|W/O|c/o|s/o|d/o|w/o)\.?\s+(" + _NAME + r")"
+)
 _P_COUPLE = re.compile(
     r"\b(" + _NAME_2 + r")[ \t]+(?i:and[ \t]+(?:her|his)[ \t]+(?:husband|wife|spouse))\b"
 )
@@ -177,6 +180,8 @@ def heuristic_ner(text: str) -> List[Span]:
         add(m, "PERSON", 0.6, fix_stop=True)
     for m in _P_RELATION.finditer(text):
         add(m, "PERSON", 0.78)
+    for m in _P_CAREOF.finditer(text):
+        add(m, "PERSON", 0.85)
     for m in _P_COUPLE.finditer(text):
         add(m, "PERSON", 0.78, fix_stop=True)
     for m in _P_VERB.finditer(text):
