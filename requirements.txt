@@ -1,0 +1,13 @@
+# --- core (Member 1) ---
+# Keep Starlette on the API generation used by FastAPI's tested TestClient.
+fastapi>=0.110,<0.116
+uvicorn[standard]>=0.29
+pydantic>=2.6
+httpx>=0.27
+python-dotenv>=1.0
+# --- privacy engine (Member 2) : required by the problem statement ---
+presidio-analyzer>=2.2
+spacy>=3.7            # then: python -m spacy download en_core_web_sm
+gliner>=0.2           # local NER; first run downloads weights ONCE (pre-download before demo)
+# --- tests ---
+pytest>=8.0
