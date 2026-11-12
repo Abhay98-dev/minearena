@@ -2,7 +2,7 @@
 
 MineArena masks sensitive values locally before sending document text to an LLM, checks the exact outbound payload, restores only request-scoped placeholders locally, and records a sanitized audit trail.
 
-See [docs/GUIDE.md](docs/GUIDE.md) for architecture diagrams, the Round 1 runbook, judge explanations, team handoffs, and current verification status.
+**New to the project? Start with [docs/TEAM_HANDBOOK.md](docs/TEAM_HANDBOOK.md)**: what we built, how to run it, how it works, and every measured number. See [docs/GUIDE.md](docs/GUIDE.md) for architecture diagrams, the Round 1 runbook, judge explanations, team handoffs, and current verification status.
 
 ## Start locally
 
