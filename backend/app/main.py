@@ -1,4 +1,7 @@
 """Run from repo root:  uvicorn app.main:app --reload --app-dir backend"""
+import asyncio
+import logging
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
@@ -6,7 +9,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.api.routes import audit, gateway, health, metrics
+from app.api.routes import audit, engines, gateway, health, metrics
 from app.core import config
 from app.core.errors import GatewayError
 from app.database import db
@@ -14,6 +17,11 @@ from app.database import db
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     db.init_db()
+    if os.getenv("PRIVACY_PRELOAD", "1") == "1":  # warm GLiNER/Presidio now, not on the first request
+        from app.privacy.detection.detection_service import preload
+        status = await asyncio.to_thread(preload)
+        logging.getLogger("minearena").info("detection engines: %s",
+                                            {k: v.get("status") for k, v in status.items()})
     yield
 
 
@@ -42,3 +50,4 @@ app.include_router(health.router, prefix="/api/v1")
 app.include_router(gateway.router, prefix="/api/v1")
 app.include_router(audit.router, prefix="/api/v1")
 app.include_router(metrics.router, prefix="/api/v1")
+app.include_router(engines.router, prefix="/api/v1")

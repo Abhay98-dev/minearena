@@ -9,5 +9,7 @@ python-dotenv>=1.0
 presidio-analyzer>=2.2
 spacy>=3.7            # then: python -m spacy download en_core_web_sm
 gliner>=0.2           # local NER; first run downloads weights ONCE (pre-download before demo)
+sentencepiece>=0.2    # GLiNER's mDeBERTa tokenizer: without these two GLiNER fails to load
+protobuf>=4.25        # (and the gateway silently falls back to regex-only name detection)
 # --- tests ---
 pytest>=8.0

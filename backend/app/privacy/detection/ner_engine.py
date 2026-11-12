@@ -7,6 +7,7 @@ Two layers, merged by detection_service:
 Everything runs locally. No network call is made at inference time
 (GLiNER downloads weights ONCE at first load; pre-download before the demo).
 """
+import logging
 import os
 import re
 from typing import List, Optional
@@ -50,8 +51,35 @@ _A_LIVES = re.compile(
 )
 _A_HINGLISH = re.compile(r"\b([A-Z][a-z]+(?:[ \t]+[A-Z][a-z]+){0,2})[ \t]+(?i:mein|me|main)[ \t]+(?i:rehta|rehti|rehte|rahta|rahti|rehna)")
 
-_STOP_LEADING = {"Main", "Mai", "Hum", "Mera", "Meri", "I", "He", "She", "They", "My", "The"}
+# Role / form words that are never part of a name. Used to (a) strip them from the front of a
+# heuristic name span ("Applicant Priya Nair" -> "Priya Nair") and (b) reject GLiNER spans that are
+# only role words ("customer", "Loan Officer", "branch").
+ROLE_WORDS = {
+    "applicant", "co-applicant", "coapplicant", "customer", "claimant", "nominee", "agent", "officer",
+    "loan", "manager", "branch", "bank", "sir", "madam", "dear", "insured", "policyholder", "policy",
+    "holder", "beneficiary", "patient", "guarantor", "spouse", "husband", "wife", "father", "mother",
+    "son", "daughter", "brother", "sister", "papa", "mummy", "bhai", "ji", "user", "client", "employee",
+    "executive", "team", "support", "address", "location", "name", "person", "field", "value",
+    "document", "the", "a", "an", "his", "her", "their", "my", "our", "and", "of", "to", "account",
+    "aadhaar", "aadhar", "pan", "passport", "voter", "gstin", "kyc", "form", "claim", "ticket",
+    "insurance", "relationship", "representative", "staff", "member", "owner", "proprietor", "director",
+    "partner", "witness", "signatory", "borrower", "lender", "employer", "tenant", "landlord", "doctor",
+    "hospital", "company", "pvt", "ltd", "limited", "private", "city", "state", "district",
+}
+# Honorifics are kept out of PERSON values so the same person is not split into "Smt. X" and "X".
+HONORIFICS = {"mr", "mrs", "ms", "miss", "shri", "sri", "smt", "dr", "kumari", "late", "prof", "w/o", "s/o", "d/o", "c/o"}
+
+_STOP_LEADING = {"Main", "Mai", "Hum", "Mera", "Meri", "I", "He", "She", "They", "My", "The",
+                 "Applicant", "Co-applicant", "Customer", "Claimant", "Nominee", "Dear", "Insured",
+                 "Policyholder", "Borrower", "Guarantor", "Beneficiary", "Patient", "Agent", "Yesterday",
+                 "Today", "Also", "Then", "When", "Later", "However"}
 _NON_NAME = {"Aadhaar", "Aadhar", "Pan", "Passport", "Loan", "Insurance", "Policy", "Claim", "Ticket"}
+
+_WORD = re.compile(r"[\w'\-/]+")
+# placeholder-shaped text: "<PERSON_1>", "PERSON_1", "ADDRESS_1" - never a name
+_PLACEHOLDERISH = re.compile(r"<\s*[A-Za-z_]+_\d+\s*>|\b[A-Z]+(?:_[A-Z]+)*_\d+\b")
+
+log = logging.getLogger("minearena.privacy")
 
 
 def _strip(text: str, s: int, e: int):
@@ -81,6 +109,11 @@ def heuristic_ner(text: str) -> List[Span]:
         if fix_stop:
             s, e = _drop_leading_stop(text, s, e)
         s, e = _strip(text, s, e)
+        if typ == "PERSON":
+            se = _trim_person(text, s, e)  # "Shri Gopal Rao" -> "Gopal Rao"
+            if se is None:
+                return
+            s, e = se
         if e - s < 2:
             return
         if typ == "PERSON" and text[s:e].split()[0] in _NON_NAME:
@@ -114,54 +147,136 @@ def heuristic_ner(text: str) -> List[Span]:
     return out
 
 
+def _words(text: str, s: int, e: int) -> List[re.Match]:
+    return list(_WORD.finditer(text, s, e))
+
+
+def _trim_person(text: str, s: int, e: int):
+    """Strip leading honorifics / role words and trailing role words from a PERSON span."""
+    ws = _words(text, s, e)
+    while ws and (ws[0].group(0).lower().rstrip(".") in HONORIFICS or ws[0].group(0).lower() in ROLE_WORDS):
+        ws.pop(0)
+    while ws and ws[-1].group(0).lower() in ROLE_WORDS:
+        ws.pop()
+    if not ws:
+        return None
+    return _strip(text, ws[0].start(), ws[-1].end())
+
+
+def _only_role_words(text: str) -> bool:
+    toks = [t.lower().rstrip(".") for t in _WORD.findall(text)]
+    return not toks or all(t in ROLE_WORDS or t in HONORIFICS for t in toks)
+
+
+def _minus_placeholders(text: str, s: int, e: int):
+    """Pieces of [s, e) that are not placeholder text (GLiNER tags "<PERSON_1>" as a person)."""
+    pieces = [(s, e)]
+    for m in _PLACEHOLDERISH.finditer(text, max(0, s - 20), min(len(text), e + 20)):
+        nxt = []
+        for a, b in pieces:
+            if m.end() <= a or m.start() >= b:
+                nxt.append((a, b))
+                continue
+            if a < m.start():
+                nxt.append((a, m.start()))
+            if m.end() < b:
+                nxt.append((m.end(), b))
+        pieces = nxt
+    return [_strip(text, a, b) for a, b in pieces]
+
+
 class GlinerNER:
-    """Local GLiNER wrapper. Model id configurable via GLINER_MODEL."""
+    """Local GLiNER wrapper. Model id configurable via GLINER_MODEL.
 
-    LABELS = {"person name": "PERSON", "address": "ADDRESS", "city": "ADDRESS"}
+    Label wording matters: this model was trained on "person" / "address" / "location"
+    (model card). "person name" returns nothing, which is how names silently went undetected before.
+    """
 
-    def __init__(self, model_id: Optional[str] = None, threshold: float = 0.5):
+    LABELS = {"person": "PERSON", "address": "ADDRESS", "location": "ADDRESS"}
+    LOCATION_MIN_SCORE = 0.8   # bare "location" hits are noisier ("branch", "Pune branch")
+    CHUNK_WORDS = 250          # model max_len is 384 words; stay well under it
+    CHUNK_OVERLAP = 30
+
+    def __init__(self, model_id: Optional[str] = None, threshold: Optional[float] = None):
         from gliner import GLiNER  # lazy import; optional dependency
-        self.model = GLiNER.from_pretrained(model_id or os.getenv("GLINER_MODEL", "urchade/gliner_multi_pii-v1"))
-        self.threshold = threshold
+        self.model_id = model_id or os.getenv("GLINER_MODEL", "urchade/gliner_multi_pii-v1")
+        self.model = GLiNER.from_pretrained(self.model_id)
+        self.threshold = threshold if threshold is not None else float(os.getenv("GLINER_THRESHOLD", "0.35"))
 
-    def _chunks(self, text: str, size: int = 900):
-        i = 0
-        while i < len(text):
-            j = min(len(text), i + size)
-            if j < len(text):
-                nl = text.rfind("\n", i, j)
-                if nl > i + size // 2:
-                    j = nl
-            yield i, text[i:j]
-            i = j
+    def _chunks(self, text: str):
+        """Word-window chunks with overlap, yielded as (char_offset, chunk_text)."""
+        words = list(re.finditer(r"\S+", text))
+        if len(words) <= self.CHUNK_WORDS:
+            yield 0, text
+            return
+        step = self.CHUNK_WORDS - self.CHUNK_OVERLAP
+        for i in range(0, len(words), step):
+            win = words[i:i + self.CHUNK_WORDS]
+            a, b = win[0].start(), win[-1].end()
+            yield a, text[a:b]
+            if i + self.CHUNK_WORDS >= len(words):
+                break
 
     def predict(self, text: str) -> List[Span]:
-        out: List[Span] = []
+        best = {}
         for off, chunk in self._chunks(text):
             for ent in self.model.predict_entities(chunk, list(self.LABELS), threshold=self.threshold):
-                typ = self.LABELS.get(ent["label"])
-                if typ:
-                    out.append(Span(off + ent["start"], off + ent["end"], typ, float(ent.get("score", 0.5)), "gliner"))
-        return out
+                label = ent["label"]
+                typ = self.LABELS.get(label)
+                score = float(ent.get("score", 0.5))
+                if not typ or (label == "location" and score < self.LOCATION_MIN_SCORE):
+                    continue
+                for s, e in _minus_placeholders(text, off + ent["start"], off + ent["end"]):
+                    if typ == "PERSON":
+                        se = _trim_person(text, s, e)
+                        if se is None:
+                            continue
+                        s, e = se
+                    if e - s < 2 or _only_role_words(text[s:e]) or not re.search(r"[A-Za-z]", text[s:e]):
+                        continue
+                    if label == "location" and not text[s].isupper():
+                        continue
+                    key = (s, e, typ)
+                    if score > best.get(key, -1):
+                        best[key] = score
+        return [Span(s, e, t, sc, "gliner") for (s, e, t), sc in sorted(best.items())]
 
 
 _gliner_singleton: Optional[GlinerNER] = None
 _gliner_failed = False
+_gliner_error: Optional[str] = None
 
 
 def get_gliner() -> Optional[GlinerNER]:
-    """Returns GLiNER or None (never raises). Loaded once per process."""
-    global _gliner_singleton, _gliner_failed
+    """Returns GLiNER or None (never raises). Loaded once per process.
+    A load failure is logged loudly and reported by engine_status(), never hidden."""
+    global _gliner_singleton, _gliner_failed, _gliner_error
     mode = os.getenv("PRIVACY_NER", "heuristic").lower()
     if mode not in ("gliner", "both") or _gliner_failed:
         return None
     if _gliner_singleton is None:
         try:
             _gliner_singleton = GlinerNER()
-        except Exception:  # missing package / weights: degrade to heuristics
+            log.info("GLiNER loaded: %s (threshold %.2f)", _gliner_singleton.model_id, _gliner_singleton.threshold)
+        except Exception as e:  # missing package / weights: degrade to heuristics, but say so
             _gliner_failed = True
+            _gliner_error = f"{type(e).__name__}: {str(e)[:200]}"
+            log.error("GLiNER failed to load; names/addresses fall back to regex heuristics only. %s",
+                      _gliner_error)
             return None
     return _gliner_singleton
+
+
+def gliner_status() -> dict:
+    mode = os.getenv("PRIVACY_NER", "heuristic").lower()
+    if mode not in ("gliner", "both"):
+        return {"status": "disabled", "mode": mode}
+    if _gliner_failed:
+        return {"status": "failed", "mode": mode, "error": _gliner_error}
+    if _gliner_singleton is None:
+        return {"status": "not_loaded", "mode": mode}
+    return {"status": "loaded", "mode": mode, "model": _gliner_singleton.model_id,
+            "threshold": _gliner_singleton.threshold}
 
 
 def detect_names_addresses(text: str) -> List[Span]:
