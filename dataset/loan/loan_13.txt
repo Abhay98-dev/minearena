@@ -1,7 +1,9 @@
-MSME Business Loan - Metro Hardware Mart
-Proprietor: Pranav Singh
-GSTIN: 19WYJCI5502E7ZK
-Proprietor PAN: RLDPS4936R
-Business address: Plot 13, Sector V, Kolkata, PIN 700711
-Annual turnover: Rs 32,99,000
-Guarantor: Rekha Agarwal (Voter ID CEX0183667)
+LOAN APPLICATION FORM
+Applicant Name: Karthik Singh
+PAN: LRLPS1493Z
+Aadhaar: 728098851651
+Voter ID: SVM1201836
+Residential Address: Flat 291, Lotus Residency, Salt Lake, Kolkata - 700527
+Loan Amount: Rs 5,26,000
+Tenure: 36 months
+Purpose: medical expenses

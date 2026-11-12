@@ -5,7 +5,7 @@
 > You need nothing else to get started. Every command is written out in full.
 >
 > - Branch: `feature/robust-detection-eval`
-> - Last updated: 12 Nov 2026
+> - Last updated: 12 Nov 2026, evening (teammate review fixes, see [section 14](#14-changes-after-the-teammate-review-12-nov-evening))
 > - All data in this repo is **synthetic**. Never put a real person's details into it.
 
 ---
@@ -25,6 +25,7 @@
 11. [Troubleshooting](#11-troubleshooting)
 12. [File map](#12-file-map)
 13. [Glossary](#13-glossary)
+14. [Changes after the teammate review (12 Nov evening)](#14-changes-after-the-teammate-review-12-nov-evening)
 
 ---
 
@@ -43,10 +44,10 @@
   - Sent to Gemini: `My name is <PERSON_1>. My Aadhaar number is <AADHAAR_1> and my PAN is <PAN_1>.`
   - Gemini's reply is restored locally, so the final answer contains "Rahul Sharma" again.
 - **Headline results** (synthetic data; full tables in [section 6](#6-precision-recall-and-every-other-number)):
-  - **0** raw personal values found in any outbound payload, across 70 test documents.
-  - Detection **F1 = 0.90** on 20 "held-out" documents written in phrasings we never tuned on (precision 0.86, recall 0.95).
+  - **0** raw personal values found in any outbound payload, across 74 test documents.
+  - Detection **F1 = 0.89** on 24 "held-out" documents: 20 written in phrasings we never tuned on, plus 4 with no personal data at all (precision 0.84, recall 0.95).
   - Restoring values when the AI reorders, paraphrases or drops tags: **100% correct, 0 wrong-person restorations**.
-  - The gateway adds about **0.22 seconds** per request. Gemini itself takes about 2.6 seconds.
+  - The gateway adds about **0.25 seconds** per request. Gemini itself takes about 2.6 seconds.
 - **Tech stack:**
   - Python 3.12 with FastAPI (backend).
   - Microsoft Presidio plus our own India ID recognizers.
@@ -82,7 +83,7 @@ The PDF is `MineArena_PS02_DPDP_Privacy_Gateway.pdf`. Section numbers below are 
 - **3.6 Demo interface, three sections side by side**: done.
   - React UI in `frontend/`. Columns: **A** original input, **B** exact outbound payload plus entity table, **C** final response.
 - **3.7 About 50 synthetic labelled documents**: done.
-  - 50 documents (15 loan, 15 KYC, 10 support, 10 insurance) with 237 labelled values, plus 20 extra "held-out" documents.
+  - 50 documents (15 loan, 15 KYC, 10 support, 10 insurance) with 230 labelled values, including raw JSON, `key=value` and lowercase-chat formats, plus 24 extra "held-out" documents (4 of them with no personal data).
   - Code: `dataset/`.
 - **3.8 Metrics report**: done.
   - Leakage count, precision and recall per type, reinsertion accuracy and added latency.
@@ -204,7 +205,7 @@ curl -X POST http://localhost:8000/api/v1/gateway/process \
 ```bash
 pytest tests -q
 ```
-- Expected: **59 passed**, in about 10 seconds.
+- Expected: **78 passed**, in about 10 seconds.
 - These tests use the **rules-only** mode on purpose (fast, no model needed).
 
 ```bash
@@ -371,7 +372,7 @@ Aadhaar 2345 6789 0123. Address: 14 Shivaji Nagar, Pune 411005. Arjun ka passpor
 The judges care most about evidence. Here is ours, from strongest to weakest.
 
 - **1. We measure leakage on the exact audited payload, not on our own output.**
-  - For each of 70 documents, we take the payload recorded in the audit log (what really would leave).
+  - For each of 74 documents, we take the payload recorded in the audit log (what really would leave).
   - We search it for every labelled real value:
     - Aadhaar compared by digits only, so spaces and dashes can't hide it.
     - IDs compared ignoring case and spaces.
@@ -382,7 +383,7 @@ The judges care most about evidence. Here is ours, from strongest to weakest.
   - While building, we looked at mistakes on the 50-document main set and fixed them. That makes the main-set scores **optimistic** (they reached 1.000).
   - So we wrote **20 more documents in different styles**: emails, WhatsApp-style chat, SMS, "near"/"opp." addresses, more Hinglish, three-person documents.
   - We ran them **once** and did **not** change the detector afterwards.
-  - **These are the numbers we quote:** F1 0.90, recall 0.95, zero leaks.
+  - **These are the numbers we quote:** F1 0.89, recall 0.95, zero leaks.
   - **Rule for the team:** do not tune the detector on the held-out files, or they stop being a fair test.
 - **3. Before/after comparison on the same data.**
   - The evaluation runs the same pipeline twice: with GLiNER, and rules-only.
@@ -394,9 +395,12 @@ The judges care most about evidence. Here is ours, from strongest to weakest.
   - For every tag in the reply, we check it was replaced by **the right person's** value, using the labels.
   - **100% correct, 0 wrong-person restorations, invented tags 130/130 left untouched.**
 - **6. Real Gemini.**
-  - We sent 10 documents through live `gemini-2.5-flash`. 7 succeeded, with **38/38** tags restored correctly and **0** leaks.
+  - We sent 10 documents through live `gemini-2.5-flash` (before the 12 Nov evening fixes; not re-run since). 7 succeeded, with **38/38** tags restored correctly and **0** leaks.
   - 3 failed with a provider error on back-to-back calls, probably the free-tier rate limit (not confirmed).
-- **7. Automated tests** (59 fast + 8 with real models). They cover:
+- **7. Automated tests** (78 fast + 8 with real models). They cover:
+  - Messy real input (added after the teammate review): the exact screenshot prompt, Aadhaar with dots and
+    slashes, `a.id=` / `unique id=` / `ekyc id` labels, spaced PAN and Voter ID, JSON staying valid JSON,
+    `key=value`, lowercase names and cities, Hinglish spellings like "reheta" and "rahte".
   - The judge example: exact output.
   - All 7 entity types, and a GSTIN not being split into a PAN.
   - The same name always getting the same tag.
@@ -422,43 +426,48 @@ The judges care most about evidence. Here is ours, from strongest to weakest.
 - **Strict match:** exactly the same characters. This is harsher; for example, "14 Shivaji Nagar, Pune" vs "Flat 14, Shivaji Nagar, Pune" fails strict.
 - **TP / FP / FN:** correct finds / wrong finds / misses.
 
-### 6.2 Held-out set: the honest numbers (20 documents, 76 labelled values)
+### 6.2 Held-out set: the honest numbers (24 documents: 20 with 76 labelled values, 4 with none)
 
 | Type | Precision | Recall | F1 | Strict F1 | TP | FP | FN |
 |---|---|---|---|---|---|---|---|
-| PERSON | 0.792 | 0.950 | 0.864 | 0.864 | 38 | 10 | 2 |
+| PERSON | 0.776 | 0.950 | 0.854 | 0.854 | 38 | 11 | 2 |
 | AADHAAR | 1.000 | 1.000 | 1.000 | 1.000 | 4 | 0 | 0 |
 | PAN | 1.000 | 1.000 | 1.000 | 1.000 | 6 | 0 | 0 |
 | GSTIN | 1.000 | 1.000 | 1.000 | 1.000 | 2 | 0 | 0 |
 | VOTER_ID | 1.000 | 1.000 | 1.000 | 1.000 | 2 | 0 | 0 |
 | PASSPORT | 1.000 | 1.000 | 1.000 | 1.000 | 4 | 0 | 0 |
-| ADDRESS | 0.889 | 0.889 | 0.889 | 0.778 | 16 | 2 | 2 |
-| **Overall** | **0.857** | **0.947** | **0.900** | 0.875 | 72 | 12 | 4 |
+| ADDRESS | 0.842 | 0.889 | 0.865 | 0.757 | 16 | 3 | 2 |
+| **Overall** | **0.837** | **0.947** | **0.889** | 0.864 | 72 | 14 | 4 |
 
 - The same documents with **rules only (no GLiNER)**:
-  - PERSON recall 0.300, ADDRESS recall 0.278.
-  - Overall F1 0.603.
+  - PERSON recall 0.350, ADDRESS recall 0.278.
+  - Overall F1 0.627.
 - What this tells us:
   - ID numbers are essentially solved: fixed formats plus checksums.
   - Names and addresses are where the AI model matters. Its weak spot is **over-masking names** (precision 0.79): it sometimes masks a word that isn't a name. That is the safe direction.
   - The 4 misses did **not** cause leaks; the leakage checks found 0. They were partly-matched spans or values still masked under a different span.
-  - **Caveat:** the held-out set is small (20 documents; only 2 GSTINs and 2 Voter IDs), so per-type numbers for rare types are not statistically strong.
+  - **Caveat:** the held-out set is small (20 documents with personal data; only 2 GSTINs and 2 Voter IDs), so per-type numbers for rare types are not statistically strong.
+  - **The 4 negative documents** (added 12 Nov) produced 2 false positives: "Credit" (from "Credit Officer") tagged as a name,
+    and "Koramangala branch" tagged as an address. We left them in: tuning them away would make the held-out set unfair.
+    The 20 original documents score exactly as before the review fixes (no regression).
 
-### 6.3 Main set (50 documents, 237 labelled values; used for error analysis, so optimistic)
+### 6.3 Main set (50 documents, 230 labelled values; used for error analysis, so optimistic)
 
 - With GLiNER (full engine): every type 1.000 precision and recall.
-  - Strict F1 0.979; addresses 0.889 strict, because boundaries differ slightly.
+  - Strict F1 0.983; addresses 0.913 strict, because boundaries differ slightly.
 - Rules only:
-  - PERSON recall 0.556, ADDRESS recall 0.556.
-  - Overall F1 0.830.
+  - PERSON recall 0.606, ADDRESS recall 0.609.
+  - Overall F1 0.852 (it was 0.830 before the review fixes: the fallback mode got stronger).
 - What's in the set:
   - 15 loan, 15 KYC, 10 support and 10 insurance documents.
   - 10 Hinglish documents; 5 with no personal data at all (negatives).
-  - Labelled values by type: PERSON 99, ADDRESS 45, PAN 35, AADHAAR 25, VOTER_ID 12, PASSPORT 12, GSTIN 9.
+  - Labelled values by type: PERSON 94, ADDRESS 46, PAN 35, AADHAAR 25, VOTER_ID 12, PASSPORT 10, GSTIN 8.
   - Deliberately hard cases:
     - Two people sharing a surname; first-name-only re-mentions.
     - Initials ("K. Ramesh"); honorifics ("Smt.", "Shri").
     - A lowercase chat name; multi-line forms.
+    - Raw JSON and `key=value` exports, a dotted Aadhaar with an `a.id=` label, a spaced PAN, and lowercase Hinglish
+      with the spelling "reheta" (added after the teammate review).
     - Bank codes and policy numbers that look like IDs but aren't.
 
 ### 6.4 Leakage (target: 0)
@@ -473,22 +482,22 @@ The judges care most about evidence. Here is ours, from strongest to weakest.
 
 | What the LLM did | Tags in reply (main) | Restored correctly | Accuracy | Wrong person | Dropped tags (reported, not guessed) | Invented tags left untouched |
 |---|---|---|---|---|---|---|
-| Keeps every tag | 211 | 211 | 100% | 0 | 0 | — |
-| Reorders tags | 211 | 211 | 100% | 0 | 0 | — |
-| Paraphrases around them | 211 | 211 | 100% | 0 | 0 | — |
-| Drops most tags | 45 | 45 | 100% | 0 | 166 | — |
-| Invents unknown tags | 211 | 211 | 100% | 0 | 0 | 90 / 90 |
+| Keeps every tag | 207 | 207 | 100% | 0 | 0 | — |
+| Reorders tags | 207 | 207 | 100% | 0 | 0 | — |
+| Paraphrases around them | 207 | 207 | 100% | 0 | 0 | — |
+| Drops most tags | 45 | 45 | 100% | 0 | 162 | — |
+| Invents unknown tags | 207 | 207 | 100% | 0 | 0 | 90 / 90 |
 
 - The held-out set gives the same result: 100%, 0 wrong-person, 40/40 invented tags untouched.
-- Live Gemini: 38/38 restored (100%), 0 wrong-person.
+- Live Gemini: 38/38 restored (100%), 0 wrong-person (measured before the 12 Nov evening fixes).
 - **Honest note:** the mock modes reuse our exact tags, so 100% is expected there. The real test of reinsertion is Gemini paraphrasing freely, and that also scored 100% on our 7-request sample.
 
 ### 6.6 Latency (extra time the gateway adds)
 
 | | Median | Mean | 95th percentile |
 |---|---|---|---|
-| Gateway overhead, held-out (n=20) | 215 ms | 237 ms | 402 ms |
-| Gateway overhead, main (n=50) | 232 ms | 242 ms | 308 ms |
+| Gateway overhead, held-out (n=24) | 222 ms | 246 ms | 418 ms |
+| Gateway overhead, main (n=50) | 252 ms | 265 ms | 337 ms |
 | Rules-only engine (for comparison) | ~0 ms | ~0.3 ms | 1 ms |
 | Gemini call itself (live sample, n=7) | — | 2,572 ms | — |
 
@@ -510,6 +519,9 @@ The judges care most about evidence. Here is ours, from strongest to weakest.
      - One tag per person, even for "Arjun ka…".
      - No "Nair" anywhere in column B.
      - This exact document leaked a surname to Gemini in an early version; now it doesn't.
+  3b. **D7, messy chat** (lowercase Hinglish, "reheta", dotted and slashed Aadhaar, spaced PAN) and
+      **D8, raw JSON payload**: everything masked, and the JSON in column B is still valid JSON.
+      Judges type input like this; showing it pre-empts the question.
   4. **Switch the provider to Gemini** and run D5 (insurance claim, all 7 types). Show the real model, LLM time vs gateway overhead, and the restored answer.
   5. **Misbehaving LLM:**
      - Stop the backend, set `MOCK_MODE=drop` in `.env`, restart, and run D1 with provider Mock.
@@ -519,7 +531,7 @@ The judges care most about evidence. Here is ours, from strongest to weakest.
      - The UI can't easily force a leak, because detection catches everything first.
      - So show the automated test instead: `pytest tests/backend/test_gateway.py -k leak -v`. It proves the guard blocks with 409 and the LLM is **never called**.
   7. **Audit trail tab:** each request with model, entity types and leak count, and never the real values.
-  8. **Evaluation tab:** zero leakage, held-out F1 0.90, 100% reinsertion, about 0.22 s overhead.
+  8. **Evaluation tab:** zero leakage, held-out F1 0.89, 100% reinsertion, about 0.25 s overhead.
      - Toggle "Main set" to show the rules-only vs GLiNER recall gap.
 - **One honest sentence to say:** "Our numbers are on synthetic data we generated, including a held-out set we never tuned on. ID detection is near perfect; names are where we lean towards over-masking, which is the safe side."
 
@@ -528,7 +540,7 @@ The judges care most about evidence. Here is ours, from strongest to weakest.
 ## 8. Questions judges will ask, and our answers
 
 - **"How do you know nothing leaks?"**
-  - We check the exact audited payload against every labelled value in 70 documents: 0 leaks.
+  - We check the exact audited payload against every labelled value in 74 documents: 0 leaks.
   - At run time, a guard re-checks every outgoing payload and blocks with 409 if anything remains. The LLM is never called in that case.
 - **"What if your detector misses a name completely?"**
   - Then the guard can't know it's a name. That is our main residual risk, and we say so.
@@ -553,14 +565,14 @@ The judges care most about evidence. Here is ours, from strongest to weakest.
   - We do **not** claim the gateway makes anyone DPDP-compliant. It is one technical safeguard.
 - **"Where is the mapping stored?"**
   - In server memory, for one request, deleted in a `finally` block, with a 15-minute safety purge. Never on disk, never in the audit.
-- **"How much slower is it?"** About 0.22 s per request, roughly 10% of a Gemini call.
+- **"How much slower is it?"** About 0.25 s per request, roughly 10% of a Gemini call.
 
 ---
 
 ## 9. Known limitations (say these before the judges do)
 
 - **Synthetic data only.** Our documents are generated from templates we wrote. Real documents are messier, so real-world accuracy will be lower than our numbers.
-- **The held-out set is small** (20 documents), so rare types (GSTIN, Voter ID) have only 2 examples each there.
+- **The held-out set is small** (20 documents with personal data, plus 4 without), so rare types (GSTIN, Voter ID) have only 2 examples each there.
 - **Name precision is 0.79 on held-out data.** We over-mask some ordinary words. That is safe for privacy, but it can make the LLM's answer slightly less useful.
 - **Names and addresses the model misses entirely cannot be caught by the guard.** The guard only knows values we detected, plus ID-shaped patterns.
 - **Some filter word lists** (role words, Hinglish fillers, organisation words) were extended after looking at the main set's errors. That is why we quote held-out numbers.
@@ -656,7 +668,7 @@ repo/
 │   ├── App.jsx                   3-column workspace, tabs
 │   ├── components/GatewayViews.jsx    highlighting + entity table
 │   ├── pages/EvaluationReport.jsx     Evaluation tab
-│   ├── samples.js                demo documents D1–D5
+│   ├── samples.js                demo documents D1–D8
 │   └── services/api.js           calls to the backend
 ├── dataset/
 │   ├── generate_dataset.py       50 docs, seed 42  → loan/ kyc/ support/ insurance/ + ground_truth.json
@@ -664,7 +676,7 @@ repo/
 ├── evaluation/
 │   ├── run_eval.py               runs the real pipeline, computes all metrics
 │   └── results.md / .json, results_heldout.md / .json
-├── tests/                        59 fast tests + optional real-model tests
+├── tests/                        78 fast tests + optional real-model tests
 ├── scripts/solo_demo.py          command-line demo (server must be running)
 └── docs/
     ├── TEAM_HANDBOOK.md          this file
@@ -691,3 +703,77 @@ repo/
 - **IoU:** intersection over union, how much two text spans overlap (0 = none, 1 = identical).
 - **Mock provider:** a fake LLM for testing without an API key. It can misbehave on purpose.
 - **DPDP:** India's Digital Personal Data Protection Act 2023 and Rules 2025.
+
+---
+
+## 14. Changes after the teammate review (12 Nov evening)
+
+A teammate tested the app with realistic messy input and sent a list of problems (`suggestions.txt`).
+We **re-tested every claim on our own code** before changing anything. The headline was real: on the prompt
+below, two values went to the LLM unmasked **while the UI showed "Guard passed · 0 leaks"**.
+
+```
+hi mera naam aditya hai aur me pune me reheta hu also mera adhaar no 5555-6666-7894 hai and
+mere dost ka name rahul hai aur uska adhar no 1111.2222.8888 hai
+```
+
+### 14.1 What was wrong, and what we changed
+
+| Problem (reproduced on our code) | Why it happened | Fix | File |
+|---|---|---|---|
+| Dotted / slashed Aadhaar (`1111.2222.8888`, `1234/5678/9012`) leaked, and the guard said 0 leaks | The Aadhaar pattern only allowed spaces and dashes. The guard re-uses the same pattern, so it was blind too. | Pattern accepts space, dash, dot and slash, and refuses to match inside longer dotted numbers (invoice and version numbers). | `india_recognizers.py` |
+| Lowercase city "pune" leaked ("aur me pune me reheta hu") | The Hinglish rule needed a capital letter and didn't know the spelling "reheta"; GLiNER scored the lowercase city too low | New residence rule: any case, verb spellings reh/rah(e)ta/ti/te/na/ne, keeps only the place word right before "me/mein" (never the pronoun or a person before it) | `ner_engine.py` |
+| `unique id=`, `ekyc id`, `a.id=`, `u.id=` Aadhaar labels missed | Not in the keyword list | Added; keyword window 40 → 60 characters | `india_recognizers.py` |
+| Spaced PAN / Voter ID / passport (`ABCDE 1234 F`, `XYZ 1234567`) leaked, guard passed | Only compact forms were recognised | Spaced forms accepted **only when the keyword (pan / voter / passport) is just before them**, so ordinary text like "Room ABC 1234567" stays untouched | `india_recognizers.py` |
+| Raw JSON was mangled: `"address<ADDRESS_1><PAN_1>…` | The address rule ran past the closing quote and swallowed the rest of the object | Label rules stop at quotes, `;`, `\|` and the next `key=` / `"key":`. Masked JSON now parses as valid JSON. | `ner_engine.py` |
+| Lowercase names in chat ("my name is aditya kulkarni and…", JSON `"name": "rahul sharma"`) depended on GLiNER alone | The name rules needed capital letters | Lowercase trigger and label rules; the value runs until a stop word (hai, and, aur…). Capitalised names still end at the first lowercase word. | `ner_engine.py` |
+| "i live in nashik" leaked in rules-only mode | The English residence rule needed a capital letter | Lowercase version, which skips "i live in a flat…" | `ner_engine.py` |
+| GLiNER tagged the Hinglish word "me" as a person, and propagation then masked every "me" | No filter for function words | Spans made only of function words, or a single token under 3 letters, are never names or places | `ner_engine.py` |
+| `ABCDE-1234-F` and `ABCDE1234F` got different tags; the guard compared IDs ignoring spaces only | `normalize()` stripped only spaces | IDs compared ignoring space, dash, dot and slash, in both masking and the guard | `mapping_store.py`, `leakage_guard.py` |
+| Presidio would have thrown away dotted / spaced IDs | Its shape check didn't allow those separators | Shape check uses the same separators | `presidio_engine.py` |
+| Two simultaneous first requests could load the 1.1 GB model twice | No lock on the lazy loaders | `threading.Lock` around GLiNER and Presidio loading | `ner_engine.py`, `presidio_engine.py` |
+| Model load could stall on bad Wi-Fi | It always checked HuggingFace first | Loads from the local cache first (`local_files_only=True`), downloads only if missing | `ner_engine.py` |
+| Opening `http://localhost:8000/` returned a 404 | No root route | `GET /` returns the service name and links to `/docs`, `/api/v1/health` and `/api/v1/engines` | `main.py` |
+| 9 empty `.jsx` files in `frontend/src` | Leftover stubs | Deleted (nothing imported them) | `frontend/src/` |
+
+**Also added:**
+- Demo samples **D7** (the messy chat above, plus a spaced PAN and a slashed `a.id=`) and **D8** (raw JSON support payload).
+- **19 regression tests**: the screenshot prompt, every Aadhaar separator, abbreviated labels, spaced IDs with and without keywords, JSON validity, `key=value`, lowercase English and Hinglish, ID normalisation, and the root route.
+  - They run in **rules-only mode**, so they also prove the fallback works if GLiNER fails to load.
+- Main dataset: 3 new templates (lowercase Hinglish + spaced PAN, `key=value` export + dotted Aadhaar, raw JSON payload).
+- Held-out set: **4 negative documents** with no personal data, to measure false alarms.
+  - The 20 original held-out documents are **byte-identical** (checked by fingerprint), and we did not tune on any held-out result.
+
+### 14.2 Effect on the numbers
+
+| | Before review | After review fixes |
+|---|---|---|
+| Leaks (whole value / stricter residue) | 0 / 0 | **0 / 0** |
+| Held-out recall (full engine) | 0.947 | **0.947** (unchanged) |
+| Held-out precision (full engine) | 0.857 (20 docs) | **0.837** (24 docs; the 2 new false positives are both in the new negative docs) |
+| Held-out F1, rules-only fallback | 0.603 | **0.627** |
+| Main-set F1, rules-only fallback | 0.830 | **0.852** |
+| Fast tests | 59 | **78** |
+| Gateway overhead (median, main set) | ~232 ms | ~252 ms |
+
+### 14.3 Suggestions we checked and deliberately did NOT follow
+
+- **"Make `tests/conftest.py` use `setdefault`."**
+  - The fast tests assert exact outputs from rules-only mode.
+  - With `setdefault`, a `PRIVACY_NER=both` left in someone's shell would quietly switch them to GLiNER, making them slow and flaky.
+  - Forcing the mode is intentional. The real-model tests live in the `*_optional.py` files.
+- **"Lower the GLiNER location threshold to 0.45 / raise the PERSON threshold to 0.40."**
+  - Choosing thresholds by looking at held-out results is tuning on the test set, which would make our honest numbers dishonest.
+  - The leaks were fixed with context rules instead, which work even without the model.
+  - Re-tune thresholds only with a *new* test set.
+- **"Add a city gazetteer."** Not needed for the reported leaks. The residence rules cover them without a hand-maintained list of cities.
+- **Round 2 / sponsor features** (email, phone, UPI, card masking with a policy selector; purpose policies; Redis mapping store; API keys; audit export; tested Ollama fallback).
+  - These are new features, not fixes. They are listed in the review as "pick 2–3 if time permits".
+  - The team should choose which, if any, to build. Email and phone are still **not** masked (see section 9).
+
+### 14.4 How to check these fixes yourself
+
+```bash
+pytest tests/privacy/test_privacy.py -q -k "screenshot or aadhaar or spaced or json or key_value or lowercase or hinglish or normalize"
+```
+In the UI, pick **D7** and **D8** from the sample dropdown. Column B must show no raw value, and D8's payload must still be valid JSON.

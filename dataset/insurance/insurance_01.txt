@@ -1,9 +1,9 @@
 HEALTH INSURANCE CLAIM
-Policy No: POL/2023/95664
-Insured: Suresh Saxena
-Patient: Deepika Mishra (wife)
-Hospital: Sunrise Multispeciality Hospital, Davangere
-Claim amount: Rs 26,12,000
-Insured PAN: SVPPS2181X
-Insured Aadhaar: 611739348357
-Employer GSTIN (group policy): 29FBJCD5561D1ZD
+Policy No: POL/2023/96832
+Insured: Tushar Singh
+Patient: Ananya Desai (mother)
+Hospital: Lifeline Nursing Home, Andheri West, Mumbai
+Claim amount: Rs 4,86,000
+Insured PAN: OBDPS2045Z
+Insured Aadhaar: 6208 7375 3003
+Employer GSTIN (group policy): 27LOTCK4155F2Z2

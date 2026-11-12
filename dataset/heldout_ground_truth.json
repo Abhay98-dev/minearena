@@ -692,6 +692,34 @@
         }
       ],
       "hinglish": false
+    },
+    {
+      "document_id": "heldout_21",
+      "category": "heldout_negative",
+      "text": "Release note v4.8.2: the statement download page now loads 40% faster. Fixed a crash on Android 12 when the Manager approves a request. Known issue: export to CSV times out above 10,000 rows.",
+      "entities": [],
+      "hinglish": false
+    },
+    {
+      "document_id": "heldout_22",
+      "category": "heldout_negative",
+      "text": "HR policy update: every Relationship Officer and Branch Manager must complete the annual compliance training by 06/04/2024. The Credit Officer will verify completion. Contact the HR desk for questions.",
+      "entities": [],
+      "hinglish": false
+    },
+    {
+      "document_id": "heldout_23",
+      "category": "heldout_negative",
+      "text": "Payment operations log: NEFT batch HL/2026/3370 settled at 14:05. 1,248 transactions, Rs 15,17,000 total. IFSC SBIN0004321 and UTR N123456789012 reconciled. Two retries pending; no customer impact.",
+      "entities": [],
+      "hinglish": false
+    },
+    {
+      "document_id": "heldout_24",
+      "category": "heldout_negative",
+      "text": "Branch notice: the Koramangala branch will stay closed on Saturday for system maintenance. ATM and net banking services remain available. Ticket volume is expected to rise on Monday.",
+      "entities": [],
+      "hinglish": false
     }
   ]
 }

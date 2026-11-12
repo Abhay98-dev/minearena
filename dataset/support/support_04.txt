@@ -1,5 +1,1 @@
-Ticket #TKT-49552
-From: Aniket Mukherjee
-Subject: EMI debited twice
-Hi team, my EMI was debited twice this month. My PAN is WCLPM4100M and my shop GSTIN is 29PZSFD3271Z1Z7. Please refund the extra amount.
-- Aniket
+{"ticket": "TKT-10235", "customer_name": "harpreet sethi", "address": "H.No. 3-21-12, Dadar East, Mumbai 400251", "pan": "FOCPS0405I", "issue": "refund not received"}

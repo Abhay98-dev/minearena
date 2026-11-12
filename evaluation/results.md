@@ -1,6 +1,6 @@
 # Evaluation report - main (used for error analysis)
 
-Generated 2026-11-12T14:50:17+00:00 on 50 synthetic documents (237 labelled entities, 10 Hinglish, 5 with no PII). Mock LLM unless stated. Measured on our own seeded synthetic set; not a claim about real-world data.
+Generated 2026-11-12T16:42:52+00:00 on 50 synthetic documents (230 labelled entities, 11 Hinglish, 5 with no PII). Mock LLM unless stated. Measured on our own seeded synthetic set; not a claim about real-world data.
 
 ## Leakage in outbound payloads (target 0)
 
@@ -11,44 +11,40 @@ Generated 2026-11-12T14:50:17+00:00 on 50 synthetic documents (237 labelled enti
 
 | Type | Precision | Recall | F1 | Strict F1 | TP | FP | FN |
 |---|---|---|---|---|---|---|---|
-| PERSON | 1.000 | 1.000 | 1.000 | 1.000 | 99 | 0 | 0 |
+| PERSON | 1.000 | 1.000 | 1.000 | 1.000 | 94 | 0 | 0 |
 | AADHAAR | 1.000 | 1.000 | 1.000 | 1.000 | 25 | 0 | 0 |
 | PAN | 1.000 | 1.000 | 1.000 | 1.000 | 35 | 0 | 0 |
-| GSTIN | 1.000 | 1.000 | 1.000 | 1.000 | 9 | 0 | 0 |
+| GSTIN | 1.000 | 1.000 | 1.000 | 1.000 | 8 | 0 | 0 |
 | VOTER_ID | 1.000 | 1.000 | 1.000 | 1.000 | 12 | 0 | 0 |
-| PASSPORT | 1.000 | 1.000 | 1.000 | 1.000 | 12 | 0 | 0 |
-| ADDRESS | 1.000 | 1.000 | 1.000 | 0.889 | 45 | 0 | 0 |
-| **overall** | 1.000 | 1.000 | 1.000 | 0.979 | 237 | 0 | 0 |
+| PASSPORT | 1.000 | 1.000 | 1.000 | 1.000 | 10 | 0 | 0 |
+| ADDRESS | 1.000 | 1.000 | 1.000 | 0.913 | 46 | 0 | 0 |
+| **overall** | 1.000 | 1.000 | 1.000 | 0.983 | 230 | 0 | 0 |
 
-Gateway overhead per request: mean 242.4 ms, median 232.0 ms, p95 308 ms (n=50). Blocked requests: 0.
+Gateway overhead per request: mean 265.2 ms, median 252.5 ms, p95 337 ms (n=50). Blocked requests: 0.
 
 ## Detection - rules only (relaxed: same type, IoU >= 0.5 / strict: exact span)
 
 | Type | Precision | Recall | F1 | Strict F1 | TP | FP | FN |
 |---|---|---|---|---|---|---|---|
-| PERSON | 0.948 | 0.556 | 0.701 | 0.701 | 55 | 3 | 44 |
+| PERSON | 0.950 | 0.606 | 0.740 | 0.727 | 57 | 3 | 37 |
 | AADHAAR | 1.000 | 1.000 | 1.000 | 1.000 | 25 | 0 | 0 |
 | PAN | 1.000 | 1.000 | 1.000 | 1.000 | 35 | 0 | 0 |
-| GSTIN | 1.000 | 1.000 | 1.000 | 1.000 | 9 | 0 | 0 |
+| GSTIN | 1.000 | 1.000 | 1.000 | 1.000 | 8 | 0 | 0 |
 | VOTER_ID | 1.000 | 1.000 | 1.000 | 1.000 | 12 | 0 | 0 |
-| PASSPORT | 1.000 | 1.000 | 1.000 | 1.000 | 12 | 0 | 0 |
-| ADDRESS | 0.862 | 0.556 | 0.676 | 0.541 | 25 | 4 | 20 |
-| **overall** | 0.961 | 0.730 | 0.830 | 0.806 | 173 | 7 | 64 |
+| PASSPORT | 1.000 | 1.000 | 1.000 | 1.000 | 10 | 0 | 0 |
+| ADDRESS | 0.903 | 0.609 | 0.727 | 0.597 | 28 | 3 | 18 |
+| **overall** | 0.967 | 0.761 | 0.852 | 0.822 | 175 | 6 | 55 |
 
-Gateway overhead per request: mean 0.3 ms, median 0.0 ms, p95 1 ms (n=50). Blocked requests: 0.
+Gateway overhead per request: mean 0.9 ms, median 1.0 ms, p95 1 ms (n=50). Blocked requests: 0.
 
 ## Placeholder reinsertion (mock LLM behaviours)
 
 | LLM behaviour | Placeholders in reply | Restored correctly | Accuracy | Wrong person | Dropped (reported) | Unknown (left as-is) |
 |---|---|---|---|---|---|---|
-| echo | 211 | 211 | 100.0% | 0 | 0 | 0/0 |
-| reorder | 211 | 211 | 100.0% | 0 | 0 | 0/0 |
-| paraphrase | 211 | 211 | 100.0% | 0 | 0 | 0/0 |
-| drop | 45 | 45 | 100.0% | 0 | 166 | 0/0 |
-| unknown | 211 | 211 | 100.0% | 0 | 0 | 90/90 |
+| echo | 207 | 207 | 100.0% | 0 | 0 | 0/0 |
+| reorder | 207 | 207 | 100.0% | 0 | 0 | 0/0 |
+| paraphrase | 207 | 207 | 100.0% | 0 | 0 | 0/0 |
+| drop | 45 | 45 | 100.0% | 0 | 162 | 0/0 |
+| unknown | 207 | 207 | 100.0% | 0 | 0 | 90/90 |
 
-## Live Gemini sample
-
-7/10 requests succeeded. Reinsertion 100.0% (38/38), wrong person 0, leaks 0. Mean LLM time 2571.9 ms vs mean gateway overhead 263.4 ms.
-
-Model warm-up at server start: 8173 ms (excluded from per-request overhead).
+Model warm-up at server start: 8436 ms (excluded from per-request overhead).

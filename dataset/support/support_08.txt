@@ -1,1 +1,1 @@
-Ticket #TKT-51079: The mobile app crashes when opening the statements page. Affected version 4.2.1. Customer reports the issue since 05/04/2025. Account ending XXXX4430. Priority: medium. Assigned to the digital banking team.
+Ticket #TKT-66233: The mobile app crashes when opening the statements page. Affected version 4.2.1. Customer reports the issue since 15/05/2024. Account ending XXXX9745. Priority: medium. Assigned to the digital banking team.

@@ -1,5 +1,5 @@
-Chat transcript TKT-84943
-User: hello, sanjay khan here. mera card block ho gaya hai
-Bot: Please share your registered PAN.
-User: VLZPK8693R
-User: aur mera address Gomti Nagar, Lucknow hai
+Ticket #TKT-74106
+From: Bhavesh Fernandes
+Subject: EMI debited twice
+Hi team, my EMI was debited twice this month. My PAN is DYOPF2233E and my shop GSTIN is 19ZCCFX6868K5ZE. Please refund the extra amount.
+- Bhavesh

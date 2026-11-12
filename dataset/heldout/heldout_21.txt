@@ -1,0 +1,1 @@
+Release note v4.8.2: the statement download page now loads 40% faster. Fixed a crash on Android 12 when the Manager approves a request. Known issue: export to CSV times out above 10,000 rows.

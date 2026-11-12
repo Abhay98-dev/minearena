@@ -1,10 +1,9 @@
-Video KYC transcript
-Agent: Aapka poora naam bataiye.
-Customer: Mera naam Ritu Mishra hai.
-Agent: Aadhaar number?
-Customer: 425790507239
-Agent: Aur PAN?
-Customer: IHRPM4279X
-Agent: Aap kahan rehti hain?
-Customer: 126 ITPL Main Road, Koramangala, Bengaluru 560627
-Agent: Dhanyavaad Ritu ji.
+KYC FORM
+Name: Nandini Mishra
+Father's Name: Manoj Mishra
+DOB: 04-04-1979
+Aadhaar No: 8887 6767 7219
+PAN: SDIPM8580Y
+Voter ID: WTU6292330
+Address: H.No. 1-16-18, Aliganj, Lucknow 226225
+Nominee: Naveen Menon (husband)

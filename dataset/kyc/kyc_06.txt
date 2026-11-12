@@ -1,9 +1,1 @@
-KYC FORM
-Name: Asha Pandey
-Father's Name: Sanjay Pandey
-DOB: 23-04-1991
-Aadhaar No: 5083 3016 5718
-PAN: RXXPP0262B
-Voter ID: IGZ1527420
-Address: H.No. 3-4-79, Sector 18, Noida 201733
-Nominee: Mohammed Banerjee (father)
+kyc_export: name=Revathi Pandey; a.id=6219.9330.8331; pan=YJKPP4019H; city=Basavanagudi, Bengaluru; status=verified

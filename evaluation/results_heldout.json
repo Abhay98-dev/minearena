@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-11-12T14:44:23+00:00",
+  "generated_at": "2026-11-12T16:41:39+00:00",
   "dataset": {
-    "documents": 20,
+    "documents": 24,
     "entities": 76,
     "hinglish_documents": 4,
-    "negative_documents": 0,
+    "negative_documents": 4,
     "per_type": {
       "PERSON": 40,
       "AADHAAR": 4,
@@ -46,17 +46,17 @@
       ]
     }
   },
-  "model_load_ms": 8183,
+  "model_load_ms": 9547,
   "detection": {
     "full": {
       "strict": {
         "per_type": {
           "PERSON": {
-            "precision": 0.792,
+            "precision": 0.776,
             "recall": 0.95,
-            "f1": 0.864,
+            "f1": 0.854,
             "tp": 38,
-            "fp": 10,
+            "fp": 11,
             "fn": 2
           },
           "AADHAAR": {
@@ -100,31 +100,31 @@
             "fn": 0
           },
           "ADDRESS": {
-            "precision": 0.778,
+            "precision": 0.737,
             "recall": 0.778,
-            "f1": 0.778,
+            "f1": 0.757,
             "tp": 14,
-            "fp": 4,
+            "fp": 5,
             "fn": 4
           }
         },
         "overall": {
-          "precision": 0.833,
+          "precision": 0.814,
           "recall": 0.921,
-          "f1": 0.875,
+          "f1": 0.864,
           "tp": 70,
-          "fp": 14,
+          "fp": 16,
           "fn": 6
         }
       },
       "relaxed": {
         "per_type": {
           "PERSON": {
-            "precision": 0.792,
+            "precision": 0.776,
             "recall": 0.95,
-            "f1": 0.864,
+            "f1": 0.854,
             "tp": 38,
-            "fp": 10,
+            "fp": 11,
             "fn": 2
           },
           "AADHAAR": {
@@ -168,42 +168,42 @@
             "fn": 0
           },
           "ADDRESS": {
-            "precision": 0.889,
+            "precision": 0.842,
             "recall": 0.889,
-            "f1": 0.889,
+            "f1": 0.865,
             "tp": 16,
-            "fp": 2,
+            "fp": 3,
             "fn": 2
           }
         },
         "overall": {
-          "precision": 0.857,
+          "precision": 0.837,
           "recall": 0.947,
-          "f1": 0.9,
+          "f1": 0.889,
           "tp": 72,
-          "fp": 12,
+          "fp": 14,
           "fn": 4
         }
       },
       "blocked_requests": [],
       "latency_overhead_ms": {
-        "n": 20,
-        "mean": 236.9,
-        "median": 215.0,
-        "p95": 402,
-        "max": 436
+        "n": 24,
+        "mean": 246.0,
+        "median": 222.0,
+        "p95": 418,
+        "max": 503
       }
     },
     "rules_only": {
       "strict": {
         "per_type": {
           "PERSON": {
-            "precision": 0.857,
-            "recall": 0.3,
-            "f1": 0.444,
-            "tp": 12,
+            "precision": 0.875,
+            "recall": 0.35,
+            "f1": 0.5,
+            "tp": 14,
             "fp": 2,
-            "fn": 28
+            "fn": 26
           },
           "AADHAAR": {
             "precision": 1.0,
@@ -255,23 +255,23 @@
           }
         },
         "overall": {
-          "precision": 0.825,
-          "recall": 0.434,
-          "f1": 0.569,
-          "tp": 33,
+          "precision": 0.833,
+          "recall": 0.461,
+          "f1": 0.593,
+          "tp": 35,
           "fp": 7,
-          "fn": 43
+          "fn": 41
         }
       },
       "relaxed": {
         "per_type": {
           "PERSON": {
-            "precision": 0.857,
-            "recall": 0.3,
-            "f1": 0.444,
-            "tp": 12,
+            "precision": 0.875,
+            "recall": 0.35,
+            "f1": 0.5,
+            "tp": 14,
             "fp": 2,
-            "fn": 28
+            "fn": 26
           },
           "AADHAAR": {
             "precision": 1.0,
@@ -323,19 +323,19 @@
           }
         },
         "overall": {
-          "precision": 0.875,
-          "recall": 0.461,
-          "f1": 0.603,
-          "tp": 35,
+          "precision": 0.881,
+          "recall": 0.487,
+          "f1": 0.627,
+          "tp": 37,
           "fp": 5,
-          "fn": 41
+          "fn": 39
         }
       },
       "blocked_requests": [],
       "latency_overhead_ms": {
-        "n": 20,
-        "mean": 0.2,
-        "median": 0.0,
+        "n": 24,
+        "mean": 0.7,
+        "median": 1.0,
         "p95": 1,
         "max": 1
       }
@@ -347,7 +347,7 @@
     "full_value": [],
     "token_residue_count": 0,
     "token_residue": [],
-    "checked_payloads": 20,
+    "checked_payloads": 24,
     "source": "audit_logs.sanitized_payload"
   },
   "reinsertion": {

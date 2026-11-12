@@ -1,0 +1,1 @@
+Payment operations log: NEFT batch HL/2026/3370 settled at 14:05. 1,248 transactions, Rs 15,17,000 total. IFSC SBIN0004321 and UTR N123456789012 reconciled. Two retries pending; no customer impact.

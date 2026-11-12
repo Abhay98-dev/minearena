@@ -1,10 +1,1 @@
-Video KYC transcript
-Agent: Aapka poora naam bataiye.
-Customer: Mera naam Kavitha Gupta hai.
-Agent: Aadhaar number?
-Customer: 5067 3830 2849
-Agent: Aur PAN?
-Customer: RSXPG2687B
-Agent: Aap kahan rehti hain?
-Customer: Plot 77, MG Road, Kochi, PIN 682331
-Agent: Dhanyavaad Kavitha ji.
+Dear Customer, this is to confirm that the re-KYC for Arjun Gupta has been completed. The following documents were verified: Voter ID ZOB8668826, Passport H9351751. Updated correspondence address: Plot 77, MG Road, Kochi, PIN 682331. Please contact the branch if Arjun wishes to change the nominee.

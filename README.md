@@ -38,8 +38,8 @@ For an offline request, send `"provider":"mock"` to `POST /api/v1/gateway/proces
 ## Dataset and evaluation (PS-02 3.7 / 3.8)
 
 ```bash
-python dataset/generate_dataset.py      # 50 seeded synthetic docs, 237 labelled spans
-cd dataset && python generate_heldout.py && cd ..   # 20 held-out docs (new phrasings)
+python dataset/generate_dataset.py      # 50 seeded synthetic docs, 230 labelled spans (incl. JSON / key=value / chat)
+cd dataset && python generate_heldout.py && cd ..   # 24 held-out docs (20 new phrasings + 4 with no PII)
 python evaluation/run_eval.py --heldout # held-out first, so the main report embeds it
 python evaluation/run_eval.py           # add --gemini 10 to include live Gemini requests
 ```
@@ -48,20 +48,22 @@ Results go to [evaluation/results.md](evaluation/results.md) and the **Evaluatio
 
 | | Held-out (never tuned on) | Main set (used for error analysis) |
 |---|---|---|
-| Raw PII in outbound payloads | **0** / 20 | **0** / 50 |
-| Detection F1, relaxed (precision / recall) | 0.900 (0.857 / 0.947) | 1.000 (optimistic) |
-| Name recall, GLiNER vs rules only | 0.950 vs 0.300 | 1.000 vs 0.556 |
+| Raw PII in outbound payloads | **0** / 24 | **0** / 50 |
+| Detection F1, relaxed (precision / recall) | 0.889 (0.837 / 0.947) | 1.000 (optimistic) |
+| Name recall, GLiNER vs rules only | 0.950 vs 0.350 | 1.000 vs 0.606 |
 | Reinsertion accuracy, mock keep/reorder/paraphrase/drop | 100%, 0 wrong-person | 100%, 0 wrong-person |
-| Added latency per request (median) | ~215 ms | ~225 ms |
+| Added latency per request (median) | ~222 ms | ~252 ms |
 
-Live Gemini (10 requests): 7 succeeded, 38/38 placeholders restored, 0 leaks. Mean LLM time was 2.6 s against 0.26 s gateway overhead. The 3 failures were provider errors on back-to-back calls, probably free-tier rate limiting (not confirmed).
+What changed after the 12 Nov teammate review (dotted Aadhaar, lowercase Hinglish cities, JSON input…) is in [docs/TEAM_HANDBOOK.md, section 14](docs/TEAM_HANDBOOK.md#14-changes-after-the-teammate-review-12-nov-evening).
+
+Live Gemini (10 requests, measured before those fixes): 7 succeeded, 38/38 placeholders restored, 0 leaks. Mean LLM time was 2.6 s against 0.26 s gateway overhead. The 3 failures were provider errors on back-to-back calls, probably free-tier rate limiting (not confirmed).
 
 All numbers are on our own synthetic data. They show the method works; they are not a claim about real-world documents.
 
 ## Verify
 
 ```bash
-pytest tests -q                                   # fast, rules-only, no model downloads
+pytest tests -q                                   # 78 fast tests, rules-only, no model downloads
 pytest tests/privacy/test_gliner_optional.py tests/privacy/test_presidio_optional.py   # real models
 ```
 

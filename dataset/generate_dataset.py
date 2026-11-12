@@ -160,6 +160,9 @@ T = {
         ({"p1": "F", "p2": "M"}, "Credit officer note: Met [[PERSON:p1]] today regarding loan account {acct}. [[PERSON:p1f]] "
          "works as a {job} in [[ADDRESS:c1]] and wants to top up the loan. Co-applicant [[PERSON:p2]] was not present. "
          "Documents verified: PAN [[PAN:pan1]], passport [[PASSPORT:pass1]]."),
+        # messy chat: all lowercase, spelling variant "reheta", spaced PAN
+        ({"p1": "M"}, "sir mera naam [[PERSON:p1l]] hai, me [[ADDRESS:c1l]] me reheta hu. pan = [[PAN:pan1s]] hai, "
+         "loan chahiye Rs {amount}"),
     ],
     "kyc": [
         ({"p1": "F", "p2": "M", "p3": "M", "shared": [("p1", "p2")]},
@@ -176,6 +179,9 @@ T = {
          "holder [[PAN:pan1]], PAN of secondary holder [[PAN:pan2]]. Both reside at [[ADDRESS:a1]]."),
         ({"p1": "M"}, "Account holder [[PERSON:p1i]] (Aadhaar [[AADHAAR:aad1]]) requested an address change to [[ADDRESS:a1]]. "
          "Passport [[PASSPORT:pass1]] was submitted as proof of address."),
+        # key=value export with a dotted Aadhaar and an abbreviated label
+        ({"p1": "F"}, "kyc_export: name=[[PERSON:p1]]; a.id=[[AADHAAR:aad1d]]; pan=[[PAN:pan1]]; city=[[ADDRESS:c1]]; "
+         "status=verified"),
     ],
     "support": [
         ({"p1": "M"}, "Ticket #{ticket}\nFrom: [[PERSON:p1]]\nSubject: EMI debited twice\nHi team, my EMI was debited twice "
@@ -185,6 +191,9 @@ T = {
         ({"p1": "F", "p2": "M"}, "Yesterday [[PERSON:p1]] raised a complaint that the branch at [[ADDRESS:c1]] refused to "
          "update her Aadhaar [[AADHAAR:aad1]]. Her brother [[PERSON:p2]] also holds an account with us. [[PERSON:p1f]] has "
          "asked for a callback."),
+        # raw JSON payload from an order/support system (braces doubled for str.format)
+        ({"p1": "M"}, '{{"ticket": "{ticket}", "customer_name": "[[PERSON:p1l]]", "address": "[[ADDRESS:a1]]", '
+         '"pan": "[[PAN:pan1]]", "issue": "refund not received"}}'),
     ],
     "insurance": [
         ({"p1": "M", "p2": "F"}, "HEALTH INSURANCE CLAIM\nPolicy No: {policy}\nInsured: [[PERSON:p1]]\nPatient: [[PERSON:p2]] "
@@ -256,6 +265,12 @@ def make_values(g: Gen, meta: dict) -> dict:
     vals["pan2"] = g.pan(surnames.get("p2", ""))
     vals["gst1"] = g.gstin(city[2])
     vals["voter1"], vals["pass1"] = g.voter(), g.passport()
+    # Messy-format variants (added after the 12 Nov teammate review). Derived from the values above
+    # WITHOUT drawing new random numbers, so documents generated before this change stay identical.
+    vals["c1l"] = vals["c1"].lower()
+    digits = re.sub(r"\D", "", vals["aad1"])
+    vals["aad1d"] = ".".join([digits[:4], digits[4:8], digits[8:]])
+    vals["pan1s"] = f"{vals['pan1'][:5]} {vals['pan1'][5:9]} {vals['pan1'][9]}"
     return vals
 
 

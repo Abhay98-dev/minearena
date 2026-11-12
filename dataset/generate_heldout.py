@@ -43,6 +43,18 @@ TEMPLATES = [
 ]
 
 
+NEGATIVES = [
+    "Release note v4.8.2: the statement download page now loads 40% faster. Fixed a crash on Android 12 when the "
+    "Manager approves a request. Known issue: export to CSV times out above 10,000 rows.",
+    "HR policy update: every Relationship Officer and Branch Manager must complete the annual compliance training "
+    "by {date}. The Credit Officer will verify completion. Contact the HR desk for questions.",
+    "Payment operations log: NEFT batch {ref} settled at 14:05. 1,248 transactions, Rs {amount} total. IFSC "
+    "SBIN0004321 and UTR N123456789012 reconciled. Two retries pending; no customer impact.",
+    "Branch notice: the Koramangala branch will stay closed on Saturday for system maintenance. ATM and net "
+    "banking services remain available. Ticket volume is expected to rise on Monday.",
+]
+
+
 def main() -> None:
     g = Gen(SEED)
     docs = []
@@ -51,6 +63,12 @@ def main() -> None:
         text, ents = render(tpl, make_values(g, meta), fillers(g))
         docs.append({"document_id": f"heldout_{i + 1:02d}", "category": "heldout", "text": text, "entities": ents,
                      "hinglish": i % len(TEMPLATES) in (1, 7)})
+    # Negatives (added 12 Nov): ordinary business text with NO personal data, to measure false alarms.
+    # Appended after the 20 originals, so those stay byte-identical. Any masking here counts as a false positive.
+    for k, tpl in enumerate(NEGATIVES):
+        text, _ = render(tpl, {}, fillers(g))
+        docs.append({"document_id": f"heldout_{21 + k:02d}", "category": "heldout_negative", "text": text,
+                     "entities": [], "hinglish": False})
     shutil.rmtree(ROOT / "heldout", ignore_errors=True)
     (ROOT / "heldout").mkdir()
     for d in docs:

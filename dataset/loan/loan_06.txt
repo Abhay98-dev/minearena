@@ -1,9 +1,1 @@
-LOAN APPLICATION FORM
-Applicant Name: Vikram Bose
-PAN: MKVPB6272T
-Aadhaar: 8036-6909-6702
-Voter ID: IYN4170805
-Residential Address: Plot 43, Bull Temple Road, Bengaluru, PIN 560623
-Loan Amount: Rs 36,86,000
-Tenure: 36 months
-Purpose: working capital
+sir mera naam vikram bose hai, me koramangala, bengaluru me reheta hu. pan = MKVPB 6272 T hai, loan chahiye Rs 36,86,000

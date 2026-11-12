@@ -1,1 +1,1 @@
-Dear Customer, this is to confirm that the re-KYC for Ashok Naidu has been completed. The following documents were verified: Voter ID OSN6033419, Passport D5255371. Updated correspondence address: H.No. 7-15-99, Dadar East, Mumbai 400143. Please contact the branch if Ashok wishes to change the nominee.
+kyc_export: name=Divya Kapoor; a.id=9146.1125.4572; pan=UDVPK2382R; city=Davangere; status=verified

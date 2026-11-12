@@ -1,9 +1,9 @@
 HEALTH INSURANCE CLAIM
-Policy No: POL/2026/99803
-Insured: Joseph Pillai
-Patient: Revathi Kulkarni (sister)
-Hospital: City Care Hospital, Sector 18, Noida
-Claim amount: Rs 4,98,000
-Insured PAN: YUTPP4798L
-Insured Aadhaar: 4122-8160-6488
-Employer GSTIN (group policy): 09QFNCZ8861L4ZD
+Policy No: POL/2026/46583
+Insured: Rahul D'Souza
+Patient: Swati Pillai (sister)
+Hospital: Lifeline Nursing Home, Kothrud, Pune
+Claim amount: Rs 13,89,000
+Insured PAN: VLOPD3993B
+Insured Aadhaar: 5281-8268-8610
+Employer GSTIN (group policy): 27QYLFA8877B5Z9
