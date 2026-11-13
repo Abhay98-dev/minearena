@@ -5,6 +5,7 @@ uvicorn[standard]>=0.29
 pydantic>=2.6
 httpx>=0.27
 python-dotenv>=1.0
+PyPDF2>=3.0            # PDF text extraction for document uploads
 # --- privacy engine (Member 2) : required by the problem statement ---
 presidio-analyzer>=2.2
 spacy>=3.7            # then: python -m spacy download en_core_web_sm
@@ -13,3 +14,4 @@ sentencepiece>=0.2    # GLiNER's mDeBERTa tokenizer: without these two GLiNER fa
 protobuf>=4.25        # (and the gateway silently falls back to regex-only name detection)
 # --- tests ---
 pytest>=8.0
+fpdf2>=2.7             # generate a synthetic PDF in the upload tests
