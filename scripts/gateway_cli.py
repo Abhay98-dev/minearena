@@ -20,13 +20,14 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "backend"))
 
 from app.core import config
 from app.privacy import destroy_mapping, reinsert_placeholders, sanitize_document, validate_outbound_payload
+from app.services.document_reader import extract_document_text
 from app.services.docx_reader import read_docx_text
 from app.services.gateway_service import process_document
 
 
 def print_banner():
     print("=" * 70)
-    print(" 🛡️  MineArena DPDP-2023 Enterprise Privacy Gateway CLI")
+    print(" 🛡️  PolarGate DPDP-2023 Enterprise AI Privacy Gateway CLI")
     print("=" * 70)
 
 
@@ -96,7 +97,7 @@ def main():
     parser = argparse.ArgumentParser(description="MineArena Privacy Gateway CLI")
     parser.add_argument("--text", type=str, help="Text to process through gateway")
     parser.add_argument("--inspect", type=str, help="Fast pre-flight inspection without calling LLM")
-    parser.add_argument("--file", type=str, help="Path to .docx file to process")
+    parser.add_argument("--file", type=str, help="Path to document file to process (.pdf, .docx, .txt, .json, .csv, .md)")
     parser.add_argument("--task", type=str, default="summarize", choices=["summarize", "extract"], help="Gateway task")
     parser.add_argument("--provider", type=str, default="mock", help="AI provider (mock or gemini)")
     parser.add_argument("--interactive", action="store_true", help="Launch interactive gateway shell")
@@ -109,11 +110,8 @@ def main():
 
     text = None
     if args.file:
-        if not args.file.lower().endswith(".docx"):
-            print("Error: Only .docx files are currently supported")
-            sys.exit(1)
         with open(args.file, "rb") as f:
-            text = read_docx_text(f.read())
+            text = extract_document_text(f.read(), args.file)
     elif args.text:
         text = args.text
     elif args.interactive:
@@ -139,3 +137,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

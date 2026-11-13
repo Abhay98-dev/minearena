@@ -76,7 +76,7 @@ def test_docx_with_multiple_people_and_table_content_uses_existing_gateway(api_s
 
 
 @pytest.mark.parametrize("filename,body,status,code", [
-    ("legacy.doc", b"not a docx", 415, "UNSUPPORTED_FILE"),
+    ("legacy.exe", b"not a supported file", 415, "UNSUPPORTED_FILE"),
     ("broken.docx", b"not a zip archive", 400, "INVALID_DOCUMENT"),
 ])
 def test_docx_upload_reports_safe_file_errors(api_setup, filename, body, status, code):
@@ -84,3 +84,31 @@ def test_docx_upload_reports_safe_file_errors(api_setup, filename, body, status,
         asyncio.run(process_file(_request(body), filename=filename, provider="mock"))
     assert exc.value.http_status == status
     assert exc.value.code == code
+
+
+def test_txt_upload_uses_existing_gateway(api_setup):
+    body = b"Applicant: Rahul Sharma\nPAN: ABCDE1234F"
+    result = asyncio.run(process_file(
+        _request(body), filename="application.txt", task="summarize", provider="mock",
+    ))
+    assert mapping_store.active_count() == 0
+    assert "Rahul Sharma" not in result["outbound_payload"]
+    assert "ABCDE1234F" not in result["outbound_payload"]
+    assert "Rahul Sharma" in result["final_response"]
+
+
+def test_pdf_upload_uses_existing_gateway(api_setup):
+    from fpdf import FPDF
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Helvetica", size=12)
+    pdf.cell(text="Applicant: Rahul Sharma, PAN: ABCPE1234F")
+    pdf_bytes = bytes(pdf.output())
+
+    result = asyncio.run(process_file(
+        _request(pdf_bytes), filename="application.pdf", task="summarize", provider="mock",
+    ))
+    assert mapping_store.active_count() == 0
+    assert "Rahul Sharma" not in result["outbound_payload"]
+    assert "ABCPE1234F" not in result["outbound_payload"]
+    assert "Rahul Sharma" in result["final_response"]

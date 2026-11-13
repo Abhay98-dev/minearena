@@ -46,14 +46,15 @@ export function inspectDocument(payload) {
   return request('/gateway/inspect', { method: 'POST', body: JSON.stringify(payload) })
 }
 
-export function processWordDocument(file, { task, provider }) {
+export function processFileDocument(file, { task, provider }) {
   const query = new URLSearchParams({ filename: file.name, task, provider })
   return request(`/gateway/process-file?${query}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' },
+    headers: { 'Content-Type': file.type || 'application/octet-stream' },
     body: file,
   })
 }
+export const processWordDocument = processFileDocument
 
 export async function getAudit(limit = 50) {
   const data = await request(`/audit?limit=${limit}`)

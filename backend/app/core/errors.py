@@ -9,8 +9,8 @@ STATUS = {
 }
 SAFE_MESSAGE = {
     "INVALID_REQUEST": "Missing or invalid text, task or provider.",
-    "INVALID_DOCUMENT": "The uploaded Word document is invalid or contains no readable text.",
-    "UNSUPPORTED_FILE": "Upload a Word .docx document.",
+    "INVALID_DOCUMENT": "The uploaded document is invalid or contains no readable text.",
+    "UNSUPPORTED_FILE": "Upload a supported document (.docx, .pdf, .txt, .json, .csv, .md).",
     "INPUT_TOO_LARGE": "Input exceeds the configured size limit.",
     "PII_PROCESSING_FAILED": "Local PII detection or masking failed.",
     "LLM_PROVIDER_ERROR": "The external LLM provider returned an error.",

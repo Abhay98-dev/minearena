@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 from app.core import config
 from app.core.errors import GatewayError
 from app.privacy import destroy_mapping, sanitize_document, validate_outbound_payload
+from app.services.document_reader import DocumentReadError, UnsupportedFileError, extract_document_text
 from app.services.docx_reader import DocxReadError, read_docx_text
 from app.services.gateway_service import process_document
 from app.services.llm.factory import get_provider
@@ -68,7 +69,7 @@ async def process(req: ProcessRequest):
 
 @router.post("/gateway/process-file", openapi_extra={
     "requestBody": {"required": True, "content": {
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
+        "application/octet-stream": {
             "schema": {"type": "string", "format": "binary"},
         },
     }},
@@ -79,10 +80,7 @@ async def process_file(
     task: Literal["summarize", "extract"] = "summarize",
     provider: str = Query(config.DEFAULT_PROVIDER),
 ):
-    """Accept a raw DOCX body; no multipart parser or disk storage is needed."""
-    if not filename.lower().endswith(".docx"):
-        raise GatewayError("UNSUPPORTED_FILE")
-
+    """Accept multi-format enterprise files (.docx, .pdf, .txt, .json, .csv, .md) in memory."""
     max_upload_bytes = max(config.MAX_INPUT_CHARS * 1024, 1024 * 1024)
     contents = bytearray()
     async for chunk in request.stream():
@@ -92,8 +90,10 @@ async def process_file(
     if not contents:
         raise GatewayError("INVALID_DOCUMENT")
     try:
-        text = await asyncio.to_thread(read_docx_text, bytes(contents))
-    except DocxReadError as exc:
+        text = await asyncio.to_thread(extract_document_text, bytes(contents), filename)
+    except UnsupportedFileError:
+        raise GatewayError("UNSUPPORTED_FILE")
+    except DocumentReadError as exc:
         raise GatewayError("INVALID_DOCUMENT") from exc
 
     request_id = "req_" + uuid.uuid4().hex[:12]

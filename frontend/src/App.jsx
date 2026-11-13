@@ -18,6 +18,8 @@ const INDIAN_PII_TYPES = [
   "PERSON", "ADDRESS", "CITY", "STATE"
 ]
 
+const ALLOWED_EXTS = ['.docx', '.pdf', '.txt', '.json', '.csv', '.md', '.log']
+
 function App() {
   const [tab, setTab] = useState('process')
   const [text, setText] = useState(SAMPLES[0].text)
@@ -54,9 +56,13 @@ function App() {
     const file = event.target.files?.[0]
     event.target.value = ''
     if (!file) return
-    if (!file.name.toLowerCase().endsWith('.docx')) {
+    const ext = '.' + file.name.split('.').pop().toLowerCase()
+    if (!ALLOWED_EXTS.includes(ext)) {
       setSelectedFile(null)
-      setError({ code: 'UNSUPPORTED_FILE', message: 'Choose a Word document in .docx format.' })
+      setError({
+        code: 'UNSUPPORTED_FILE',
+        message: 'Choose a supported document (.docx, .pdf, .txt, .json, .csv, .md).'
+      })
       return
     }
     setSelectedFile(file)
@@ -132,22 +138,23 @@ function App() {
 
   return <main className="app-shell">
     <header className="topbar">
-      <a className="brand" href="#home" onClick={() => setTab('process')}><span className="brand-mark"><ShieldCheck size={20} /></span><span>mine<span className="brand-accent">arena</span><small>PRIVACY GATEWAY</small></span></a>
+      <a className="brand" href="#home" onClick={() => setTab('process')}><span className="brand-mark"><ShieldCheck size={20} /></span><span>polar<span className="brand-accent">gate</span><small>POLARIZED PRIVACY PROXY</small></span></a>
       <nav aria-label="Main navigation">
-        <button className={tab === 'process' ? 'active' : ''} onClick={() => setTab('process')}>Workspace</button>
-        <button className={tab === 'api' ? 'active' : ''} onClick={() => setTab('api')}>Gateway API</button>
-        <button className={tab === 'eval' ? 'active' : ''} onClick={() => setTab('eval')}>Evaluation</button>
-        <button className={tab === 'audit' ? 'active' : ''} onClick={() => { setTab('audit'); refreshAudit() }}>Audit trail</button>
+        <button className={tab === 'process' ? 'active' : ''} onClick={() => setTab('process')}>Gateway Console</button>
+        <button className={tab === 'api' ? 'active' : ''} onClick={() => setTab('api')}>API Proxy &amp; Integration</button>
+        <button className={tab === 'eval' ? 'active' : ''} onClick={() => setTab('eval')}>Evaluation &amp; Benchmark</button>
+        <button className={tab === 'audit' ? 'active' : ''} onClick={() => { setTab('audit'); refreshAudit() }}>Audit Trail</button>
       </nav>
-      <div className="connection"><span className={`status-dot ${health}`} /> API {health}</div>
+      <div className="connection"><span className={`status-dot ${health}`} /> PROXY {health}</div>
     </header>
 
     <section className="page-heading">
-      <div><div className="eyebrow"><LockKeyhole size={14} /> DPDP-READY PRIVACY GATEWAY</div>
-        <h1>{tab === 'process' ? 'Process documents, privately.' : tab === 'eval' ? 'Measured, not claimed.' : 'A clear record of every request.'}</h1>
-        <p>{tab === 'process' ? 'Personal data is detected and masked on this server. Only the middle column ever reaches the AI provider.'
-          : tab === 'eval' ? 'Leakage, detection accuracy, reinsertion and latency on seeded synthetic Indian documents.'
-            : 'Sanitized request metadata: entity types, exact outbound payload, model. Never original values.'}</p></div>
+      <div><div className="eyebrow"><LockKeyhole size={14} /> POLARGATE · POLARIZED DPDP-2023 REVERSE PROXY</div>
+        <h1>{tab === 'process' ? 'Filters the PII glare. Preserves the intelligence.' : tab === 'api' ? 'Drop-in proxy for any enterprise LLM stack.' : tab === 'eval' ? 'Measured, not claimed.' : 'A clear record of every request.'}</h1>
+        <p>{tab === 'process' ? 'Like polarized lenses blocking blinding glare while letting clean light pass, PolarGate filters all personal identity glare on-premise. Only anonymized tokens leave your network.'
+          : tab === 'api' ? 'Zero code rewrite: point your OpenAI SDK, LangChain, or internal microservices to http://localhost:8000/v1.'
+            : tab === 'eval' ? 'Leakage, detection accuracy, reinsertion and latency on seeded synthetic Indian documents.'
+              : 'Sanitized request metadata: entity types, exact outbound payload, model. Never original values.'}</p></div>
       {engines && <div className="engine-chips" aria-label="Detection engines">
         {Object.entries(ENGINE_LABEL).map(([k, label]) => {
           const st = engines[k]?.status
@@ -186,12 +193,12 @@ function App() {
           {editing || !result
             ? <><div className="text-entry-wrap">
                 <textarea aria-label="Document text" value={text} onChange={e => { setText(e.target.value); setSelectedFile(null) }} maxLength={20000} required={!selectedFile} />
-                <input ref={fileInput} className="hidden-file-input" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={chooseFile} />
-                <button className="file-pick-button" type="button" aria-label="Choose a Word document" title="Upload a Word .docx document" onClick={() => fileInput.current?.click()}>
+                <input ref={fileInput} className="hidden-file-input" type="file" accept=".docx,.pdf,.txt,.json,.csv,.md,.log,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,application/json" onChange={chooseFile} />
+                <button className="file-pick-button" type="button" aria-label="Upload document" title="Upload enterprise document (.docx, .pdf, .txt, .json, .csv, .md)" onClick={() => fileInput.current?.click()}>
                   <Upload size={16} />
                 </button>
               </div>
-              <div className="editor-meta"><span>{selectedFile ? `Selected: ${selectedFile.name} · Word document` : `${text.length.toLocaleString()} / 20,000 characters`}</span><span>{selectedFile ? 'File text will be processed instead of the text box' : 'Use synthetic data only'}</span></div></>
+              <div className="editor-meta"><span>{selectedFile ? `Selected: ${selectedFile.name} · Enterprise document` : `${text.length.toLocaleString()} / 20,000 characters`}</span><span>{selectedFile ? 'Document text will be extracted in-memory and processed' : 'Use synthetic or real enterprise data'}</span></div></>
             : <><HighlightedOriginal text={submitted} entities={result.entities} />
               <p className="muted small">{result.entities.length} detected mention(s), marked with their type.</p></>}
         </article>
